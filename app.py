@@ -1,4 +1,4 @@
-﻿import folium
+import folium
 import streamlit as st
 from streamlit_folium import st_folium
 
@@ -6,6 +6,7 @@ st.set_page_config(
     page_title="全国一級河川・道路交通 リアルタイムモニタリング",
     page_icon="🌧️",
     layout="wide",
+    initial_sidebar_state="expanded",
 )
 
 # 1. 災害アラート（上部バナー）
@@ -18,7 +19,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# 2. タイトル（インラインスタイルで確実に小さくコンパクトに）
+# 2. タイトル（コンパクト表示）
 st.markdown(
     """
     <div style="font-size: 1.25rem; font-weight: bold; color: #FFFFFF; margin-bottom: 0.3rem;">
@@ -31,7 +32,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# 3. サイドバー（フィルターや凡例）
+# 3. サイドバー（フィルターと凡例）
 with st.sidebar:
   st.markdown("### 🔍 表示フィルター")
   st.checkbox("危険・注意（赤・橙）のみ表示", value=False)
@@ -73,12 +74,38 @@ with col_btn7:
 
 st.divider()
 
-# 5. メインタブ（マップ・リンク）
-tab1, tab2 = st.tabs(["🗺️ マップ", "📋 リンク"])
+# 5. メインタブ（マップ ＋ レベル別地点リストの復活）
+tab1, tab2 = st.tabs(["🗺️ マップ・地点一覧", "📋 リンク"])
 
 with tab1:
   m = folium.Map(location=[35.6812, 139.7671], zoom_start=13)
-  st_folium(m, width="100%", height=450)
+  st_folium(m, width="100%", height=400)
+
+  st.markdown("### 📊 警戒レベル別 該当地点・ライブ映像リンク")
+
+  # レベル5・4の表示エリア
+  st.markdown(
+      '<span style="color:red; font-weight:bold;">🔴 レベル5・4（避難指示等）</span>',
+      unsafe_allow_html=True,
+  )
+  st.markdown(
+      "- [A河川 〇〇地点] 警戒水位超え (ライブカメラ映像 / 道路情報リンク)"
+  )
+  st.markdown("- [B道路 〇〇区間] 冠水通行止め (ライブカメラ映像)")
+
+  # レベル3の表示エリア
+  st.markdown(
+      '<span style="color:orange; font-weight:bold;">🟠 レベル3（高齢者等避難）</span>',
+      unsafe_allow_html=True,
+  )
+  st.markdown("- [C河川 △△地点] 水位上昇中 (ライブカメラ映像)")
+
+  # レベル1・2の表示エリア
+  st.markdown(
+      '<span style="color:blue; font-weight:bold;">🔵 レベル1・2（早期注意）</span>',
+      unsafe_allow_html=True,
+  )
+  st.markdown("- [D河川 □□地点] 監視中")
 
 with tab2:
   st.markdown("""
