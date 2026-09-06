@@ -57,22 +57,6 @@ def fetch_free_disaster_news():
 
 locations = [
     {
-        "category": "【河川氾濫】", "region": "九州", "pref": "福岡県", "name": "筑後川流域（久留米市周辺）", 
-        "river_name": "筑後川（ちくごがわ）", "lat": 33.3197, "lon": 130.5086, "source": "国土交通省 九州地方整備局", 
-        "level": "レベル3", "level_desc": "【高齢者等避難】水位上昇中。要配慮者は避難準備。",
-        "metric": "観測 5.1m / 警戒 5.8m", "status": "注意（水位上昇中）", "color": "orange", "priority": 2,
-        "desc": "西日本最大の「筑紫次郎」と呼ばれる一級河川。上流の豪雨で水位上昇中。",
-        "camera_url": "https://www.qsr.mlit.go.jp/"
-    },
-    {
-        "category": "【河川氾濫】", "region": "北海道", "pref": "北海道", "name": "石狩川流域（札幌市・江別市周辺）", 
-        "river_name": "石狩川（いしかりがわ）", "lat": 43.1167, "lon": 141.5333, "source": "国土交通省 札幌開発建設部", 
-        "level": "レベル3", "level_desc": "【高齢者等避難】水位上昇中。要配慮者は避難準備。",
-        "metric": "観測 3.8m / 警戒 4.2m", "status": "注意（水位上昇中）", "color": "orange", "priority": 2,
-        "desc": "北海道を代表する大河川。上流のまとまった雨により水位が上昇傾向。",
-        "camera_url": "https://www.hkd.mlit.go.jp/"
-    },
-    {
         "category": "【河川氾濫】", "region": "関東", "pref": "東京都", "name": "多摩川流域（二子玉川周辺）", 
         "river_name": "多摩川（たまがわ）", "lat": 35.6000, "lon": 139.6300, "source": "国土交通省 京浜河川事務所", 
         "level": "レベル4", "level_desc": "【避難指示】全員速やかに避難。氾濫のおそれが極めて高い状態。",
@@ -87,6 +71,22 @@ locations = [
         "metric": "冠水深 40cm（車両水没のおそれ）", "status": "危険（通行止め）", "color": "red", "priority": 1,
         "desc": "ゲリラ豪雨によりアンダーパスが水没。立ち往生車両が発生し全面通行止め。",
         "camera_url": "https://www.kensetsu.metro.tokyo.lg.jp/"
+    },
+    {
+        "category": "【河川氾濫】", "region": "九州", "pref": "福岡県", "name": "筑後川流域（久留米市周辺）", 
+        "river_name": "筑後川（ちくごがわ）", "lat": 33.3197, "lon": 130.5086, "source": "国土交通省 九州地方整備局", 
+        "level": "レベル3", "level_desc": "【高齢者等避難】水位上昇中。要配慮者は避難準備。",
+        "metric": "観測 5.1m / 警戒 5.8m", "status": "注意（水位上昇中）", "color": "orange", "priority": 2,
+        "desc": "西日本最大の「筑紫次郎」と呼ばれる一級河川。上流の豪雨で水位上昇中。",
+        "camera_url": "https://www.qsr.mlit.go.jp/"
+    },
+    {
+        "category": "【河川氾濫】", "region": "北海道", "pref": "北海道", "name": "石狩川流域（札幌市・江別市周辺）", 
+        "river_name": "石狩川（いしかりがわ）", "lat": 43.1167, "lon": 141.5333, "source": "国土交通省 札幌開発建設部", 
+        "level": "レベル3", "level_desc": "【高齢者等避難】水位上昇中。要配慮者は避難準備。",
+        "metric": "観測 3.8m / 警戒 4.2m", "status": "注意（水位上昇中）", "color": "orange", "priority": 2,
+        "desc": "北海道を代表する大河川。上流のまとまった雨により水位が上昇傾向。",
+        "camera_url": "https://www.hkd.mlit.go.jp/"
     },
     {
         "category": "【河川氾濫】", "region": "東北", "pref": "宮城県", "name": "広瀬川流域（仙台市中心部）", 
@@ -154,7 +154,8 @@ if danger_count > 0:
 else:
     st.warning(f"⚠️ 【注意喚起】 重大な危険（赤）はありませんが、**{warning_count}件** の注意情報が発表されています。")
 
-st.title("🌧️ 全日本 一級河川・道路交通 リアルタイムモニタリング")
+# タイトルの文字サイズを小さく調整（HTML指定）
+st.markdown("<h3 style='font-size: 20px; font-weight: bold; margin-bottom: 0rem;'>🌧️ 全日本 一級河川・道路交通 リアルタイムモニタリング</h3>", unsafe_allow_html=True)
 st.write("主要一級河川や道路冠水情報を警戒レベル・ライブ映像リンク付きで一元管理するシステムです。")
 
 with st.expander("📡 【無料取得】リアルタイム災害・ネット速報フィード（公的RSS連携）", expanded=True):
@@ -193,7 +194,7 @@ for name, coords, zoom_level, col in regions:
     with col:
         if is_selected:
             if st.button(button_label, key=f"btn_{name}", type="primary"):
-                pass  # 既に選択中の場合は何もしない
+                pass  # 選択中の場合は何もしない
         else:
             if st.button(button_label, key=f"btn_{name}", type="secondary"):
                 st.session_state["selected_region"] = name
