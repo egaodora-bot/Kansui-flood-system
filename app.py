@@ -4,7 +4,11 @@ from streamlit_folium import st_folium
 import urllib.request
 import xml.etree.ElementTree as ET
 
-st.set_page_config(page_title="全国統合防災・リスク管理システム", layout="wide")
+st.set_page_config(
+    page_title="全国統合防災・リスク管理システム", 
+    page_icon="🛡️", 
+    layout="wide"
+)
 
 st.markdown("""
 <style>
@@ -23,6 +27,10 @@ button[kind="primary"] {
 }
 </style>
 """, unsafe_allow_html=True)
+
+# 初回訪問のセッション管理
+if "first_visit" not in st.session_state:
+    st.session_state["first_visit"] = True
 
 @st.cache_data(ttl=300)
 def fetch_robust_disaster_news():
@@ -152,6 +160,26 @@ locations = [
     }
 ]
 
+# 初回訪問時の説明モーダル・ガイド表示
+if st.session_state["first_visit"]:
+    st.markdown("<h2 style='color:#0056b3;'>🛡️ 全国統合防災・リスク管理システムへようこそ</h2>", unsafe_allow_html=True)
+    st.info("このシステムは、日本全国の重大な気象・河川・交通リスクをひと目で俯瞰し、迅速な安全確認を行うためのリアルタイムダッシュボードです。")
+    
+    with st.expander("📖 【ご利用ガイド・システム概要】（必ずご確認ください）", expanded=True):
+        st.markdown("""
+        - **全国一元ビュー**: 日本全体の重要な災害リスク（河川氾濫・道路冠水・交通規制）をマップとリストで同時に把握できます。
+        - **リアルタイム速報連携**: Yahoo!災害情報や気象庁のRSSフィードを自動取得し、トップ画面で最新ニュースを確認できます。
+        - **クイック外部アクセス**: 雨雲レーダーや落雷情報、交通機関の運行状況へワンクリックでアクセスできます。
+        - **スマホからのご利用**: ブラウザのメニューから「ホーム画面に追加」を行うことで、専用アプリ感覚でいつでもすばやく起動できます。
+        """)
+        
+        if st.button("確認しました（システムを開始する）", type="primary"):
+            st.session_state["first_visit"] = False
+            st.rerun()
+    
+    st.stop() # 初回はここで処理を止め、ボタンが押されるまでメイン画面を表示しない
+
+# メインダッシュボードの描画
 danger_count = sum(1 for loc in locations if loc["color"] == "red")
 warning_count = sum(1 for loc in locations if loc["color"] == "orange")
 
@@ -214,7 +242,6 @@ for name, coords, zoom_level, col in regions:
                 st.session_state["zoom"] = zoom_level
                 st.rerun()
 
-# サイドバーはシンプルな表示・凡例のみに整理
 st.sidebar.markdown("<h3 style='font-size: 15px; font-weight: bold; color: #1e90ff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3), 0 0 8px rgba(30,144,255,0.4); margin-bottom: 0px; line-height: 1.4; white-space: nowrap;'>🛡️ 全国統合防災・リスク管理システム</h3>", unsafe_allow_html=True)
 st.sidebar.markdown("---")
 st.sidebar.subheader("📌 防災警戒レベル凡例")
@@ -226,8 +253,6 @@ current_center = st.session_state.get("center", [37.5, 138.0])
 current_zoom = st.session_state.get("zoom", 5)
 
 m = folium.Map(location=current_center, zoom_start=current_zoom, control_scale=True)
-
-# すべての地点を無条件で対象にする
 filtered_locations = sorted(locations, key=lambda x: x["priority"])
 
 for idx, loc in enumerate(filtered_locations):
@@ -266,7 +291,7 @@ for idx, loc in enumerate(filtered_locations):
 
 st_folium(m, width="100%", height=500, key=f"map_{current_center[0]}_{current_center[1]}_{current_zoom}")
 
-st.markdown("<h3 style='font-size: 20px; font-weight: bold; margin-top: 1rem; margin-bottom: 0.5rem;'>📋 全国統合リスク・警戒レベル一覧</h3>", unsafe_allow_html=True)
+st.markdown(f"<h3 style='font-size: 20px; font-weight: bold; margin-top: 1rem; margin-bottom: 0.5rem;'>📋 全国統合リスク・警戒レベル一覧</h3>", unsafe_allow_html=True)
 
 for idx, loc in enumerate(filtered_locations):
     badge = "🔴【レベル4】" if loc["color"] == "red" else ("🟠【レベル3】" if loc["color"] == "orange" else "🔵【レベル1】")
