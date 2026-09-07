@@ -25,7 +25,6 @@ button[kind="primary"] {
 </style>
 """, unsafe_allow_html=True)
 
-# タイムアウトとエラーハンドリングを強化した実用的フィード取得関数
 @st.cache_data(ttl=300)
 def fetch_robust_disaster_news():
     news_items = []
@@ -170,7 +169,6 @@ with st.expander("📡 【ライブ取得】リアルタイム災害・速報フ
     for news in news_list:
         st.markdown(f"- <a href='{news['link']}' target='_blank' style='color: #d32f2f; font-weight: bold;'>{news['title']}</a> <small style='color:gray;'>({news['date']})</small>", unsafe_allow_html=True)
 
-# セッション状態の初期化
 if "selected_region" not in st.session_state:
     st.session_state["selected_region"] = "日本全国"
 if "center" not in st.session_state:
@@ -207,8 +205,8 @@ for name, coords, zoom_level, col in regions:
                 st.session_state["zoom"] = zoom_level
                 st.rerun()
 
-# サイドバー：タイトルとフィルター構成
-st.sidebar.markdown("### 🛡️ 防災システム設定")
+# サイドバーのタイトルを修正
+st.sidebar.markdown("### 🌧️ 全日本 一級河川・道路交通 リアルタイムモニタリング")
 st.sidebar.markdown("---")
 st.sidebar.subheader("🔍 表示フィルター")
 show_danger_only = st.sidebar.checkbox("危険・注意（赤・橙）のみ表示", value=False)
