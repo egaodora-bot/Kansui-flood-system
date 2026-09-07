@@ -28,7 +28,6 @@ button[kind="primary"] {
 </style>
 """, unsafe_allow_html=True)
 
-# 初回訪問のセッション管理
 if "first_visit" not in st.session_state:
     st.session_state["first_visit"] = True
 
@@ -160,7 +159,6 @@ locations = [
     }
 ]
 
-# 初回訪問時の説明モーダル・ガイド表示
 if st.session_state["first_visit"]:
     st.markdown("<h2 style='color:#0056b3;'>🛡️ 全国統合防災・リスク管理システムへようこそ</h2>", unsafe_allow_html=True)
     st.info("このシステムは、日本全国の重大な気象・河川・交通リスクをひと目で俯瞰し、迅速な安全確認を行うためのリアルタイムダッシュボードです。")
@@ -168,8 +166,8 @@ if st.session_state["first_visit"]:
     with st.expander("📖 【ご利用ガイド・システム概要】（必ずご確認ください）", expanded=True):
         st.markdown("""
         - **全国一元ビュー**: 日本全体の重要な災害リスク（河川氾濫・道路冠水・交通規制）をマップとリストで同時に把握できます。
-        - **リアルタイム速報連携**: Yahoo!災害情報や気象庁のRSSフィードを自動取得し、トップ画面で最新ニュースを確認できます。
-        - **クイック外部アクセス**: 雨雲レーダーや落雷情報、交通機関の運行状況へワンクリックでアクセスできます。
+        - **リアルタイム速報連携**: Yahoo!災害情報や気象庁RSSの自動取得とフォールバック機能により、トップ画面で最新ニュースを確認できます。
+        - **クイック外部アクセス**: 雨雲レーダー、落雷情報、運行情報へのワンクリックアクセスが可能です。
         - **スマホからのご利用**: ブラウザのメニューから「ホーム画面に追加」を行うことで、専用アプリ感覚でいつでもすばやく起動できます。
         """)
         
@@ -177,9 +175,8 @@ if st.session_state["first_visit"]:
             st.session_state["first_visit"] = False
             st.rerun()
     
-    st.stop() # 初回はここで処理を止め、ボタンが押されるまでメイン画面を表示しない
+    st.stop()
 
-# メインダッシュボードの描画
 danger_count = sum(1 for loc in locations if loc["color"] == "red")
 warning_count = sum(1 for loc in locations if loc["color"] == "orange")
 
@@ -307,3 +304,5 @@ for idx, loc in enumerate(filtered_locations):
         st.markdown(f"- **状況説明**: {loc['desc']}")
         if loc['camera_url']:
             st.markdown(f"### [🎥 自治体ライブカメラ・関連詳細情報はこちら]({loc['camera_url']})")
+
+by 銅鑼衛門
