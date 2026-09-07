@@ -12,33 +12,20 @@ st.set_page_config(
 
 st.markdown("""
 <style>
+/* ボタン全体のデザイン調整 */
 div.stButton > button {
     width: 100%;
-    border-radius: 8px;
+    border-radius: 6px;
     font-weight: bold;
+    padding: 4px 8px !important;
+    font-size: 13px !important;
     transition: all 0.3s ease;
 }
 button[kind="primary"] {
     background-color: #0056b3 !important;
     border: 3px solid #004085 !important;
     color: #ffffff !important;
-    font-size: 16px !important;
     font-weight: 800 !important;
-}
-
-/* ツールバー等を左下に移動して誤操作を防止 */
-[data-testid="stHeader"], 
-[data-testid="stToolbar"], 
-.stDeployButton, 
-header {
-    position: fixed !important;
-    top: auto !important;
-    bottom: 15px !important;
-    left: 15px !important;
-    right: auto !important;
-    background: transparent !important;
-    z-index: 999999 !important;
-    width: auto !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -181,9 +168,9 @@ if st.session_state["first_visit"]:
     with st.expander("📖 【ご利用ガイド・システム概要】（必ずご確認ください）", expanded=True):
         st.markdown("""
         - **全国一元ビュー**: 日本全体の重要な災害リスク（河川氾濫・道路冠水・交通規制）をマップとリストで同時に把握できます。
-        - **リアルタイム速報連携**: Yahoo!災害情報や気象庁RSSの自動取得とフォールバック機能により、トップ画面で最新ニュースを確認できます。
+        - **💡 スマホでの快適な使い方のコツ**: スマートフォンでご利用の際は、**「画面を横向き」にしていただく**と、地域選択ボタンが綺麗に横並びになり、地図も非常に見やすくなります。ぜひ横向きでお試しください！
+        - **リアルタイム速報連携**: Yahoo!災害情報や気象庁RSSの自動取得により、トップ画面で最新ニュースを確認できます。
         - **クイック外部アクセス**: 雨雲レーダー、落雷情報、運行情報へのワンクリックアクセスが可能です。
-        - **スマホからのご利用**: ブラウザのメニューから「ホーム画面に追加」を行うことで、専用アプリ感覚でいつでもすばやく起動できます。
         """, unsafe_allow_html=True)
         
         if st.button("確認しました（システムを開始する）", type="primary"):
@@ -225,7 +212,7 @@ if "center" not in st.session_state:
 if "zoom" not in st.session_state:
     st.session_state["zoom"] = 5
 
-st.markdown("<h3 style='font-size: 20px; font-weight: bold; margin-top: 1rem; margin-bottom: 0.5rem;'>📍 表示地域の選択</h3>", unsafe_allow_html=True)
+st.markdown("<h3 style='font-size: 20px; font-weight: bold; margin-top: 1rem; margin-bottom: 0.5rem;'>📍 表示地域の選択 <span style='font-size:13px; color:#d32f2f; font-weight:bold;'>（スマホは画面を横向きにすると見やすいです💡）</span></h3>", unsafe_allow_html=True)
 
 col1, col2, col3, col4, col5, col6, col7 = st.columns(7)
 
@@ -301,7 +288,6 @@ for idx, loc in enumerate(filtered_locations):
             icon=folium.Icon(color=c_color, icon="warning" if c_color!="blue" else "info-sign")
         ).add_to(m)
 
-# 💡 地図の高さを 400 に調整し、上下の文章や操作がしやすくなるよう改善
 st_folium(m, width="100%", height=400, key=f"map_{current_center[0]}_{current_center[1]}_{current_zoom}")
 
 st.markdown(f"<h3 style='font-size: 20px; font-weight: bold; margin-top: 1rem; margin-bottom: 0.5rem;'>📋 全国統合リスク・警戒レベル一覧</h3>", unsafe_allow_html=True)
