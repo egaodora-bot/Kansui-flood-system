@@ -113,4 +113,189 @@ locations = [
     },
     {
         "category": "【河川氾濫】", "region": "中部", "pref": "愛知県", "name": "木曽川流域（犬山市周辺）", 
-        "river_name": "木曽川（きそがわ）", "lat": 35.38
+        "river_name": "木曽川（きそがわ）", "lat": 35.3850, "lon": 136.9420, "source": "国交省 中部地方整備局", 
+        "level": "レベル1", "level_desc": "【早期注意情報】気象情報に留意し、今後の動向を注視。",
+        "metric": "観測 3.0m / 警戒 4.5m", "status": "正常（監視中）", "color": "blue", "priority": 3,
+        "desc": "木曽三川の一つ。現在のところ安全水位を維持しています。",
+        "camera_url": ""
+    },
+    {
+        "category": "【高速道路】", "region": "関東", "pref": "埼玉県", "name": "東北自動車道（羽生IC〜館林IC）", 
+        "river_name": "---", "lat": 36.1700, "lon": 139.5500, "source": "NEXCO東日本", 
+        "level": "レベル3", "level_desc": "【交通規制】迂回ルートの検討および安全確認が必須。",
+        "metric": "冠水影響による通行止め", "status": "注意（災害影響）", "color": "orange", "priority": 2,
+        "desc": "大雨に伴う道路冠水のため、該当区間で上下線とも通行止め。",
+        "camera_url": "https://www.c-nexco.co.jp/"
+    },
+    {
+        "category": "【鉄道影響】", "region": "関東", "pref": "東京都", "name": "JR山手線・中央線", 
+        "river_name": "---", "lat": 35.6812, "lon": 139.7671, "source": "JR東日本 運行情報", 
+        "level": "レベル3", "level_desc": "【運行障害】運転見合わせ・大幅な遅延が発生中。",
+        "metric": "一部運転見合わせ", "status": "注意（ダイヤ乱れ）", "color": "orange", "priority": 2,
+        "desc": "大雨の影響および線路内点検のため、一部区間で運転見合わせ。",
+        "camera_url": ""
+    },
+    {
+        "category": "【河川氾濫】", "region": "関西", "pref": "大阪府", "name": "淀川流域（大阪市北区）", 
+        "river_name": "淀川（よどがわ）", "lat": 34.7000, "lon": 135.5000, "source": "国交省 近畿地方整備局", 
+        "level": "レベル1", "level_desc": "【早期注意情報】平常時・安全監視中。",
+        "metric": "観測 2.1m / 警戒 5.0m", "status": "正常（監視中）", "color": "blue", "priority": 3,
+        "desc": "関西の主要一級水系。安全水位を維持中。",
+        "camera_url": ""
+    },
+    {
+        "category": "【河川氾濫】", "region": "四国", "pref": "高知県", "name": "四万十川流域（中下流）", 
+        "river_name": "四万十川（しまんとがわ）", "lat": 33.0000, "lon": 132.9333, "source": "国交省 四国地方整備局", 
+        "level": "レベル1", "level_desc": "【早期注意情報】平常時・安全監視中。",
+        "metric": "観測 5.2m / 警戒 6.5m", "status": "正常（監視中）", "color": "blue", "priority": 3,
+        "desc": "日本最後の清流。現在のところ水位に異常なし。",
+        "camera_url": ""
+    }
+]
+
+danger_count = sum(1 for loc in locations if loc["color"] == "red")
+warning_count = sum(1 for loc in locations if loc["color"] == "orange")
+
+if danger_count > 0:
+    st.error(f"🚨 【緊急警報発令中】 危険（赤）が **{danger_count}件**、注意（橙）が **{warning_count}件** 発生しています。警戒レベルを確認し、速やかな避難・安全確保を行ってください。")
+else:
+    st.warning(f"⚠️ 【注意喚起】 重大な危険（赤）はありませんが、**{warning_count}件** の注意情報が発表されています。")
+
+st.markdown("<h3 style='font-size: 20px; font-weight: bold; margin-bottom: 0rem; color: #1e90ff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3), 0 0 10px rgba(30,144,255,0.4);'>🛡️ 全国統合防災・リスク管理システム</h3>", unsafe_allow_html=True)
+st.write("主要一級河川や道路冠水情報を警戒レベル・ライブ映像リンク付きで一元管理するシステムです。")
+
+with st.expander("📡 【ライブ取得】リアルタイム災害・速報フィード（公的RSS連携）", expanded=True):
+    news_list = fetch_robust_disaster_news()
+    for news in news_list:
+        st.markdown(f"- <a href='{news['link']}' target='_blank' style='color: #d32f2f; font-weight: bold;'>{news['title']}</a> <small style='color:gray;'>({news['date']})</small>", unsafe_allow_html=True)
+
+if "selected_region" not in st.session_state:
+    st.session_state["selected_region"] = "日本全国"
+if "center" not in st.session_state:
+    st.session_state["center"] = [37.5, 138.0]
+if "zoom" not in st.session_state:
+    st.session_state["zoom"] = 5
+
+st.markdown("<h3 style='font-size: 20px; font-weight: bold; margin-top: 1rem; margin-bottom: 0.5rem;'>📍 表示地域の選択</h3>", unsafe_allow_html=True)
+
+col1, col2, col3, col4, col5, col6, col7 = st.columns(7)
+
+regions = [
+    ("日本全国", [37.5, 138.0], 5, col1),
+    ("北海道", [43.0642, 141.3469], 7, col2),
+    ("東北", [38.2688, 140.8721], 8, col3),
+    ("関東", [35.6895, 139.6917], 9, col4),
+    ("関西", [34.6937, 135.5022], 9, col5),
+    ("四国", [33.5500, 133.5333], 8, col6),
+    ("九州", [33.5902, 130.4017], 8, col7)
+]
+
+for name, coords, zoom_level, col in regions:
+    is_selected = (st.session_state["selected_region"] == name)
+    button_label = f"📌 {name}" if is_selected else name
+    
+    with col:
+        if is_selected:
+            if st.button(button_label, key=f"btn_{name}", type="primary"):
+                pass
+        else:
+            if st.button(button_label, key=f"btn_{name}", type="secondary"):
+                st.session_state["selected_region"] = name
+                st.session_state["center"] = coords
+                st.session_state["zoom"] = zoom_level
+                st.rerun()
+
+st.sidebar.markdown("<h3 style='font-size: 15px; font-weight: bold; color: #1e90ff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3), 0 0 8px rgba(30,144,255,0.4); margin-bottom: 0px; line-height: 1.4; white-space: nowrap;'>🛡️ 全国統合防災・リスク管理システム</h3>", unsafe_allow_html=True)
+st.sidebar.markdown("---")
+st.sidebar.subheader("🔍 表示フィルター")
+show_danger_only = st.sidebar.checkbox("危険・注意（赤・橙）のみ表示", value=False)
+prefectures = ["すべて", "北海道", "東京都", "宮城県", "埼玉県", "大阪府", "福岡県", "新潟県", "愛知県", "高知県"]
+selected_pref = st.sidebar.selectbox("都道府県で絞り込み", prefectures)
+
+st.sidebar.markdown("---")
+st.sidebar.subheader("📌 防災警戒レベル凡例")
+st.sidebar.markdown("🔴 <span style='color:red; font-weight:bold;'>レベル4：避難指示（全員避難）</span>", unsafe_allow_html=True)
+st.sidebar.markdown("🟠 <span style='color:darkorange; font-weight:bold;'>レベル3：高齢者等避難・交通規制</span>", unsafe_allow_html=True)
+st.sidebar.markdown("🔵 **レベル1〜2**：早期注意・安全監視中")
+
+current_center = st.session_state.get("center", [37.5, 138.0])
+current_zoom = st.session_state.get("zoom", 5)
+
+m = folium.Map(location=current_center, zoom_start=current_zoom, control_scale=True)
+
+filtered_locations = []
+for loc in locations:
+    if show_danger_only and loc["color"] == "blue":
+        continue
+    if selected_pref != "すべて" and loc["pref"] != selected_pref:
+        continue
+    filtered_locations.append(loc)
+
+filtered_locations = sorted(filtered_locations, key=lambda x: x["priority"])
+
+for idx, loc in enumerate(filtered_locations):
+    lat, lon = loc.get("lat"), loc.get("lon")
+    if lat and lon:
+        c_cat = loc.get('category')
+        c_pref = loc.get('pref')
+        c_name = loc.get('name')
+        c_source = loc.get('source')
+        c_status = loc.get('status')
+        c_color = loc.get('color')
+        c_desc = loc.get('desc')
+        c_river = loc.get('river_name')
+        c_url = loc.get('camera_url')
+        c_lvl = loc.get('level')
+        c_lvldesc = loc.get('level_desc')
+        
+        river_info = f"<br><b>対象河川:</b> {c_river}" if c_river != "---" else ""
+        camera_link_html = f"<br><a href='{c_url}' target='_blank' style='color:red; font-weight:bold;'>▶ 【自治体ライブカメラ・規制情報】を見る</a>" if c_url else ""
+        
+        popup_html = (
+            f"<b>{c_cat} [{c_pref}] {c_name}</b>"
+            f"{river_info}<br>"
+            f"警戒レベル: <span style='color:{c_color}; font-weight:bold;'>{c_lvl}</span><br>"
+            f"レベル説明: {c_lvldesc}<br>"
+            f"情報元: {c_source}<br>"
+            f"状況: <span style='color:{c_color}; font-weight:bold;'>{c_status}</span><br>"
+            f"{c_desc}"
+            f"{camera_link_html}"
+        )
+        folium.Marker(
+            [lat, lon],
+            popup=folium.Popup(popup_html, max_width=340),
+            icon=folium.Icon(color=c_color, icon="warning" if c_color!="blue" else "info-sign")
+        ).add_to(m)
+
+st_folium(m, width="100%", height=500, key=f"map_{current_center[0]}_{current_center[1]}_{current_zoom}")
+
+st.markdown(f"<h3 style='font-size: 20px; font-weight: bold; margin-top: 1rem; margin-bottom: 0.5rem;'>📋 統合リスク・警戒レベル一覧 ({selected_pref}表示中)</h3>", unsafe_allow_html=True)
+if not filtered_locations:
+    st.info("該当するデータはありません。")
+
+for idx, loc in enumerate(filtered_locations):
+    badge = "🔴【レベル4】" if loc["color"] == "red" else ("🟠【レベル3】" if loc["color"] == "orange" else "🔵【レベル1】")
+    river_tag = f" ｜ 対象: **{loc['river_name']}**" if loc['river_name'] != "---" else ""
+    title_text = f"{badge} ｜ {loc['category']} 地点: **{loc['name']}** [{loc['pref']}]{river_tag} ｜ 情報元: {loc['source']}"
+    
+    with st.expander(title_text):
+        if loc['river_name'] != "---":
+            st.markdown(f"- **対象水系**: {loc['river_name']}")
+        
+        # 警戒レベルのバッジ（またはテキスト）を押したらその場所に移動するボタン
+        col_lvl, col_desc = st.columns([1.5, 8.5])
+        with col_lvl:
+            btn_key = f"jump_map_{idx}_{loc['name']}"
+            if st.button(f"🔍 地図で見る", key=btn_key, type="primary"):
+                st.session_state["center"] = [loc["lat"], loc["lon"]]
+                st.session_state["zoom"] = 14  # 拡大してフォーカス
+                st.rerun()
+                
+        with col_desc:
+            st.markdown(f"- **警戒レベル**: `{loc['level']}` — {loc['level_desc']}")
+            
+        st.markdown(f"- **ステータス詳細**: {loc['status']}")
+        st.markdown(f"- **規制・水位指標**: {loc['metric']}")
+        st.markdown(f"- **状況説明**: {loc['desc']}")
+        if loc['camera_url']:
+            st.markdown(f"### [🎥 自治体ライブカメラ・関連詳細情報はこちら]({loc['camera_url']})")
