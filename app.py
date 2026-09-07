@@ -168,12 +168,12 @@ locations = [
 ]
 
 if st.session_state["first_visit"]:
-    # タイトルを黄色背景・黒文字に変更して目立たせる
+    # タイトルは黄色背景
     st.markdown("<h3 style='font-size: 18px; font-weight: bold; background-color: #fef08a; color: #1e293b; padding: 8px 12px; border-radius: 6px; border-left: 6px solid #ca8a04; margin-bottom: 0.8rem;'>🛡️ 全国統合防災・リスク管理システムへようこそ</h3>", unsafe_allow_html=True)
     
-    # その下の説明文は黄色背景のまま、文字を締まりのある「青色（#1d4ed8）」に変更
+    # その下の説明文は「青背景・白文字」に変更し、アクセントに明るいブルーの左ボーダーを設定
     st.markdown("""
-    <div style="background-color: #fef9c3; padding: 12px 16px; border-radius: 8px; border-left: 6px solid #ca8a04; color: #1d4ed8; font-weight: bold; font-size: 14px; margin-bottom: 1rem;">
+    <div style="background-color: #1e40af; padding: 12px 16px; border-radius: 8px; border-left: 6px solid #60a5fa; color: #ffffff; font-weight: bold; font-size: 14px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
         このシステムは、日本全国の重大な気象・河川・交通リスクをひと目で俯瞰し、迅速な安全確認を行うためのリアルタイムダッシュボードです。
     </div>
     """, unsafe_allow_html=True)
