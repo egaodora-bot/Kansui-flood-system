@@ -205,8 +205,8 @@ for name, coords, zoom_level, col in regions:
                 st.session_state["zoom"] = zoom_level
                 st.rerun()
 
-# サイドバーのタイトルを「全国統合防災・」と「リスク管理システム」の間に改行を入れるように変更
-st.sidebar.markdown("<h3 style='font-size: 15px; font-weight: bold; color: #1e90ff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3), 0 0 8px rgba(30,144,255,0.4); margin-bottom: 0px; line-height: 1.4;'>🛡️ 全国統合防災・<br>リスク管理システム</h3>", unsafe_allow_html=True)
+# サイドバーのタイトルも改行せず一行で表示するように変更
+st.sidebar.markdown("<h3 style='font-size: 15px; font-weight: bold; color: #1e90ff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3), 0 0 8px rgba(30,144,255,0.4); margin-bottom: 0px; line-height: 1.4; white-space: nowrap;'>🛡️ 全国統合防災・リスク管理システム</h3>", unsafe_allow_html=True)
 st.sidebar.markdown("---")
 st.sidebar.subheader("🔍 表示フィルター")
 show_danger_only = st.sidebar.checkbox("危険・注意（赤・橙）のみ表示", value=False)
