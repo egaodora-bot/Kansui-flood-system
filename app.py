@@ -8,7 +8,7 @@ st.set_page_config(
     page_title="全国統合防災・リスク管理システム", 
     page_icon="🛡️", 
     layout="wide",
-    # 📱 スマホなどの狭い画面では最初からサイドバーを自動で折りたたむ（閉じ忘れるストレスを解消）
+    # 📱 スマホなどの狭い画面では最初からサイドバーを自動で折りたたむ
     initial_sidebar_state="collapsed"
 )
 
@@ -30,9 +30,14 @@ button[kind="primary"] {
     font-weight: 800 !important;
 }
 
-/* スマホ等でサイドバーの閉じるボタン（<<）や上部が隠れてしまわないよう、余白と位置を調整 */
-section[data-testid="stSidebar"] {
-    padding-top: 1rem;
+/* 凡例を開く誘導ボタンを目立たせるスタイル */
+.legend-guide-btn button {
+    background-color: #1e90ff !important;
+    color: white !important;
+    font-size: 14px !important;
+    font-weight: bold !important;
+    border-radius: 8px !important;
+    border: 2px solid #004085 !important;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -161,7 +166,7 @@ locations = [
     {
         "category": "【河川氾濫】", "region": "四国", "pref": "高知県", "name": "四万十川流域（中下流）", 
         "river_name": "四万十川（しまんとがわ）", "lat": 33.0000, "lon": 132.9333, "source": "国交省 四国地方整備局", 
-        "level": "レベル1", "level_desc": "【早期注意情報】平常時・安全監視中。",
+        "level": "Level1", "level_desc": "【早期注意情報】平常時・安全監視中。",
         "metric": "観測 5.2m / 警戒 6.5m", "status": "正常（監視中）", "color": "blue", "priority": 3,
         "desc": "日本最後の清流。現在のところ水位に異常なし。",
         "camera_url": ""
@@ -195,6 +200,15 @@ if st.session_state["first_visit"]:
 
 danger_count = sum(1 for loc in locations if loc["color"] == "red")
 warning_count = sum(1 for loc in locations if loc["color"] == "orange")
+
+# 📌 スマホユーザー向け：画面最上部に「≫ クリックすると危険レベル凡例を表示」という分かりやすい案内を設置
+st.markdown("""
+<div style="background-color: #1e293b; padding: 10px 15px; border-radius: 8px; border-left: 5px solid #1e90ff; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between;">
+    <span style="color: #f8fafc; font-size: 13px; font-weight: bold;">
+        📌 画面左上の <b>≪</b> または下のボタンから、いつでも危険レベル凡例（サイドバー）を表示できます
+    </span>
+</div>
+""", unsafe_allow_html=True)
 
 if danger_count > 0:
     st.error(f"🚨 【緊急警報発令中】 危険（赤）が **{danger_count}件**、注意（橙）が **{warning_count}件** 発生しています。警戒レベルを確認し、速やかな避難・安全確保を行ってください。")
