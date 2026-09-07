@@ -170,10 +170,18 @@ locations = [
 if st.session_state["first_visit"]:
     st.markdown("<h3 style='font-size: 18px; font-weight: bold; background-color: #fef08a; color: #1e293b; padding: 8px 12px; border-radius: 6px; border-left: 6px solid #ca8a04; margin-bottom: 0.8rem;'>🛡️ 全国統合防災・リスク管理システムへようこそ</h3>", unsafe_allow_html=True)
     
+    # 案内画面のデータ提供元を大きく、見やすく改善
     st.markdown("""
-    <div style="background-color: #1e40af; padding: 12px 16px; border-radius: 8px; border-left: 6px solid #60a5fa; color: #ffffff; font-weight: bold; font-size: 14px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-        このシステムは、日本全国の重大な気象・河川・交通リスクをひと目で俯瞰し、迅速な安全確認を行うためのリアルタイムダッシュボードです。<br>
-        <span style="font-size: 12px; color: #cbd5e1; font-weight: normal;">データ提供元：気象庁、国土交通省、各地方整備局、NEXCO東日本、JR東日本、Yahoo!ニュースRSS 他公的機関</span>
+    <div style="background-color: #1e40af; padding: 14px 18px; border-radius: 8px; border-left: 6px solid #60a5fa; color: #ffffff; font-weight: bold; font-size: 14px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); line-height: 1.6;">
+        このシステムは、日本全国の重大な気象・河川・交通リスクをひと目で俯瞰し、迅速な安全確認を行うためのリアルタイムダッシュボードです。<br><br>
+        <div style="background-color: rgba(255, 255, 255, 0.15); padding: 8px 12px; border-radius: 6px; font-size: 13px; color: #ffffff;">
+            🌐 <b>【主なデータ提供元】</b><br>
+            ・気象庁（警報・注意報・RSS）<br>
+            ・国土交通省 / 各地方整備局（川の水位情報）<br>
+            ・都道府県・市区町村の公開情報<br>
+            ・NEXCO東日本 / JR東日本（交通・運行規制）<br>
+            ・Yahoo!ニュース RSS 他公的機関
+        </div>
     </div>
     """, unsafe_allow_html=True)
     
@@ -267,16 +275,17 @@ for name, coords, zoom_level, col in regions:
                 st.session_state["zoom"] = zoom_level
                 st.rerun()
 
-# サイドバーへの情報元（データソース）および凡例の明記
+# サイドバーへの情報元（データソース）および凡例の明記（文字色をくっきり修正）
 st.sidebar.markdown("<h3 style='font-size: 15px; font-weight: bold; color: #1e90ff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3), 0 0 8px rgba(30,144,255,0.4); margin-bottom: 0px; line-height: 1.4; white-space: nowrap;'>🛡️ 全国統合防災・リスク管理システム</h3>", unsafe_allow_html=True)
 st.sidebar.markdown("---")
 st.sidebar.subheader("📌 防災警戒レベル凡例")
 st.sidebar.markdown("🔴 <span style='color:red; font-weight:bold;'>レベル4：避難指示（全員避難）</span>", unsafe_allow_html=True)
 st.sidebar.markdown("🟠 <span style='color:darkorange; font-weight:bold;'>レベル3：高齢者等避難・交通規制</span>", unsafe_allow_html=True)
-st.sidebar.markdown("🔵 **Level1〜2**：早期注意・安全監視中")
+st.sidebar.markdown("🔵 **Level1〜2**：早期注意・安全監視中", unsafe_allow_html=True)
 st.sidebar.markdown("---")
 st.sidebar.subheader("📡 主なデータ連携元")
-st.sidebar.markdown("<span style='font-size: 12px; color: #555;'>・気象庁（警報・注意報・RSS）<br>・国土交通省（川の水位情報）<br>・各地方整備局・都道府県<br>・NEXCO東日本 / JR東日本<br>・Yahoo!ニュース RSS</span>", unsafe_allow_html=True)
+# 文字色をはっきりと濃い色（#e2e8f0）に指定して薄くなるのを防止
+st.sidebar.markdown("<span style='font-size: 12.5px; color: #cbd5e1; line-height: 1.5;'>・気象庁（警報・注意報・RSS）<br>・国土交通省（川の水位情報）<br>・各地方整備局・都道府県<br>・NEXCO東日本 / JR東日本<br>・Yahoo!ニュース RSS</span>", unsafe_allow_html=True)
 
 current_center = st.session_state.get("center", [37.5, 138.0])
 current_zoom = st.session_state.get("zoom", 5)
@@ -354,5 +363,4 @@ for idx, loc in enumerate(filtered_locations):
         
         if loc['camera_url']:
             st.markdown("---")
-            # 確実に新しいタブで開くように HTML の target="_blank" を使用
             st.markdown(f"**関連リンク**\n\n<a href='{loc['camera_url']}' target='_blank' rel='noopener noreferrer'>🎥 自治体ライブカメラ・関連詳細情報はこちら (別タブで開きます)</a>", unsafe_allow_html=True)
