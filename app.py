@@ -162,10 +162,11 @@ locations = [
 if st.session_state["first_visit"]:
     st.markdown("<h3 style='font-size: 18px; font-weight: bold; background-color: #fef08a; color: #1e293b; padding: 8px 12px; border-radius: 6px; border-left: 6px solid #ca8a04; margin-bottom: 0.8rem;'>🛡️ 全国統合防災・リスク管理システムへようこそ</h3>", unsafe_allow_html=True)
     
+    # 案内画面上部にフォントを大きくして情報元・連携機関を明記
     st.markdown("""
-    <div style="background-color: #1e40af; padding: 14px 18px; border-radius: 8px; border-left: 6px solid #60a5fa; color: #ffffff; font-weight: bold; font-size: 14px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); line-height: 1.6;">
-        このシステムは、日本全国の重大な気象・河川・交通リスクをひと目で俯瞰し、迅速な安全確認を行うためのリアルタイムダッシュボードです。<br><br>
-        <div style="background-color: rgba(255, 255, 255, 0.15); padding: 8px 12px; border-radius: 6px; font-size: 13px; color: #ffffff;">
+    <div style="background-color: #1e40af; padding: 18px 22px; border-radius: 8px; border-left: 6px solid #60a5fa; color: #ffffff; font-weight: bold; font-size: 15px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); line-height: 1.7;">
+        当システムでは、気象庁や国土交通省などの公的機関が提供するオープンデータおよび信頼性の高いRSSフィードを統合してリアルタイム表示しています。<br><br>
+        <div style="background-color: rgba(255, 255, 255, 0.15); padding: 10px 14px; border-radius: 6px; font-size: 14px; color: #ffffff; line-height: 1.8;">
             🌐 <b>【主なデータ提供元・連携機関】</b><br>
             ・気象庁（警報・注意報・RSS）<br>
             ・国土交通省 / 各地方整備局（川の水位情報）<br>
