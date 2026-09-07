@@ -29,7 +29,7 @@ button[kind="primary"] {
     font-weight: 800 !important;
 }
 
-/* スマホ等でサイドバーの閉じるボタン（<<）や上部が隠れてしまわないよう調整 */
+/* スマホ等でサイドバーの閉じるボタンや上部が隠れてしまわないよう調整 */
 section[data-testid="stSidebar"] {
     padding-top: 1rem;
 }
@@ -168,27 +168,26 @@ locations = [
 ]
 
 if st.session_state["first_visit"]:
-    st.markdown("<h3 style='font-size: 20px; font-weight: bold; color: #1e90ff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3), 0 0 10px rgba(30,144,255,0.4); margin-bottom: 0.5rem;'>🛡️ 全国統合防災・リスク管理システムへようこそ</h3>", unsafe_allow_html=True)
+    # タイトル文字を少しスッキリしたサイズに調整
+    st.markdown("<h3 style='font-size: 18px; font-weight: bold; color: #1e90ff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); margin-bottom: 0.4rem;'>🛡️ 全国統合防災・リスク管理システムへようこそ</h3>", unsafe_allow_html=True)
     
     st.markdown("""
-    <div style="background-color: #fef9c3; padding: 12px 16px; border-radius: 8px; border-left: 6px solid #ca8a04; color: #713f12; font-weight: bold; font-size: 15px; margin-bottom: 1rem;">
+    <div style="background-color: #fef9c3; padding: 12px 16px; border-radius: 8px; border-left: 6px solid #ca8a04; color: #713f12; font-weight: bold; font-size: 14px; margin-bottom: 1rem;">
         このシステムは、日本全国の重大な気象・河川・交通リスクをひと目で俯瞰し、迅速な安全確認を行うためのリアルタイムダッシュボードです。
     </div>
     """, unsafe_allow_html=True)
     
-    with st.expander("📖 【ご利用ガイド・システム概要】（必ずご確認ください）", expanded=True):
+    with st.expander("📖 【ご利用ガイド・システム共有方法】（必ずご確認ください）", expanded=True):
         st.markdown("""
-        ##### ［全国一元ビュー］
-        日本全体の重要な災害リスク（河川氾濫・道路冠水・交通規制）をマップとリストで同時に把握できます。
+        ##### ［システムURL］
+        ご家族やご友人に共有する際はこちらのURLをご利用ください：  
+        👉 `https://your-app-url.streamlit.app/` （※実際の公開URLに書き換えてください）
 
-        ##### ［💡 スマホでの快適な使い方のコツ］
-        スマートフォンでご利用の際は、**「画面を横向き」**にしていただき、さらに**画面の左右にある広い余白部分を指でなぞってスクロール**していただくと、地図ループにハマらずスムーズに上下移動できます。
+        ##### ［📱 スマホのホーム画面にアイコンを作る方法（おすすめ）］
+        ご家族のスマホでこのページを開き、ブラウザのメニューから**「ホーム画面に追加」**を選ぶと、専用アプリのようなアイコンをホーム画面に配置できます。一度配置すれば、次回からワンタップで起動できます！
 
-        ##### ［リアルタイム速報連携］
-        Yahoo!災害情報や気象庁RSSの自動取得により、トップ画面で最新ニュースを確認できます。
-
-        ##### ［クイック外部アクセス］
-        雨雲レーダー、落雷情報、運行情報へのワンクリックアクセスが可能です。
+        ##### ［全国一元ビュー・操作のコツ］
+        日本全体の災害リスクをマップとリストで同時に把握できます。スマホでご利用の際は、**「画面を横向き」**にし、**画面の左右の余白を指でなぞってスクロール**するとスムーズに操作できます。
         """, unsafe_allow_html=True)
         
         if st.button("確認しました（システムを開始する）", type="primary"):
@@ -200,7 +199,6 @@ if st.session_state["first_visit"]:
 danger_count = sum(1 for loc in locations if loc["color"] == "red")
 warning_count = sum(1 for loc in locations if loc["color"] == "orange")
 
-# 📌 スマホユーザー向けの案内文（不要なカッコを削除し、すっきりシンプルな表現に変更）
 st.markdown("""
 <div style="background-color: #fef9c3; padding: 12px 16px; border-radius: 8px; border-left: 6px solid #ca8a04; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between;">
     <span style="color: #713f12; font-size: 14px; font-weight: bold;">
@@ -317,7 +315,6 @@ for idx, loc in enumerate(filtered_locations):
             icon=folium.Icon(color=c_color, icon="warning" if c_color!="blue" else "info-sign")
         ).add_to(m)
 
-# 🗺️ 地図の左右の余白（スクロール対策）
 map_left_space, map_center_col, map_right_space = st.columns([0.08, 0.84, 0.08])
 with map_center_col:
     st_folium(m, width="100%", height=400, key=f"map_{current_center[0]}_{current_center[1]}_{current_zoom}")
