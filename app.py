@@ -169,7 +169,7 @@ if st.session_state["first_visit"]:
         - **リアルタイム速報連携**: Yahoo!災害情報や気象庁RSSの自動取得とフォールバック機能により、トップ画面で最新ニュースを確認できます。
         - **クイック外部アクセス**: 雨雲レーダー、落雷情報、運行情報へのワンクリックアクセスが可能です。
         - **スマホからのご利用**: ブラウザのメニューから「ホーム画面に追加」を行うことで、専用アプリ感覚でいつでもすばやく起動できます。<div style="text-align: right; font-style: italic; margin-top: 10px;">by 銅鑼衛門</div>
-        """)
+        """, unsafe_allow_html=True)
         
         if st.button("確認しました（システムを開始する）", type="primary"):
             st.session_state["first_visit"] = False
