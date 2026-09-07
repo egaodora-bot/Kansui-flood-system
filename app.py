@@ -152,7 +152,7 @@ locations = [
     {
         "category": "【河川氾濫】", "region": "関西", "pref": "大阪府", "name": "淀川流域（大阪市北区）", 
         "river_name": "淀川（よどがわ）", "lat": 34.7000, "lon": 135.5000, "source": "国交省 近畿地方整備局", 
-        "level": "レベル1", "level_desc": "【早期注意情報】平常時・安全監視中。",
+        "level": "Level1", "level_desc": "【早期注意情報】平常時・安全監視中。",
         "metric": "観測 2.1m / 警戒 5.0m", "status": "正常（監視中）", "color": "blue", "priority": 3,
         "desc": "関西の主要一級水系。安全水位を維持中。",
         "camera_url": ""
@@ -170,7 +170,6 @@ locations = [
 if st.session_state["first_visit"]:
     st.markdown("<h3 style='font-size: 20px; font-weight: bold; color: #1e90ff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3), 0 0 10px rgba(30,144,255,0.4); margin-bottom: 0.5rem;'>🛡️ 全国統合防災・リスク管理システムへようこそ</h3>", unsafe_allow_html=True)
     
-    # 🟡 初回ウェルカムの説明文：背景を黄色（警告色）に変更して視認性をアップ
     st.markdown("""
     <div style="background-color: #fef9c3; padding: 12px 16px; border-radius: 8px; border-left: 6px solid #ca8a04; color: #713f12; font-weight: bold; font-size: 15px; margin-bottom: 1rem;">
         このシステムは、日本全国の重大な気象・河川・交通リスクをひと目で俯瞰し、迅速な安全確認を行うためのリアルタイムダッシュボードです。
@@ -201,11 +200,11 @@ if st.session_state["first_visit"]:
 danger_count = sum(1 for loc in locations if loc["color"] == "red")
 warning_count = sum(1 for loc in locations if loc["color"] == "orange")
 
-# 📌 画面上部の案内：記号を大きく分かりやすい「 ≫ 」に変更し、黄色背景で強調
+# 📌 スマホユーザー向けの案内文（不要なカッコを削除し、すっきりシンプルな表現に変更）
 st.markdown("""
 <div style="background-color: #fef9c3; padding: 12px 16px; border-radius: 8px; border-left: 6px solid #ca8a04; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between;">
     <span style="color: #713f12; font-size: 14px; font-weight: bold;">
-        <span style="font-size: 22px; color: #b45309; vertical-align: middle;">≫</span> 画面左上のボタン（またはメニューの <span style="font-size: 18px; color: #b45309;">≫</span>）をクリックすると、いつでも「危険レベル凡例」を表示できます
+        <span style="font-size: 22px; color: #b45309; vertical-align: middle;">≫</span> 画面左上のボタンをクリックすると、いつでも危険レベル凡例を表示できます
     </span>
 </div>
 """, unsafe_allow_html=True)
@@ -217,7 +216,6 @@ else:
 
 st.markdown("<h3 style='font-size: 20px; font-weight: bold; margin-bottom: 0rem; color: #1e90ff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3), 0 0 10px rgba(30,144,255,0.4);'>🛡️ 全国統合防災・リスク管理システム</h3>", unsafe_allow_html=True)
 
-# 🔴 システムの概要テキストを赤文字＆太字にして視認性を向上
 st.markdown("<p style='color: #dc2626; font-weight: bold; font-size: 15px; margin-top: 4px;'>主要一級河川や道路冠水情報を警戒レベル・ライブ映像リンク付きで一元管理するシステムです。</p>", unsafe_allow_html=True)
 
 with st.expander("📡 【ライブ取得】リアルタイム災害・速報フィード（Yahoo!・公認RSS連携）", expanded=True):
