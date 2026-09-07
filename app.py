@@ -104,7 +104,7 @@ locations = [
     {
         "category": "【河川氾濫】", "region": "北海道", "pref": "北海道", "name": "石狩川流域（札幌市・江別市周辺）", 
         "river_name": "石狩川（いしかりがわ）", "lat": 43.1167, "lon": 141.5333, "source": "国土交通省 札幌開発建設部", 
-        "level": "レベル3", "level_desc": "【高齢者等避難】水位上昇中。要配慮者は避難準備。",
+        "level": "Level3", "level_desc": "【高齢者等避難】水位上昇中。要配慮者は避難準備。",
         "metric": "観測 3.8m / 警戒 4.2m", "status": "注意（水位上昇中）", "color": "orange", "priority": 2,
         "desc": "北海道を代表する大河川。上流のまとまった雨により水位が上昇傾向。",
         "camera_url": "https://www.hkd.mlit.go.jp/"
@@ -120,7 +120,7 @@ locations = [
     {
         "category": "【河川氾濫】", "region": "関東", "pref": "新潟県", "name": "信濃川流域（新潟市下流）", 
         "river_name": "信濃川（しなのがわ）", "lat": 37.9161, "lon": 139.0364, "source": "国交省 北陸地方整備局", 
-        "level": "レベル3", "level_desc": "【高齢者等避難】災害時要配慮者は避難を開始。一般住民も準備。",
+        "level": "Level3", "level_desc": "【高齢者等避難】災害時要配慮者は避難を開始。一般住民も準備。",
         "metric": "観測 4.8m / 警戒 5.5m", "status": "注意（水位上昇中）", "color": "orange", "priority": 2,
         "desc": "日本最長の大きさを誇る一級河川。上流からの雪解け水と大雨で水位上昇。",
         "camera_url": ""
@@ -128,7 +128,7 @@ locations = [
     {
         "category": "【河川氾濫】", "region": "中部", "pref": "愛知県", "name": "木曽川流域（犬山市周辺）", 
         "river_name": "木曽川（きそがわ）", "lat": 35.3850, "lon": 136.9420, "source": "国交省 中部地方整備局", 
-        "level": "レベル1", "level_desc": "【早期注意情報】気象情報に留意し、今後の動向を注視。",
+        "level": "Level1", "level_desc": "【早期注意情報】気象情報に留意し、今後の動向を注視。",
         "metric": "観測 3.0m / 警戒 4.5m", "status": "正常（監視中）", "color": "blue", "priority": 3,
         "desc": "木曽三川の一つ。現在のところ安全水位を維持しています。",
         "camera_url": ""
@@ -136,7 +136,7 @@ locations = [
     {
         "category": "【高速道路】", "region": "関東", "pref": "埼玉県", "name": "東北自動車道（羽生IC〜館林IC）", 
         "river_name": "---", "lat": 36.1700, "lon": 139.5500, "source": "NEXCO東日本", 
-        "level": "レベル3", "level_desc": "【交通規制】迂回ルートの検討および安全確認が必須。",
+        "level": "Level3", "level_desc": "【交通規制】迂回ルートの検討および安全確認が必須。",
         "metric": "冠水影響による通行止め", "status": "注意（災害影響）", "color": "orange", "priority": 2,
         "desc": "大雨に伴う道路冠水のため、該当区間で上下線とも通行止め。",
         "camera_url": "https://www.c-nexco.co.jp/"
@@ -144,7 +144,7 @@ locations = [
     {
         "category": "【鉄道影響】", "region": "関東", "pref": "東京都", "name": "JR山手線・中央線", 
         "river_name": "---", "lat": 35.6812, "lon": 139.7671, "source": "JR東日本 運行情報", 
-        "level": "レベル3", "level_desc": "【運行障害】運転見合わせ・大幅な遅延が発生中。",
+        "level": "Level3", "level_desc": "【運行障害】運転見合わせ・大幅な遅延が発生中。",
         "metric": "一部運転見合わせ", "status": "注意（ダイヤ乱れ）", "color": "orange", "priority": 2,
         "desc": "大雨の影響および線路内点検のため、一部区間で運転見合わせ。",
         "camera_url": ""
@@ -168,10 +168,12 @@ locations = [
 ]
 
 if st.session_state["first_visit"]:
-    st.markdown("<h3 style='font-size: 18px; font-weight: bold; color: #1e90ff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); margin-bottom: 0.4rem;'>🛡️ 全国統合防災・リスク管理システムへようこそ</h3>", unsafe_allow_html=True)
+    # タイトルを黄色背景・黒文字に変更して目立たせる
+    st.markdown("<h3 style='font-size: 18px; font-weight: bold; background-color: #fef08a; color: #1e293b; padding: 8px 12px; border-radius: 6px; border-left: 6px solid #ca8a04; margin-bottom: 0.8rem;'>🛡️ 全国統合防災・リスク管理システムへようこそ</h3>", unsafe_allow_html=True)
     
+    # その下の説明文は黄色背景のまま、文字を締まりのある「青色（#1d4ed8）」に変更
     st.markdown("""
-    <div style="background-color: #fef9c3; padding: 12px 16px; border-radius: 8px; border-left: 6px solid #ca8a04; color: #713f12; font-weight: bold; font-size: 14px; margin-bottom: 1rem;">
+    <div style="background-color: #fef9c3; padding: 12px 16px; border-radius: 8px; border-left: 6px solid #ca8a04; color: #1d4ed8; font-weight: bold; font-size: 14px; margin-bottom: 1rem;">
         このシステムは、日本全国の重大な気象・河川・交通リスクをひと目で俯瞰し、迅速な安全確認を行うためのリアルタイムダッシュボードです。
     </div>
     """, unsafe_allow_html=True)
@@ -182,7 +184,7 @@ if st.session_state["first_visit"]:
         このシステムを他の人に教えるときは、ブラウザの上部にあるアドレスバーのURLをコピーして、LINEやメールで送ってあげてください。
 
         ##### ［📱 スマホのホーム画面にアイコンを作る方法（おすすめ）］
-        スマホでこのページを開き、ブラウザのメニューから**「ホーム画面に追加」**を選ぶと、専用アプリのようなアイコンをホーム画面に配置できます。一度配置すれば、次回からワンタップで起動できます！
+        スマホでこのページを開き、ブラウザのメニューから**「ホーム画面に追加」**を選ぶと、専用アプリのようなアイコンをホーム画面に配置できます。一度配置すれば、次回からアイコンをワンタップで起動できますので、設定したほうが利用しやすいです。
 
         ##### ［全国一元ビュー・操作のコツ］
         日本全体の災害リスクをマップとリストで同時に把握できます。スマホでご利用の際は、**「画面を横向き」**にし、**画面の左右の余白を指でなぞってスクロール**するとスムーズに操作できます。
