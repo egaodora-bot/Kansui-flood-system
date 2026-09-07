@@ -178,14 +178,8 @@ if st.session_state["first_visit"]:
     </div>
     """, unsafe_allow_html=True)
     
-    # エクスパンダーのタイトルでHTMLエラーにならないよう、Markdown対応のHTMLブロック（st.markdown内）で綺麗に装飾
+    # 重複部分を削除し、エクスパンダーの中身からスタート
     with st.expander("📖 【ご利用ガイド・システム共有方法】（必ずご確認ください）", expanded=True):
-        st.markdown("""
-        <div style="color: #dc2626; font-weight: 800; font-size: 15px; margin-bottom: 8px;">
-            ⚠️ 必ずご確認ください：ご利用ガイドと共有方法
-        </div>
-        """, unsafe_allow_html=True)
-        
         st.markdown("""
         ##### ［ご家族やご友人への共有について］
         このシステムを他の人に教えるときは、ブラウザの上部にあるアドレスバーのURLをコピーして、LINEやメールで送ってあげてください。
