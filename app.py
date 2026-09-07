@@ -168,13 +168,12 @@ locations = [
 ]
 
 if st.session_state["first_visit"]:
-    # タイトルは黄色背景
     st.markdown("<h3 style='font-size: 18px; font-weight: bold; background-color: #fef08a; color: #1e293b; padding: 8px 12px; border-radius: 6px; border-left: 6px solid #ca8a04; margin-bottom: 0.8rem;'>🛡️ 全国統合防災・リスク管理システムへようこそ</h3>", unsafe_allow_html=True)
     
-    # その下の説明文は青背景・白太文字
     st.markdown("""
     <div style="background-color: #1e40af; padding: 12px 16px; border-radius: 8px; border-left: 6px solid #60a5fa; color: #ffffff; font-weight: bold; font-size: 14px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-        このシステムは、日本全国の重大な気象・河川・交通リスクをひと目で俯瞰し、迅速な安全確認を行うためのリアルタイムダッシュボードです。
+        このシステムは、日本全国の重大な気象・河川・交通リスクをひと目で俯瞰し、迅速な安全確認を行うためのリアルタイムダッシュボードです。<br>
+        <span style="font-size: 12px; color: #cbd5e1; font-weight: normal;">データ提供元：気象庁、国土交通省、各地方整備局、NEXCO東日本、JR東日本、Yahoo!ニュースRSS 他公的機関</span>
     </div>
     """, unsafe_allow_html=True)
     
@@ -184,10 +183,10 @@ if st.session_state["first_visit"]:
         このシステムを他の人に教えるときは、ブラウザの上部にあるアドレスバーのURLをコピーして、LINEやメールで送ってあげてください。
 
         ##### ［📱 スマホのホーム画面にアイコンを作る方法（おすすめ）］
-        スマホでこのページを開き、ブラウザのメニューから**「ホーム画面に追加」**を選ぶと、専用アプリのようなアイコンをホーム画面に配置できます。一度配置すれば、次回からアイコンをワンタップで起動できますので、設定したほうが利用しやすいです。
+        スマホでこのページを開き、ブラウザのメニューから**「ホーム画面に追加」**を選ぶと、専用アプリのようなアイコンをホーム画面に配置できます。一度配置すれば、次回からアイコンをワンタップで起動できます。
 
-        ##### ［全国一元ビュー・操作のコツ］
-        日本全体の災害リスクをマップとリストで同時に把握できます。スマホでご利用の際は、**「画面を横向き」**にし、**画面の左右の余白を指でなぞってスクロール**するとスムーズに操作できます。
+        ##### ［データソース（情報元）について］
+        当システムでは、気象庁や国土交通省などの公的機関が提供するオープンデータおよび信頼性の高いRSSフィードを統合してリアルタイム表示しています。
         """, unsafe_allow_html=True)
         
         if st.button("確認しました（システムを開始する）", type="primary"):
@@ -214,23 +213,22 @@ st.markdown("""
 """.format(warning_count), unsafe_allow_html=True)
 
 st.markdown("<h3 style='font-size: 20px; font-weight: bold; margin-bottom: 0rem; color: #1e90ff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3), 0 0 10px rgba(30,144,255,0.4);'>🛡️ 全国統合防災・リスク管理システム</h3>", unsafe_allow_html=True)
-
 st.markdown("<p style='color: #dc2626; font-weight: bold; font-size: 15px; margin-top: 4px;'>主要一級河川や道路冠水情報を警戒レベル・ライブ映像リンク付きで一元管理するシステムです。</p>", unsafe_allow_html=True)
 
 with st.expander("📡 【ライブ取得】リアルタイム災害・速報フィード（Yahoo!・公認RSS連携）", expanded=True):
     news_list = fetch_robust_disaster_news()
     for news in news_list:
-        st.markdown(f"- <a href='{news['link']}' target='_blank' style='color: #d32f2f; font-weight: bold;'>{news['title']}</a> <small style='color:gray;'>({news['date']})</small>", unsafe_allow_html=True)
+        st.markdown(f"- <a href='{news['link']}' target='_blank' rel='noopener noreferrer' style='color: #d32f2f; font-weight: bold;'>{news['title']}</a> <small style='color:gray;'>({news['date']})</small>", unsafe_allow_html=True)
     
     st.markdown("---")
-    st.markdown("⚡ **【クイック気象・交通リンク】** 詳細なリアルタイム状況はこちら：")
+    st.markdown("⚡ **【クイック気象・交通リンク】** （※すべて新しいタブで開きます）")
     col_l1, col_l2, col_l3 = st.columns(3)
     with col_l1:
-        st.markdown("[🌧️ Yahoo!雨雲レーダー](https://weather.yahoo.co.jp/weather/zoomradar/)")
+        st.markdown("<a href='https://weather.yahoo.co.jp/weather/zoomradar/' target='_blank' rel='noopener noreferrer'>🌧️ Yahoo!雨雲レーダー</a>", unsafe_allow_html=True)
     with col_l2:
-        st.markdown("[⚡ Yahoo!落雷情報](https://weather.yahoo.co.jp/weather/lightning/)")
+        st.markdown("<a href='https://weather.yahoo.co.jp/weather/lightning/' target='_blank' rel='noopener noreferrer'>⚡ Yahoo!落雷情報</a>", unsafe_allow_html=True)
     with col_l3:
-        st.markdown("[🚆 Yahoo!路線・運行情報](https://transit.yahoo.co.jp/traininfo/top)")
+        st.markdown("<a href='https://transit.yahoo.co.jp/traininfo/top' target='_blank' rel='noopener noreferrer'>🚆 Yahoo!路線・運行情報</a>", unsafe_allow_html=True)
 
 if "selected_region" not in st.session_state:
     st.session_state["selected_region"] = "日本全国"
@@ -269,12 +267,16 @@ for name, coords, zoom_level, col in regions:
                 st.session_state["zoom"] = zoom_level
                 st.rerun()
 
+# サイドバーへの情報元（データソース）および凡例の明記
 st.sidebar.markdown("<h3 style='font-size: 15px; font-weight: bold; color: #1e90ff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3), 0 0 8px rgba(30,144,255,0.4); margin-bottom: 0px; line-height: 1.4; white-space: nowrap;'>🛡️ 全国統合防災・リスク管理システム</h3>", unsafe_allow_html=True)
 st.sidebar.markdown("---")
 st.sidebar.subheader("📌 防災警戒レベル凡例")
 st.sidebar.markdown("🔴 <span style='color:red; font-weight:bold;'>レベル4：避難指示（全員避難）</span>", unsafe_allow_html=True)
 st.sidebar.markdown("🟠 <span style='color:darkorange; font-weight:bold;'>レベル3：高齢者等避難・交通規制</span>", unsafe_allow_html=True)
-st.sidebar.markdown("🔵 **レベル1〜2**：早期注意・安全監視中")
+st.sidebar.markdown("🔵 **Level1〜2**：早期注意・安全監視中")
+st.sidebar.markdown("---")
+st.sidebar.subheader("📡 主なデータ連携元")
+st.sidebar.markdown("<span style='font-size: 12px; color: #555;'>・気象庁（警報・注意報・RSS）<br>・国土交通省（川の水位情報）<br>・各地方整備局・都道府県<br>・NEXCO東日本 / JR東日本<br>・Yahoo!ニュース RSS</span>", unsafe_allow_html=True)
 
 current_center = st.session_state.get("center", [37.5, 138.0])
 current_zoom = st.session_state.get("zoom", 5)
@@ -298,7 +300,7 @@ for idx, loc in enumerate(filtered_locations):
         c_lvldesc = loc.get('level_desc')
         
         river_info = f"<br><b>対象河川:</b> {c_river}" if c_river != "---" else ""
-        camera_link_html = f"<br><a href='{c_url}' target='_blank' style='color:red; font-weight:bold;'>▶ 【自治体ライブカメラ・規制情報】を見る</a>" if c_url else ""
+        camera_link_html = f"<br><a href='{c_url}' target='_blank' rel='noopener noreferrer' style='color:red; font-weight:bold;'>▶ 【自治体ライブカメラ・規制情報】を見る</a>" if c_url else ""
         
         popup_html = (
             f"<b>{c_cat} [{c_pref}] {c_name}</b>"
@@ -322,14 +324,19 @@ with map_center_col:
     st.markdown("<p style='font-size: 11px; color: gray; text-align: center; margin-top: 4px;'>※地図の左右にある余白部分を指でなぞると、スムーズにページ全体の上下スクロールができます</p>", unsafe_allow_html=True)
 
 st.markdown(f"<h3 style='font-size: 20px; font-weight: bold; margin-top: 1rem; margin-bottom: 0.5rem;'>📋 全国統合リスク・警戒レベル一覧</h3>", unsafe_allow_html=True)
+st.markdown("<p style='font-size: 12px; color: #555;'>表示順：[レベル] ＞ [都道府県] ＞ [対象（地点・河川）] ＞ [状況]</p>", unsafe_allow_html=True)
 
 for idx, loc in enumerate(filtered_locations):
     badge = "🔴【レベル4】" if loc["color"] == "red" else ("🟠【レベル3】" if loc["color"] == "orange" else "🔵【レベル1】")
     river_tag = f" ｜ 対象: **{loc['river_name']}**" if loc['river_name'] != "---" else ""
     
-    title_text = f"{badge} ｜ {loc['category']} 地点: **{loc['name']}** [{loc['pref']}]{river_tag}"
+    # 修正：ご要望に合わせ「レベル ＞ 都道府県 ＞ 対象 ＞ 状況」の順に表示を並び替え
+    title_text = f"{badge} ｜ {loc['pref']} ｜ 対象: **{loc['name']}**{river_tag} ｜ 状況: **{loc['status']}**"
     
     with st.expander(title_text):
+        st.markdown(f"**情報元（データソース）**\n\n`{loc['source']}`")
+        st.markdown("---")
+
         if loc['river_name'] != "---":
             st.markdown(f"**対象水系**\n\n{loc['river_name']}")
             st.markdown("---")
@@ -347,4 +354,5 @@ for idx, loc in enumerate(filtered_locations):
         
         if loc['camera_url']:
             st.markdown("---")
-            st.markdown(f"**関連リンク**\n\n[🎥 自治体ライブカメラ・関連詳細情報はこちら]({loc['camera_url']})")
+            # 確実に新しいタブで開くように HTML の target="_blank" を使用
+            st.markdown(f"**関連リンク**\n\n<a href='{loc['camera_url']}' target='_blank' rel='noopener noreferrer'>🎥 自治体ライブカメラ・関連詳細情報はこちら (別タブで開きます)</a>", unsafe_allow_html=True)
