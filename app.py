@@ -3,13 +3,7 @@ import folium
 from streamlit_folium import st_folium
 import urllib.request
 import xml.etree.ElementTree as ET
-
-# 拡張機能としての現在地取得コンポーネント（未導入の場合はフォールバック）
-try:
-    from streamlit_geolocation import streamlit_geolocation
-    HAS_GEOLOCATION = True
-except ImportError:
-    HAS_GEOLOCATION = False
+import json
 
 st.set_page_config(page_title="全国統合防災・リスク管理システム", layout="wide")
 
@@ -31,27 +25,41 @@ button[kind="primary"] {
 </style>
 """, unsafe_allow_html=True)
 
-@st.cache_data(ttl=600)
-def fetch_free_disaster_news():
+# タイムアウトとエラーハンドリングを強化した実用的フィード取得関数
+@st.cache_data(ttl=300)
+def fetch_robust_disaster_news():
     news_items = []
-    rss_url = "https://news.yahoo.co.jp/rss/topics/disaster.xml"
-    try:
-        req = urllib.request.Request(
-            rss_url, 
-            headers={'User-Agent': 'Mozilla/5.0'}
-        )
-        with urllib.request.urlopen(req, timeout=3) as response:
-            xml_data = response.read()
-            root = ET.fromstring(xml_data)
-            for item in root.findall('./channel/item')[:5]:
-                title = item.find('title').text if item.find('title') is not None else "無題"
-                link = item.find('link').text if item.find('link') is not None else "#"
-                pub_date = item.find('pubDate').text if item.find('pubDate') is not None else ""
-                news_items.append({"title": title, "link": link, "date": pub_date})
-    except Exception:
+    rss_urls = [
+        "https://news.yahoo.co.jp/rss/topics/disaster.xml",
+        "https://www.jma.go.jp/bosai/information/rss/jma_inf.xml"
+    ]
+    
+    success = False
+    for url in rss_urls:
+        try:
+            req = urllib.request.Request(
+                url, 
+                headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
+            )
+            with urllib.request.urlopen(req, timeout=2) as response:
+                xml_data = response.read()
+                root = ET.fromstring(xml_data)
+                for item in root.findall('.//item')[:5]:
+                    title = item.find('title').text if item.find('title') is not None else "無題"
+                    link = item.find('link').text if item.find('link') is not None else "#"
+                    pub_date = item.find('pubDate').text if item.find('pubDate') is not None else ""
+                    pub_date_short = pub_date.split(',')[1].strip() if ',' in pub_date else pub_date
+                    news_items.append({"title": title, "link": link, "date": pub_date_short})
+                if news_items:
+                    success = True
+                    break
+        except Exception:
+            continue
+            
+    if not success or not news_items:
         news_items = [
-            {"title": "【速報】全国各地で大雨・警戒情報発令中（公的RSS連携）", "link": "https://typhoon.yahoo.co.jp/", "date": "10分前"},
-            {"title": "河川・道路冠水の最新情報をご確認ください", "link": "https://www.river.go.jp/", "date": "25分前"}
+            {"title": "【防災情報】全国の気象警報・河川水位の最新情報をご確認ください", "link": "https://www.jma.go.jp/", "date": "現在"},
+            {"title": "【交通情報】道路冠水・公共交通機関の運行状況を確認", "link": "https://www.jartic.or.jp/", "date": "現在"}
         ]
     return news_items
 
@@ -154,12 +162,11 @@ if danger_count > 0:
 else:
     st.warning(f"⚠️ 【注意喚起】 重大な危険（赤）はありませんが、**{warning_count}件** の注意情報が発表されています。")
 
-# タイトルの文字サイズを小さく調整（HTML指定）
 st.markdown("<h3 style='font-size: 20px; font-weight: bold; margin-bottom: 0rem;'>🌧️ 全日本 一級河川・道路交通 リアルタイムモニタリング</h3>", unsafe_allow_html=True)
 st.write("主要一級河川や道路冠水情報を警戒レベル・ライブ映像リンク付きで一元管理するシステムです。")
 
-with st.expander("📡 【無料取得】リアルタイム災害・ネット速報フィード（公的RSS連携）", expanded=True):
-    news_list = fetch_free_disaster_news()
+with st.expander("📡 【ライブ取得】リアルタイム災害・速報フィード（公的RSS連携）", expanded=True):
+    news_list = fetch_robust_disaster_news()
     for news in news_list:
         st.markdown(f"- <a href='{news['link']}' target='_blank' style='color: #d32f2f; font-weight: bold;'>{news['title']}</a> <small style='color:gray;'>({news['date']})</small>", unsafe_allow_html=True)
 
@@ -170,10 +177,8 @@ if "center" not in st.session_state:
     st.session_state["center"] = [37.5, 138.0]
 if "zoom" not in st.session_state:
     st.session_state["zoom"] = 5
-if "user_location" not in st.session_state:
-    st.session_state["user_location"] = None
 
-st.subheader("📍 表示地域の選択")
+st.markdown("<h3 style='font-size: 20px; font-weight: bold; margin-top: 1rem; margin-bottom: 0.5rem;'>📍 表示地域の選択</h3>", unsafe_allow_html=True)
 
 col1, col2, col3, col4, col5, col6, col7 = st.columns(7)
 
@@ -194,7 +199,7 @@ for name, coords, zoom_level, col in regions:
     with col:
         if is_selected:
             if st.button(button_label, key=f"btn_{name}", type="primary"):
-                pass  # 選択中の場合は何もしない
+                pass
         else:
             if st.button(button_label, key=f"btn_{name}", type="secondary"):
                 st.session_state["selected_region"] = name
@@ -202,23 +207,8 @@ for name, coords, zoom_level, col in regions:
                 st.session_state["zoom"] = zoom_level
                 st.rerun()
 
-# サイドバー：現在地（GPS）機能
-st.sidebar.subheader("🧭 現在地（GPS）機能")
-if HAS_GEOLOCATION:
-    st.sidebar.write("ボタンを押すと現在地を取得し、地図の中心に表示します。")
-    loc_data = streamlit_geolocation()
-    if loc_data and loc_data.get("latitude") and loc_data.get("longitude"):
-        user_lat = loc_data["latitude"]
-        user_lon = loc_data["longitude"]
-        st.session_state["user_location"] = [user_lat, user_lon]
-        if st.sidebar.button("🎯 現在地を地図の中心にする"):
-            st.session_state["center"] = [user_lat, user_lon]
-            st.session_state["zoom"] = 13
-            st.session_state["selected_region"] = "現在地"
-            st.rerun()
-else:
-    st.sidebar.info("💡 現在地機能を利用するには `pip install streamlit-geolocation` を実行してください。（未導入でもアプリは動作します）")
-
+# サイドバー：タイトルとフィルター構成
+st.sidebar.markdown("### 🛡️ 防災システム設定")
 st.sidebar.markdown("---")
 st.sidebar.subheader("🔍 表示フィルター")
 show_danger_only = st.sidebar.checkbox("危険・注意（赤・橙）のみ表示", value=False)
@@ -235,15 +225,6 @@ current_center = st.session_state.get("center", [37.5, 138.0])
 current_zoom = st.session_state.get("zoom", 5)
 
 m = folium.Map(location=current_center, zoom_start=current_zoom, control_scale=True)
-
-# ユーザーの現在地があれば緑色のピンをプロット
-if st.session_state.get("user_location"):
-    u_lat, u_lon = st.session_state["user_location"]
-    folium.Marker(
-        [u_lat, u_lon],
-        popup=folium.Popup("<b>📍 あなたの現在地</b>", max_width=200),
-        icon=folium.Icon(color="green", icon="user", prefix="fa")
-    ).add_to(m)
 
 filtered_locations = []
 for loc in locations:
@@ -291,7 +272,7 @@ for loc in filtered_locations:
 
 st_folium(m, width="100%", height=500, key=f"map_{current_center[0]}_{current_center[1]}_{current_zoom}")
 
-st.subheader(f"📋 統合リスク・警戒レベル一覧 ({selected_pref}表示中)")
+st.markdown(f"<h3 style='font-size: 20px; font-weight: bold; margin-top: 1rem; margin-bottom: 0.5rem;'>📋 統合リスク・警戒レベル一覧 ({selected_pref}表示中)</h3>", unsafe_allow_html=True)
 if not filtered_locations:
     st.info("該当するデータはありません。")
 
