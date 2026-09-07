@@ -162,7 +162,7 @@ locations = [
 if st.session_state["first_visit"]:
     st.markdown("<h3 style='font-size: 18px; font-weight: bold; background-color: #fef08a; color: #1e293b; padding: 8px 12px; border-radius: 6px; border-left: 6px solid #ca8a04; margin-bottom: 0.8rem;'>🛡️ 全国統合防災・リスク管理システムへようこそ</h3>", unsafe_allow_html=True)
     
-    # 案内画面上部にフォントを大きくして情報元・連携機関を明記
+    # 案内画面上部に情報元を明記
     st.markdown("""
     <div style="background-color: #1e40af; padding: 18px 22px; border-radius: 8px; border-left: 6px solid #60a5fa; color: #ffffff; font-weight: bold; font-size: 15px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); line-height: 1.7;">
         当システムでは、気象庁や国土交通省などの公的機関が提供するオープンデータおよび信頼性の高いRSSフィードを統合してリアルタイム表示しています。<br><br>
@@ -177,6 +177,7 @@ if st.session_state["first_visit"]:
     </div>
     """, unsafe_allow_html=True)
     
+    # エクスパンダー内からは重複するデータソースの表記を削除
     with st.expander("📖 :red[【ご利用ガイド・システム共有方法】（必ずご確認ください）]", expanded=True):
         st.markdown("""
         ##### ［ご家族やご友人への共有について］
@@ -184,9 +185,6 @@ if st.session_state["first_visit"]:
 
         ##### ［📱 スマホのホーム画面にアイコンを作る方法（おすすめ）］
         スマホでこのページを開き、ブラウザのメニューから**「ホーム画面に追加」**を選ぶと、専用アプリのようなアイコンをホーム画面に配置できます。一度配置すれば、次回からアイコンをワンタップで起動できます。
-
-        ##### ［データソース（情報元）について］
-        当システムでは、気象庁や国土交通省などの公的機関が提供するオープンデータおよび信頼性の高いRSSフィードを統合してリアルタイム表示しています。
         """, unsafe_allow_html=True)
         
         if st.button("確認しました（システムを開始する）", type="primary"):
