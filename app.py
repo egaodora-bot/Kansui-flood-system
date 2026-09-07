@@ -169,7 +169,7 @@ with st.expander("📡 【ライブ取得】リアルタイム災害・速報フ
         st.markdown(f"- <a href='{news['link']}' target='_blank' style='color: #d32f2f; font-weight: bold;'>{news['title']}</a> <small style='color:gray;'>({news['date']})</small>", unsafe_allow_html=True)
     
     st.markdown("---")
-    st.markdown("⚡ **【クイック気象・交通リンク】** 外部の詳細なリアルタイム状況はこちら：")
+    st.markdown("⚡ **【クイック気象・交通リンク】** 詳細なリアルタイム状況はこちら：")
     col_l1, col_l2, col_l3 = st.columns(3)
     with col_l1:
         st.markdown("[🌧️ Yahoo!雨雲レーダー](https://weather.yahoo.co.jp/weather/zoomradar/)")
@@ -214,16 +214,8 @@ for name, coords, zoom_level, col in regions:
                 st.session_state["zoom"] = zoom_level
                 st.rerun()
 
-# サイドバーに現在地設定の案内とフィルターを配置
+# サイドバーはシンプルな表示・凡例のみに整理
 st.sidebar.markdown("<h3 style='font-size: 15px; font-weight: bold; color: #1e90ff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3), 0 0 8px rgba(30,144,255,0.4); margin-bottom: 0px; line-height: 1.4; white-space: nowrap;'>🛡️ 全国統合防災・リスク管理システム</h3>", unsafe_allow_html=True)
-st.sidebar.markdown("---")
-st.sidebar.subheader("📍 現在地・表示エリア設定")
-st.sidebar.info("お住まいの地域を選択すると、対応する都道府県の防災情報に絞り込むことができます。")
-prefectures = ["すべて", "北海道", "東京都", "宮城県", "埼玉県", "大阪府", "福岡県", "新潟県", "愛知県", "高知県"]
-selected_pref = st.sidebar.selectbox("現在地（都道府県）を指定", prefectures)
-
-show_danger_only = st.sidebar.checkbox("危険・注意（赤・橙）のみ表示", value=False)
-
 st.sidebar.markdown("---")
 st.sidebar.subheader("📌 防災警戒レベル凡例")
 st.sidebar.markdown("🔴 <span style='color:red; font-weight:bold;'>レベル4：避難指示（全員避難）</span>", unsafe_allow_html=True)
@@ -235,15 +227,8 @@ current_zoom = st.session_state.get("zoom", 5)
 
 m = folium.Map(location=current_center, zoom_start=current_zoom, control_scale=True)
 
-filtered_locations = []
-for loc in locations:
-    if show_danger_only and loc["color"] == "blue":
-        continue
-    if selected_pref != "すべて" and loc["pref"] != selected_pref:
-        continue
-    filtered_locations.append(loc)
-
-filtered_locations = sorted(filtered_locations, key=lambda x: x["priority"])
+# すべての地点を無条件で対象にする
+filtered_locations = sorted(locations, key=lambda x: x["priority"])
 
 for idx, loc in enumerate(filtered_locations):
     lat, lon = loc.get("lat"), loc.get("lon")
@@ -281,9 +266,7 @@ for idx, loc in enumerate(filtered_locations):
 
 st_folium(m, width="100%", height=500, key=f"map_{current_center[0]}_{current_center[1]}_{current_zoom}")
 
-st.markdown(f"<h3 style='font-size: 20px; font-weight: bold; margin-top: 1rem; margin-bottom: 0.5rem;'>📋 統合リスク・警戒レベル一覧 ({selected_pref}表示中)</h3>", unsafe_allow_html=True)
-if not filtered_locations:
-    st.info("該当するデータはありません。")
+st.markdown("<h3 style='font-size: 20px; font-weight: bold; margin-top: 1rem; margin-bottom: 0.5rem;'>📋 全国統合リスク・警戒レベル一覧</h3>", unsafe_allow_html=True)
 
 for idx, loc in enumerate(filtered_locations):
     badge = "🔴【レベル4】" if loc["color"] == "red" else ("🟠【レベル3】" if loc["color"] == "orange" else "🔵【レベル1】")
