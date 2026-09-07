@@ -72,7 +72,7 @@ def fetch_robust_disaster_news():
     if not success or not news_items:
         news_items = [
             {"title": "【防災情報】全国の気象警報・河川水位の最新情報をご確認ください", "link": "https://www.jma.go.jp/", "date": "現在"},
-            {"title": "【交通情報】道路冠水・公共交通機関の運行状況を確認", "link": "https://www.jartic.or.jp/", "date": "現在"}
+            {"title": "【交通情報】全国の高速道路・鉄道の運行状況を確認", "link": "https://www.jartic.or.jp/", "date": "現在"}
         ]
     return news_items
 
@@ -87,11 +87,11 @@ locations = [
     },
     {
         "category": "【道路冠水】", "region": "関東", "pref": "東京都", "name": "新宿駅西口地下道路・アンダーパス", 
-        "river_name": "---", "lat": 35.6895, "lon": 139.6917, "source": "東京都建設局 道路冠水情報", 
+        "river_name": "---", "lat": 35.6895, "lon": 139.6917, "source": "東京都建設局 / 首都高速道路", 
         "level": "レベル4", "level_desc": "【通行止め・水没危険】車両の進入・通行を厳に禁止。",
         "metric": "冠水深 40cm（車両水没のおそれ）", "status": "危険（通行止め）", "color": "red", "priority": 1,
         "desc": "ゲリラ豪雨によりアンダーパスが水没。立ち往生車両が発生し全面通行止め。",
-        "camera_url": "https://www.kensetsu.metro.tokyo.lg.jp/"
+        "camera_url": "https://www.shutoko.co.jp/"
     },
     {
         "category": "【河川氾濫】", "region": "九州", "pref": "福岡県", "name": "筑後川流域（久留米市周辺）", 
@@ -118,68 +118,59 @@ locations = [
         "camera_url": "https://www.river.go.jp/"
     },
     {
-        "category": "【河川氾濫】", "region": "関東", "pref": "新潟県", "name": "信濃川流域（新潟市下流）", 
-        "river_name": "信濃川（しなのがわ）", "lat": 37.9161, "lon": 139.0364, "source": "国交省 北陸地方整備局", 
-        "level": "Level3", "level_desc": "【高齢者等避難】災害時要配慮者は避難を開始。一般住民も準備。",
-        "metric": "観測 4.8m / 警戒 5.5m", "status": "注意（水位上昇中）", "color": "orange", "priority": 2,
-        "desc": "日本最長の大きさを誇る一級河川。上流からの雪解け水と大雨で水位上昇。",
-        "camera_url": ""
+        "category": "【高速道路】", "region": "中部", "pref": "愛知県", "name": "東名高速道路（岡崎IC〜豊田JCT）", 
+        "river_name": "---", "lat": 34.9500, "lon": 137.1600, "source": "NEXCO中日本 道路交通情報", 
+        "level": "Level3", "level_desc": "【交通規制】大雨による速度規制および一部通行止めのおそれ。",
+        "metric": "降雨量超過による速度規制", "status": "注意（速度規制中）", "color": "orange", "priority": 2,
+        "desc": "NEXCO中日本管内。まとまった降雨により該当区間で50km/hの速度規制を実施中。",
+        "camera_url": "https://www.c-nexco.co.jp/"
     },
     {
-        "category": "【河川氾濫】", "region": "中部", "pref": "愛知県", "name": "木曽川流域（犬山市周辺）", 
-        "river_name": "木曽川（きそがわ）", "lat": 35.3850, "lon": 136.9420, "source": "国交省 中部地方整備局", 
-        "level": "Level1", "level_desc": "【早期注意情報】気象情報に留意し、今後の動向を注視。",
-        "metric": "観測 3.0m / 警戒 4.5m", "status": "正常（監視中）", "color": "blue", "priority": 3,
-        "desc": "木曽三川の一つ。現在のところ安全水位を維持しています。",
-        "camera_url": ""
+        "category": "【鉄道影響】", "region": "関西", "pref": "大阪府", "name": "JR京都線・JR神戸線", 
+        "river_name": "---", "lat": 34.7000, "lon": 135.5000, "source": "JR西日本 運行情報", 
+        "level": "Level3", "level_desc": "【運行障害】大雨に伴う運転見合わせ・遅延。",
+        "metric": "一部ダイヤ乱れ", "status": "注意（遅延発生）", "color": "orange", "priority": 2,
+        "desc": "JR西日本管内。沿線の大雨レーダー反応にともない、一時的に速度落として運行。",
+        "camera_url": "https://www.westjr.co.jp/"
     },
     {
         "category": "【高速道路】", "region": "関東", "pref": "埼玉県", "name": "東北自動車道（羽生IC〜館林IC）", 
         "river_name": "---", "lat": 36.1700, "lon": 139.5500, "source": "NEXCO東日本", 
         "level": "Level3", "level_desc": "【交通規制】迂回ルートの検討および安全確認が必須。",
         "metric": "冠水影響による通行止め", "status": "注意（災害影響）", "color": "orange", "priority": 2,
-        "desc": "大雨に伴う道路冠水のため、該当区間で上下線とも通行止め。",
-        "camera_url": "https://www.c-nexco.co.jp/"
+        "desc": "NEXCO東日本管内。大雨に伴う道路冠水のため、該当区間で上下線とも通行止め。",
+        "camera_url": "https://www.e-nexco.co.jp/"
     },
     {
         "category": "【鉄道影響】", "region": "関東", "pref": "東京都", "name": "JR山手線・中央線", 
         "river_name": "---", "lat": 35.6812, "lon": 139.7671, "source": "JR東日本 運行情報", 
         "level": "Level3", "level_desc": "【運行障害】運転見合わせ・大幅な遅延が発生中。",
         "metric": "一部運転見合わせ", "status": "注意（ダイヤ乱れ）", "color": "orange", "priority": 2,
-        "desc": "大雨の影響および線路内点検のため、一部区間で運転見合わせ。",
-        "camera_url": ""
+        "desc": "JR東日本管内。大雨の影響および線路内点検のため、一部区間で運転見合わせ。",
+        "camera_url": "https://www.jreast.co.jp/"
     },
     {
-        "category": "【河川氾濫】", "region": "関西", "pref": "大阪府", "name": "淀川流域（大阪市北区）", 
-        "river_name": "淀川（よどがわ）", "lat": 34.7000, "lon": 135.5000, "source": "国交省 近畿地方整備局", 
+        "category": "【高速道路】", "region": "九州", "pref": "福岡県", "name": "九州自動車道（太宰府IC〜鳥栖JCT）", 
+        "river_name": "---", "lat": 33.4800, "lon": 130.5200, "source": "NEXCO西日本", 
         "level": "Level1", "level_desc": "【早期注意情報】平常時・安全監視中。",
-        "metric": "観測 2.1m / 警戒 5.0m", "status": "正常（監視中）", "color": "blue", "priority": 3,
-        "desc": "関西の主要一級水系。安全水位を維持中。",
-        "camera_url": ""
-    },
-    {
-        "category": "【河川氾濫】", "region": "四国", "pref": "高知県", "name": "四万十川流域（中下流）", 
-        "river_name": "四万十川（しまんとがわ）", "lat": 33.0000, "lon": 132.9333, "source": "国交省 四国地方整備局", 
-        "level": "Level1", "level_desc": "【早期注意情報】平常時・安全監視中。",
-        "metric": "観測 5.2m / 警戒 6.5m", "status": "正常（監視中）", "color": "blue", "priority": 3,
-        "desc": "日本最後の清流。現在のところ水位に異常なし。",
-        "camera_url": ""
+        "metric": "異常なし", "status": "正常（監視中）", "color": "blue", "priority": 3,
+        "desc": "NEXCO西日本管内。現在のところ交通規制はありません。",
+        "camera_url": "https://www.w-nexco.co.jp/"
     }
 ]
 
 if st.session_state["first_visit"]:
     st.markdown("<h3 style='font-size: 18px; font-weight: bold; background-color: #fef08a; color: #1e293b; padding: 8px 12px; border-radius: 6px; border-left: 6px solid #ca8a04; margin-bottom: 0.8rem;'>🛡️ 全国統合防災・リスク管理システムへようこそ</h3>", unsafe_allow_html=True)
     
-    # 案内画面のデータ提供元を大きく、見やすく改善
     st.markdown("""
     <div style="background-color: #1e40af; padding: 14px 18px; border-radius: 8px; border-left: 6px solid #60a5fa; color: #ffffff; font-weight: bold; font-size: 14px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); line-height: 1.6;">
         このシステムは、日本全国の重大な気象・河川・交通リスクをひと目で俯瞰し、迅速な安全確認を行うためのリアルタイムダッシュボードです。<br><br>
         <div style="background-color: rgba(255, 255, 255, 0.15); padding: 8px 12px; border-radius: 6px; font-size: 13px; color: #ffffff;">
-            🌐 <b>【主なデータ提供元】</b><br>
+            🌐 <b>【主なデータ提供元・連携機関】</b><br>
             ・気象庁（警報・注意報・RSS）<br>
             ・国土交通省 / 各地方整備局（川の水位情報）<br>
-            ・都道府県・市区町村の公開情報<br>
-            ・NEXCO東日本 / JR東日本（交通・運行規制）<br>
+            ・高速道路会社：NEXCO東日本・NEXCO中日本・NEXCO西日本、首都高速、阪神高速等<br>
+            ・鉄道会社：JR東日本・JR東海・JR西日本・JR九州等 各旅客鉄道会社<br>
             ・Yahoo!ニュース RSS 他公的機関
         </div>
     </div>
@@ -275,7 +266,6 @@ for name, coords, zoom_level, col in regions:
                 st.session_state["zoom"] = zoom_level
                 st.rerun()
 
-# サイドバーへの情報元（データソース）および凡例の明記（文字色をくっきり修正）
 st.sidebar.markdown("<h3 style='font-size: 15px; font-weight: bold; color: #1e90ff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3), 0 0 8px rgba(30,144,255,0.4); margin-bottom: 0px; line-height: 1.4; white-space: nowrap;'>🛡️ 全国統合防災・リスク管理システム</h3>", unsafe_allow_html=True)
 st.sidebar.markdown("---")
 st.sidebar.subheader("📌 防災警戒レベル凡例")
@@ -284,8 +274,7 @@ st.sidebar.markdown("🟠 <span style='color:darkorange; font-weight:bold;'>レ�
 st.sidebar.markdown("🔵 **Level1〜2**：早期注意・安全監視中", unsafe_allow_html=True)
 st.sidebar.markdown("---")
 st.sidebar.subheader("📡 主なデータ連携元")
-# 文字色をはっきりと濃い色（#e2e8f0）に指定して薄くなるのを防止
-st.sidebar.markdown("<span style='font-size: 12.5px; color: #cbd5e1; line-height: 1.5;'>・気象庁（警報・注意報・RSS）<br>・国土交通省（川の水位情報）<br>・各地方整備局・都道府県<br>・NEXCO東日本 / JR東日本<br>・Yahoo!ニュース RSS</span>", unsafe_allow_html=True)
+st.sidebar.markdown("<span style='font-size: 12.5px; color: #cbd5e1; line-height: 1.5;'>・気象庁（警報・注意報・RSS）<br>・国土交通省（川の水位情報）<br>・NEXCO東/中/西日本・首都高等<br>・JR東/中/西/九州等 旅客鉄道各社<br>・Yahoo!ニュース RSS</span>", unsafe_allow_html=True)
 
 current_center = st.session_state.get("center", [37.5, 138.0])
 current_zoom = st.session_state.get("zoom", 5)
@@ -309,7 +298,7 @@ for idx, loc in enumerate(filtered_locations):
         c_lvldesc = loc.get('level_desc')
         
         river_info = f"<br><b>対象河川:</b> {c_river}" if c_river != "---" else ""
-        camera_link_html = f"<br><a href='{c_url}' target='_blank' rel='noopener noreferrer' style='color:red; font-weight:bold;'>▶ 【自治体ライブカメラ・規制情報】を見る</a>" if c_url else ""
+        camera_link_html = f"<br><a href='{c_url}' target='_blank' rel='noopener noreferrer' style='color:red; font-weight:bold;'>▶ 【事業者公式サイト・ライブ情報】を見る</a>" if c_url else ""
         
         popup_html = (
             f"<b>{c_cat} [{c_pref}] {c_name}</b>"
@@ -339,7 +328,6 @@ for idx, loc in enumerate(filtered_locations):
     badge = "🔴【レベル4】" if loc["color"] == "red" else ("🟠【レベル3】" if loc["color"] == "orange" else "🔵【レベル1】")
     river_tag = f" ｜ 対象: **{loc['river_name']}**" if loc['river_name'] != "---" else ""
     
-    # 修正：ご要望に合わせ「レベル ＞ 都道府県 ＞ 対象 ＞ 状況」の順に表示を並び替え
     title_text = f"{badge} ｜ {loc['pref']} ｜ 対象: **{loc['name']}**{river_tag} ｜ 状況: **{loc['status']}**"
     
     with st.expander(title_text):
@@ -363,4 +351,4 @@ for idx, loc in enumerate(filtered_locations):
         
         if loc['camera_url']:
             st.markdown("---")
-            st.markdown(f"**関連リンク**\n\n<a href='{loc['camera_url']}' target='_blank' rel='noopener noreferrer'>🎥 自治体ライブカメラ・関連詳細情報はこちら (別タブで開きます)</a>", unsafe_allow_html=True)
+            st.markdown(f"**関連リンク**\n\n<a href='{loc['camera_url']}' target='_blank' rel='noopener noreferrer'>🎥 公式サイト・関連詳細情報はこちら (別タブで開きます)</a>", unsafe_allow_html=True)
