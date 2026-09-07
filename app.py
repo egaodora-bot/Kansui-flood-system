@@ -166,17 +166,18 @@ if st.session_state["first_visit"]:
     st.info("このシステムは、日本全国の重大な気象・河川・交通リスクをひと目で俯瞰し、迅速な安全確認を行うためのリアルタイムダッシュボードです。")
     
     with st.expander("📖 【ご利用ガイド・システム概要】（必ずご確認ください）", expanded=True):
+        # 📌 ガイド内のタイトルを［ ］ごとにきれいに改行（2段化）
         st.markdown("""
-        **【全国一元ビュー】**
+        ##### ［全国一元ビュー］
         日本全体の重要な災害リスク（河川氾濫・道路冠水・交通規制）をマップとリストで同時に把握できます。
 
-        **【💡 スマホでの快適な使い方のコツ】**
-        スマートフォンでご利用の際は、**「画面を横向き」**にしていただき、さらに**画面の左右にある余白部分を指でなぞってスクロール**していただくと、地図ループにハマらずスムーズに上下移動できます。
+        ##### ［💡 スマホでの快適な使い方のコツ］
+        スマートフォンでご利用の際は、**「画面を横向き」**にしていただき、さらに**画面の左右にある広い余白部分を指でなぞってスクロール**していただくと、地図ループにハマらずスムーズに上下移動できます。
 
-        **【リアルタイム速報連携】**
+        ##### ［リアルタイム速報連携］
         Yahoo!災害情報や気象庁RSSの自動取得により、トップ画面で最新ニュースを確認できます。
 
-        **【クイック外部アクセス】**
+        ##### ［クイック外部アクセス］
         雨雲レーダー、落雷情報、運行情報へのワンクリックアクセスが可能です。
         """, unsafe_allow_html=True)
         
@@ -296,11 +297,11 @@ for idx, loc in enumerate(filtered_locations):
             icon=folium.Icon(color=c_color, icon="warning" if c_color!="blue" else "info-sign")
         ).add_to(m)
 
-# 🗺️ 地図の左右に余白（カラム）を設けて、スマホでの地図ループ（スクロール固定）を防止
-map_left_space, map_center_col, map_right_space = st.columns([0.03, 0.94, 0.03])
+# 🗺️ 地図の左右の余白をさらに広げ（0.08 → 0.84 → 0.08）、スマホでの地図ループを確実に防止
+map_left_space, map_center_col, map_right_space = st.columns([0.08, 0.84, 0.08])
 with map_center_col:
     st_folium(m, width="100%", height=400, key=f"map_{current_center[0]}_{current_center[1]}_{current_zoom}")
-    st.markdown("<p style='font-size: 11px; color: gray; text-align: center; margin-top: 2px;'>※地図の上下にある左右の余白部分をなぞると、スムーズにページ全体のスクロールができます</p>", unsafe_allow_html=True)
+    st.markdown("<p style='font-size: 11px; color: gray; text-align: center; margin-top: 4px;'>※地図の左右にある余白部分を指でなぞると、スムーズにページ全体の上下スクロールができます</p>", unsafe_allow_html=True)
 
 st.markdown(f"<h3 style='font-size: 20px; font-weight: bold; margin-top: 1rem; margin-bottom: 0.5rem;'>📋 全国統合リスク・警戒レベル一覧</h3>", unsafe_allow_html=True)
 
@@ -308,10 +309,10 @@ for idx, loc in enumerate(filtered_locations):
     badge = "🔴【レベル4】" if loc["color"] == "red" else ("🟠【レベル3】" if loc["color"] == "orange" else "🔵【レベル1】")
     river_tag = f" ｜ 対象: **{loc['river_name']}**" if loc['river_name'] != "---" else ""
     
-    # 📋 展開アコーディオンの中の項目名と説明も、それぞれ改行（2段）にして見やすく整理
     title_text = f"{badge} ｜ {loc['category']} 地点: **{loc['name']}** [{loc['pref']}]{river_tag}"
     
     with st.expander(title_text):
+        # 📋 アコーディオン内の各タイトル文字が大きすぎたため、標準サイズ（太字の段落）に変更してすっきり整理
         if loc['river_name'] != "---":
             st.markdown(f"**対象水系**\n\n{loc['river_name']}")
             st.markdown("---")
