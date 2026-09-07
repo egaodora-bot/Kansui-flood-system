@@ -205,8 +205,8 @@ for name, coords, zoom_level, col in regions:
                 st.session_state["zoom"] = zoom_level
                 st.rerun()
 
-# サイドバーのタイトルも同様に「リアルタイム」の前で改行
-st.sidebar.markdown("<h3 style='font-size: 15px; font-weight: bold; color: #1e90ff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3), 0 0 8px rgba(30,144,255,0.4); margin-bottom: 0px; line-height: 1.4;'>🌧️ 全日本 一級河川・道路交通<br>リアルタイムモニタリング</h3>", unsafe_allow_html=True)
+# サイドバーのタイトルを「全日本」と「リアルタイム」の間に改行を入れるように調整
+st.sidebar.markdown("<h3 style='font-size: 15px; font-weight: bold; color: #1e90ff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3), 0 0 8px rgba(30,144,255,0.4); margin-bottom: 0px; line-height: 1.4;'>🌧️ 全日本<br>リアルタイム一級河川・道路交通<br>モニタリング</h3>", unsafe_allow_html=True)
 st.sidebar.markdown("---")
 st.sidebar.subheader("🔍 表示フィルター")
 show_danger_only = st.sidebar.checkbox("危険・注意（赤・橙）のみ表示", value=False)
