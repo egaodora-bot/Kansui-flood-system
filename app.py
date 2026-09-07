@@ -167,10 +167,17 @@ if st.session_state["first_visit"]:
     
     with st.expander("📖 【ご利用ガイド・システム概要】（必ずご確認ください）", expanded=True):
         st.markdown("""
-        - **全国一元ビュー**: 日本全体の重要な災害リスク（河川氾濫・道路冠水・交通規制）をマップとリストで同時に把握できます。
-        - **💡 スマホでの快適な使い方のコツ**: スマートフォンでご利用の際は、**「画面を横向き」にしていただく**と、地域選択ボタンが綺麗に横並びになり、地図も非常に見やすくなります。ぜひ横向きでお試しください！
-        - **リアルタイム速報連携**: Yahoo!災害情報や気象庁RSSの自動取得により、トップ画面で最新ニュースを確認できます。
-        - **クイック外部アクセス**: 雨雲レーダー、落雷情報、運行情報へのワンクリックアクセスが可能です。
+        **【全国一元ビュー】**
+        日本全体の重要な災害リスク（河川氾濫・道路冠水・交通規制）をマップとリストで同時に把握できます。
+
+        **【💡 スマホでの快適な使い方のコツ】**
+        スマートフォンでご利用の際は、**「画面を横向き」**にしていただき、さらに**画面の左右にある余白部分を指でなぞってスクロール**していただくと、地図ループにハマらずスムーズに上下移動できます。
+
+        **【リアルタイム速報連携】**
+        Yahoo!災害情報や気象庁RSSの自動取得により、トップ画面で最新ニュースを確認できます。
+
+        **【クイック外部アクセス】**
+        雨雲レーダー、落雷情報、運行情報へのワンクリックアクセスが可能です。
         """, unsafe_allow_html=True)
         
         if st.button("確認しました（システムを開始する）", type="primary"):
@@ -212,7 +219,8 @@ if "center" not in st.session_state:
 if "zoom" not in st.session_state:
     st.session_state["zoom"] = 5
 
-st.markdown("<h3 style='font-size: 20px; font-weight: bold; margin-top: 1rem; margin-bottom: 0.5rem;'>📍 表示地域の選択 <span style='font-size:13px; color:#d32f2f; font-weight:bold;'>（スマホは画面を横向きにすると見やすいです💡）</span></h3>", unsafe_allow_html=True)
+st.markdown("<h3 style='font-size: 20px; font-weight: bold; margin-top: 1rem; margin-bottom: 0.5rem;'>📍 表示地域の選択</h3>", unsafe_allow_html=True)
+st.markdown("<p style='font-size: 13px; color: #d32f2f; font-weight: bold; margin-bottom: 0.5rem;'>💡 スマホは画面を横向きにするとボタンが綺麗に並びやすくなります</p>", unsafe_allow_html=True)
 
 col1, col2, col3, col4, col5, col6, col7 = st.columns(7)
 
@@ -288,21 +296,37 @@ for idx, loc in enumerate(filtered_locations):
             icon=folium.Icon(color=c_color, icon="warning" if c_color!="blue" else "info-sign")
         ).add_to(m)
 
-st_folium(m, width="100%", height=400, key=f"map_{current_center[0]}_{current_center[1]}_{current_zoom}")
+# 🗺️ 地図の左右に余白（カラム）を設けて、スマホでの地図ループ（スクロール固定）を防止
+map_left_space, map_center_col, map_right_space = st.columns([0.03, 0.94, 0.03])
+with map_center_col:
+    st_folium(m, width="100%", height=400, key=f"map_{current_center[0]}_{current_center[1]}_{current_zoom}")
+    st.markdown("<p style='font-size: 11px; color: gray; text-align: center; margin-top: 2px;'>※地図の上下にある左右の余白部分をなぞると、スムーズにページ全体のスクロールができます</p>", unsafe_allow_html=True)
 
 st.markdown(f"<h3 style='font-size: 20px; font-weight: bold; margin-top: 1rem; margin-bottom: 0.5rem;'>📋 全国統合リスク・警戒レベル一覧</h3>", unsafe_allow_html=True)
 
 for idx, loc in enumerate(filtered_locations):
     badge = "🔴【レベル4】" if loc["color"] == "red" else ("🟠【レベル3】" if loc["color"] == "orange" else "🔵【レベル1】")
     river_tag = f" ｜ 対象: **{loc['river_name']}**" if loc['river_name'] != "---" else ""
-    title_text = f"{badge} ｜ {loc['category']} 地点: **{loc['name']}** [{loc['pref']}]{river_tag} ｜ 情報元: {loc['source']}"
+    
+    # 📋 展開アコーディオンの中の項目名と説明も、それぞれ改行（2段）にして見やすく整理
+    title_text = f"{badge} ｜ {loc['category']} 地点: **{loc['name']}** [{loc['pref']}]{river_tag}"
     
     with st.expander(title_text):
         if loc['river_name'] != "---":
-            st.markdown(f"- **対象水系**: {loc['river_name']}")
-        st.markdown(f"- **警戒レベル**: `{loc['level']}` — {loc['level_desc']}")
-        st.markdown(f"- **ステータス詳細**: {loc['status']}")
-        st.markdown(f"- **規制・水位指標**: {loc['metric']}")
-        st.markdown(f"- **状況説明**: {loc['desc']}")
+            st.markdown(f"**対象水系**\n\n{loc['river_name']}")
+            st.markdown("---")
+        
+        st.markdown(f"**警戒レベル**\n\n`{loc['level']}` — {loc['level_desc']}")
+        st.markdown("---")
+        
+        st.markdown(f"**ステータス詳細**\n\n{loc['status']}")
+        st.markdown("---")
+        
+        st.markdown(f"**規制・水位指標**\n\n{loc['metric']}")
+        st.markdown("---")
+        
+        st.markdown(f"**状況説明**\n\n{loc['desc']}")
+        
         if loc['camera_url']:
-            st.markdown(f"### [🎥 自治体ライブカメラ・関連詳細情報はこちら]({loc['camera_url']})")
+            st.markdown("---")
+            st.markdown(f"**関連リンク**\n\n[🎥 自治体ライブカメラ・関連詳細情報はこちら]({loc['camera_url']})")
