@@ -3,7 +3,6 @@ import folium
 from streamlit_folium import st_folium
 import urllib.request
 import xml.etree.ElementTree as ET
-import json
 
 st.set_page_config(page_title="全国統合防災・リスク管理システム", layout="wide")
 
@@ -164,10 +163,20 @@ else:
 st.markdown("<h3 style='font-size: 20px; font-weight: bold; margin-bottom: 0rem; color: #1e90ff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3), 0 0 10px rgba(30,144,255,0.4);'>🛡️ 全国統合防災・リスク管理システム</h3>", unsafe_allow_html=True)
 st.write("主要一級河川や道路冠水情報を警戒レベル・ライブ映像リンク付きで一元管理するシステムです。")
 
-with st.expander("📡 【ライブ取得】リアルタイム災害・速報フィード（公的RSS連携）", expanded=True):
+with st.expander("📡 【ライブ取得】リアルタイム災害・速報フィード（Yahoo!・公認RSS連携）", expanded=True):
     news_list = fetch_robust_disaster_news()
     for news in news_list:
         st.markdown(f"- <a href='{news['link']}' target='_blank' style='color: #d32f2f; font-weight: bold;'>{news['title']}</a> <small style='color:gray;'>({news['date']})</small>", unsafe_allow_html=True)
+    
+    st.markdown("---")
+    st.markdown("⚡ **【クイック気象・交通リンク】** 外部の詳細なリアルタイム状況はこちら：")
+    col_l1, col_l2, col_l3 = st.columns(3)
+    with col_l1:
+        st.markdown("[🌧️ Yahoo!雨雲レーダー](https://weather.yahoo.co.jp/weather/zoomradar/)")
+    with col_l2:
+        st.markdown("[⚡ Yahoo!落雷情報](https://weather.yahoo.co.jp/weather/lightning/)")
+    with col_l3:
+        st.markdown("[🚆 Yahoo!路線・運行情報](https://transit.yahoo.co.jp/traininfo/top)")
 
 if "selected_region" not in st.session_state:
     st.session_state["selected_region"] = "日本全国"
@@ -205,12 +214,15 @@ for name, coords, zoom_level, col in regions:
                 st.session_state["zoom"] = zoom_level
                 st.rerun()
 
+# サイドバーに現在地設定の案内とフィルターを配置
 st.sidebar.markdown("<h3 style='font-size: 15px; font-weight: bold; color: #1e90ff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3), 0 0 8px rgba(30,144,255,0.4); margin-bottom: 0px; line-height: 1.4; white-space: nowrap;'>🛡️ 全国統合防災・リスク管理システム</h3>", unsafe_allow_html=True)
 st.sidebar.markdown("---")
-st.sidebar.subheader("🔍 表示フィルター")
-show_danger_only = st.sidebar.checkbox("危険・注意（赤・橙）のみ表示", value=False)
+st.sidebar.subheader("📍 現在地・表示エリア設定")
+st.sidebar.info("お住まいの地域を選択すると、対応する都道府県の防災情報に絞り込むことができます。")
 prefectures = ["すべて", "北海道", "東京都", "宮城県", "埼玉県", "大阪府", "福岡県", "新潟県", "愛知県", "高知県"]
-selected_pref = st.sidebar.selectbox("都道府県で絞り込み", prefectures)
+selected_pref = st.sidebar.selectbox("現在地（都道府県）を指定", prefectures)
+
+show_danger_only = st.sidebar.checkbox("危険・注意（赤・橙）のみ表示", value=False)
 
 st.sidebar.markdown("---")
 st.sidebar.subheader("📌 防災警戒レベル凡例")
@@ -281,19 +293,7 @@ for idx, loc in enumerate(filtered_locations):
     with st.expander(title_text):
         if loc['river_name'] != "---":
             st.markdown(f"- **対象水系**: {loc['river_name']}")
-        
-        # 警戒レベルのバッジ（またはテキスト）を押したらその場所に移動するボタン
-        col_lvl, col_desc = st.columns([1.5, 8.5])
-        with col_lvl:
-            btn_key = f"jump_map_{idx}_{loc['name']}"
-            if st.button(f"🔍 地図で見る", key=btn_key, type="primary"):
-                st.session_state["center"] = [loc["lat"], loc["lon"]]
-                st.session_state["zoom"] = 14  # 拡大してフォーカス
-                st.rerun()
-                
-        with col_desc:
-            st.markdown(f"- **警戒レベル**: `{loc['level']}` — {loc['level_desc']}")
-            
+        st.markdown(f"- **警戒レベル**: `{loc['level']}` — {loc['level_desc']}")
         st.markdown(f"- **ステータス詳細**: {loc['status']}")
         st.markdown(f"- **規制・水位指標**: {loc['metric']}")
         st.markdown(f"- **状況説明**: {loc['desc']}")
