@@ -178,8 +178,8 @@ if st.session_state["first_visit"]:
     </div>
     """, unsafe_allow_html=True)
     
-    # 重複部分を削除し、エクスパンダーの中身からスタート
-    with st.expander("📖 【ご利用ガイド・システム共有方法】（必ずご確認ください）", expanded=True):
+    # Streamlitのカラー構文（:red[...]）を使用して、エラーを出さずにタイトルを赤文字にする
+    with st.expander("📖 :red[【ご利用ガイド・システム共有方法】（必ずご確認ください）]", expanded=True):
         st.markdown("""
         ##### ［ご家族やご友人への共有について］
         このシステムを他の人に教えるときは、ブラウザの上部にあるアドレスバーのURLをコピーして、LINEやメールで送ってあげてください。
