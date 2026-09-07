@@ -154,7 +154,7 @@ locations = [
     {
         "category": "【河川氾濫】", "region": "四国", "pref": "高知県", "name": "四万十川流域（中下流）", 
         "river_name": "四万十川（しまんとがわ）", "lat": 33.0000, "lon": 132.9333, "source": "国交省 四国地方整備局", 
-        "level": "レベル1", "level_desc": "【早期注意情報】平常時・安全監視中。",
+        "level": "Level1", "level_desc": "【早期注意情報】平常時・安全監視中。",
         "metric": "観測 5.2m / 警戒 6.5m", "status": "正常（監視中）", "color": "blue", "priority": 3,
         "desc": "日本最後の清流。現在のところ水位に異常なし。",
         "camera_url": ""
@@ -162,11 +162,11 @@ locations = [
 ]
 
 if st.session_state["first_visit"]:
-    st.markdown("<h2 style='color:#0056b3;'>🛡️ 全国統合防災・リスク管理システムへようこそ</h2>", unsafe_allow_html=True)
+    # 🔍 ウェルカムタイトルの大きさを他の見出し（20px）と統一してバランスを改善
+    st.markdown("<h3 style='font-size: 20px; font-weight: bold; color: #1e90ff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3), 0 0 10px rgba(30,144,255,0.4); margin-bottom: 0.5rem;'>🛡️ 全国統合防災・リスク管理システムへようこそ</h3>", unsafe_allow_html=True)
     st.info("このシステムは、日本全国の重大な気象・河川・交通リスクをひと目で俯瞰し、迅速な安全確認を行うためのリアルタイムダッシュボードです。")
     
     with st.expander("📖 【ご利用ガイド・システム概要】（必ずご確認ください）", expanded=True):
-        # 📌 ガイド内のタイトルを［ ］ごとにきれいに改行（2段化）
         st.markdown("""
         ##### ［全国一元ビュー］
         日本全体の重要な災害リスク（河川氾濫・道路冠水・交通規制）をマップとリストで同時に把握できます。
@@ -297,7 +297,7 @@ for idx, loc in enumerate(filtered_locations):
             icon=folium.Icon(color=c_color, icon="warning" if c_color!="blue" else "info-sign")
         ).add_to(m)
 
-# 🗺️ 地図の左右の余白をさらに広げ（0.08 → 0.84 → 0.08）、スマホでの地図ループを確実に防止
+# 🗺️ 地図の左右の余白（スクロール対策）
 map_left_space, map_center_col, map_right_space = st.columns([0.08, 0.84, 0.08])
 with map_center_col:
     st_folium(m, width="100%", height=400, key=f"map_{current_center[0]}_{current_center[1]}_{current_zoom}")
@@ -312,7 +312,6 @@ for idx, loc in enumerate(filtered_locations):
     title_text = f"{badge} ｜ {loc['category']} 地点: **{loc['name']}** [{loc['pref']}]{river_tag}"
     
     with st.expander(title_text):
-        # 📋 アコーディオン内の各タイトル文字が大きすぎたため、標準サイズ（太字の段落）に変更してすっきり整理
         if loc['river_name'] != "---":
             st.markdown(f"**対象水系**\n\n{loc['river_name']}")
             st.markdown("---")
