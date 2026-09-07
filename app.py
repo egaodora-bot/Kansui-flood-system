@@ -171,14 +171,15 @@ if st.session_state["first_visit"]:
     # タイトルは黄色背景
     st.markdown("<h3 style='font-size: 18px; font-weight: bold; background-color: #fef08a; color: #1e293b; padding: 8px 12px; border-radius: 6px; border-left: 6px solid #ca8a04; margin-bottom: 0.8rem;'>🛡️ 全国統合防災・リスク管理システムへようこそ</h3>", unsafe_allow_html=True)
     
-    # その下の説明文は「青背景・白文字（太文字：font-weight: bold;）」に設定
+    # その下の説明文は青背景・白太文字
     st.markdown("""
     <div style="background-color: #1e40af; padding: 12px 16px; border-radius: 8px; border-left: 6px solid #60a5fa; color: #ffffff; font-weight: bold; font-size: 14px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
         このシステムは、日本全国の重大な気象・河川・交通リスクをひと目で俯瞰し、迅速な安全確認を行うためのリアルタイムダッシュボードです。
     </div>
     """, unsafe_allow_html=True)
     
-    with st.expander("📖 【ご利用ガイド・システム共有方法】（必ずご確認ください）", expanded=True):
+    # ご利用ガイドのエクスパンダータイトルを「赤字・太字」に変更（StreamlitのMarkdownでHTMLタグを使用）
+    with st.expander("📖 <span style='color: #dc2626; font-weight: 800;'>【ご利用ガイド・システム共有方法】（必ずご確認ください）</span>", expanded=True):
         st.markdown("""
         ##### ［ご家族やご友人への共有について］
         このシステムを他の人に教えるときは、ブラウザの上部にあるアドレスバーのURLをコピーして、LINEやメールで送ってあげてください。
