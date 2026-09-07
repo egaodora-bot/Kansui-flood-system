@@ -7,7 +7,9 @@ import xml.etree.ElementTree as ET
 st.set_page_config(
     page_title="全国統合防災・リスク管理システム", 
     page_icon="🛡️", 
-    layout="wide"
+    layout="wide",
+    # 📱 スマホなどの狭い画面では最初からサイドバーを自動で折りたたむ（閉じ忘れるストレスを解消）
+    initial_sidebar_state="collapsed"
 )
 
 st.markdown("""
@@ -26,6 +28,11 @@ button[kind="primary"] {
     border: 3px solid #004085 !important;
     color: #ffffff !important;
     font-weight: 800 !important;
+}
+
+/* スマホ等でサイドバーの閉じるボタン（<<）や上部が隠れてしまわないよう、余白と位置を調整 */
+section[data-testid="stSidebar"] {
+    padding-top: 1rem;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -154,7 +161,7 @@ locations = [
     {
         "category": "【河川氾濫】", "region": "四国", "pref": "高知県", "name": "四万十川流域（中下流）", 
         "river_name": "四万十川（しまんとがわ）", "lat": 33.0000, "lon": 132.9333, "source": "国交省 四国地方整備局", 
-        "level": "Level1", "level_desc": "【早期注意情報】平常時・安全監視中。",
+        "level": "レベル1", "level_desc": "【早期注意情報】平常時・安全監視中。",
         "metric": "観測 5.2m / 警戒 6.5m", "status": "正常（監視中）", "color": "blue", "priority": 3,
         "desc": "日本最後の清流。現在のところ水位に異常なし。",
         "camera_url": ""
@@ -162,7 +169,6 @@ locations = [
 ]
 
 if st.session_state["first_visit"]:
-    # 🔍 ウェルカムタイトルの大きさを他の見出し（20px）と統一してバランスを改善
     st.markdown("<h3 style='font-size: 20px; font-weight: bold; color: #1e90ff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3), 0 0 10px rgba(30,144,255,0.4); margin-bottom: 0.5rem;'>🛡️ 全国統合防災・リスク管理システムへようこそ</h3>", unsafe_allow_html=True)
     st.info("このシステムは、日本全国の重大な気象・河川・交通リスクをひと目で俯瞰し、迅速な安全確認を行うためのリアルタイムダッシュボードです。")
     
