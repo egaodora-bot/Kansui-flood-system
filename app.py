@@ -25,12 +25,16 @@ button[kind="primary"] {
     font-size: 16px !important;
     font-weight: 800 !important;
 }
-/* ツールバーを左下に移動して右上の誤タップを防止 */
-[data-testid="stHeader"] {
+
+/* ツールバー等を左下に移動して誤操作を防止 */
+[data-testid="stHeader"], 
+[data-testid="stToolbar"], 
+.stDeployButton, 
+header {
     position: fixed !important;
     top: auto !important;
-    bottom: 10px !important;
-    left: 10px !important;
+    bottom: 15px !important;
+    left: 15px !important;
     right: auto !important;
     background: transparent !important;
     z-index: 999999 !important;
@@ -297,7 +301,8 @@ for idx, loc in enumerate(filtered_locations):
             icon=folium.Icon(color=c_color, icon="warning" if c_color!="blue" else "info-sign")
         ).add_to(m)
 
-st_folium(m, width="100%", height=500, key=f"map_{current_center[0]}_{current_center[1]}_{current_zoom}")
+# 💡 地図の高さを 400 に調整し、上下の文章や操作がしやすくなるよう改善
+st_folium(m, width="100%", height=400, key=f"map_{current_center[0]}_{current_center[1]}_{current_zoom}")
 
 st.markdown(f"<h3 style='font-size: 20px; font-weight: bold; margin-top: 1rem; margin-bottom: 0.5rem;'>📋 全国統合リスク・警戒レベル一覧</h3>", unsafe_allow_html=True)
 
