@@ -25,9 +25,10 @@ button[kind="primary"] {
     font-size: 16px !important;
     font-weight: 800 !important;
 }
-/* ヘッダーを表示したままクリック・タップを無効化して誤操作を防ぐ */
-[data-testid="stHeader"] {
-    pointer-events: none;
+
+/* 💡 修正：ヘッダー全体および右上の王冠（Deploy）ボタン等のクリックを完全に無効化 */
+[data-testid="stHeader"], .stDeployButton, header {
+    pointer-events: none !important;
 }
 </style>
 """, unsafe_allow_html=True)
