@@ -178,7 +178,6 @@ if st.session_state["first_visit"]:
     </div>
     """, unsafe_allow_html=True)
     
-    # Streamlitのカラー構文（:red[...]）を使用して、エラーを出さずにタイトルを赤文字にする
     with st.expander("📖 :red[【ご利用ガイド・システム共有方法】（必ずご確認ください）]", expanded=True):
         st.markdown("""
         ##### ［ご家族やご友人への共有について］
@@ -201,17 +200,18 @@ danger_count = sum(1 for loc in locations if loc["color"] == "red")
 warning_count = sum(1 for loc in locations if loc["color"] == "orange")
 
 st.markdown("""
-<div style="background-color: #fef9c3; padding: 12px 16px; border-radius: 8px; border-left: 6px solid #ca8a04; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between;">
-    <span style="color: #713f12; font-size: 14px; font-weight: bold;">
-        <span style="font-size: 22px; color: #b45309; vertical-align: middle;">≫</span> 画面左上のボタンをクリックすると、いつでも危険レベル凡例を表示できます
+<div style="background-color: #1e293b; padding: 12px 16px; border-radius: 8px; border-left: 6px solid #ef4444; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+    <span style="color: #f8fafc; font-size: 14px; font-weight: bold;">
+        🚨 <span style="color: #fca5a5;">【緊急警報発令中】</span> 危険（赤）が <span style="color: #f87171; font-size: 16px;"><b>{}件</b></span>、注意（橙）が <span style="color: #fbbf24; font-size: 16px;"><b>{}件</b></span> 発生しています。警戒レベルを確認し、速やかな避難・安全確保を行ってください。
     </span>
 </div>
-""", unsafe_allow_html=True)
-
-if danger_count > 0:
-    st.error(f"🚨 【緊急警報発令中】 危険（赤）が **{danger_count}件**、注意（橙）が **{warning_count}件** 発生しています。警戒レベルを確認し、速やかな避難・安全確保を行ってください。")
-else:
-    st.warning(f"⚠️ 【注意喚起】 重大な危険（赤）はありませんが、**{warning_count}件** の注意情報が発表されています。")
+""".format(danger_count, warning_count) if danger_count > 0 else """
+<div style="background-color: #1e293b; padding: 12px 16px; border-radius: 8px; border-left: 6px solid #f59e0b; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+    <span style="color: #f8fafc; font-size: 14px; font-weight: bold;">
+        ⚠️ <span style="color: #fde047;">【注意喚起】</span> 重大な危険（赤）はありませんが、<span style="color: #fbbf24; font-size: 16px;"><b>{}件</b></span> の注意情報が発表されています。
+    </span>
+</div>
+""".format(warning_count), unsafe_allow_html=True)
 
 st.markdown("<h3 style='font-size: 20px; font-weight: bold; margin-bottom: 0rem; color: #1e90ff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3), 0 0 10px rgba(30,144,255,0.4);'>🛡️ 全国統合防災・リスク管理システム</h3>", unsafe_allow_html=True)
 
