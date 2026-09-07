@@ -25,9 +25,16 @@ button[kind="primary"] {
     font-size: 16px !important;
     font-weight: 800 !important;
 }
-/* ヘッダー・王冠マーク・メニューを完全に非表示にして誤操作を防ぐ */
-[data-testid="stHeader"], .stDeployButton, #MainMenu, footer {
-    display: none !important;
+/* ツールバーを左下に移動して右上の誤タップを防止 */
+[data-testid="stHeader"] {
+    position: fixed !important;
+    top: auto !important;
+    bottom: 10px !important;
+    left: 10px !important;
+    right: auto !important;
+    background: transparent !important;
+    z-index: 999999 !important;
+    width: auto !important;
 }
 </style>
 """, unsafe_allow_html=True)
