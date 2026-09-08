@@ -192,6 +192,18 @@ if st.session_state["first_visit"]:
     
     st.stop()
 
+# --- メイン画面上部のシステムタイトル（カードデザインで綺麗に改修） ---
+st.markdown("""
+<div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 1px solid #334155; border-left: 6px solid #3b82f6; padding: 16px 20px; border-radius: 8px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+    <div style="color: #60a5fa; font-size: 20px; font-weight: bold; margin-bottom: 4px;">
+        🛡️ 全国総合防災・気象庁データ統合システム
+    </div>
+    <div style="color: #fde047; font-size: 13.5px; font-weight: bold;">
+        気象庁の公式災害情報をベースに、重要拠点の状況をリアルタイムで把握します。
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
 available_regions = ["北海道", "東北", "関東", "中部", "関西", "四国", "九州"]
 if "selected_regions" not in st.session_state:
     st.session_state["selected_regions"] = ["関東"]
@@ -229,9 +241,6 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown("<h3 style='font-size: 20px; font-weight: bold; margin-bottom: 0rem; color: #1e90ff;'>🛡️ 全国総合防災・気象庁データ統合システム</h3>", unsafe_allow_html=True)
-st.markdown("<p style='color: #fde047; font-weight: bold; font-size: 14px; margin-top: 4px;'>気象庁の災害情報をベースに、重要拠点の状況を把握します。</p>", unsafe_allow_html=True)
-
 # 通勤・鉄道情報の常時確認用「小窓（ミニウィジェット風枠）」
 st.markdown("""
 <div style="background-color: #0f172a; border: 2px solid #38bdf8; padding: 12px 16px; border-radius: 8px; margin-top: 1rem; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
@@ -266,7 +275,8 @@ with st.expander("📡 【ライブ取得】リアルタイム災害・速報フ
     for news in news_list:
         st.markdown(f"- <a href='{news['link']}' target='_blank' rel='noopener noreferrer' style='color: #d32f2f; font-weight: bold;'>{news['title']}</a> <small style='color:gray;'>({news['date']})</small>", unsafe_allow_html=True)
 
-st.sidebar.markdown("<h3 style='font-size: 15px; font-weight: bold; color: #1e90ff;'>🛡️ 全国総合防災システム</h3>", unsafe_allow_html=True)
+# --- 左側メニュー（サイドバー）のシステム名も完全に統一 ---
+st.sidebar.markdown("<h3 style='font-size: 14px; font-weight: bold; color: #60a5fa; line-height: 1.5;'>🛡️ 全国総合防災・<br>気象庁データ統合システム</h3>", unsafe_allow_html=True)
 st.sidebar.markdown("---")
 st.sidebar.subheader("📌 警戒レベル凡例")
 st.sidebar.markdown("🔴 <span style='color:red; font-weight:bold;'>レベル4：避難指示（全員避難）</span>", unsafe_allow_html=True)
