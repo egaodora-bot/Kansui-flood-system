@@ -197,14 +197,14 @@ if st.session_state["first_visit"]:
     
     st.stop()
 
-# --- メイン画面上部のシステムタイトル（左右両端に青いアクセントライン） ---
+# --- メイン画面上部のシステムタイトル（左右両端に青いアクセントライン、補足は青文字に調整） ---
 st.markdown("""
 <div style="border-left: 5px solid #3b82f6; border-right: 5px solid #3b82f6; padding-left: 12px; padding-right: 12px; margin-bottom: 1.2rem;">
     <div style="color: #60a5fa; font-size: 20px; font-weight: bold; margin-bottom: 4px;">
         🛡️ 全国総合防災・気象庁データ統合システム
     </div>
-    <div style="color: #fde047; font-size: 13.5px; font-weight: bold;">
-        気象庁の公式災害情報をベースに、重要拠点の状況をリアルタイムで把握します。
+    <div style="color: #93c5fd; font-size: 13.5px; font-weight: bold;">
+        （※気象庁の公式災害情報をベースに、重要拠点の状況をリアルタイムで把握します）
     </div>
 </div>
 """, unsafe_allow_html=True)
