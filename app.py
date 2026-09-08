@@ -162,9 +162,9 @@ if st.session_state["first_visit"]:
     <div style="background-color: #1e40af; padding: 18px 22px; border-radius: 8px; border-left: 6px solid #60a5fa; color: #ffffff; font-weight: bold; font-size: 15px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); line-height: 1.7;">
         当システムでは、気象庁や国土交通省などの公的機関が提供するオープンデータおよび信頼性の高い情報を統合してリアルタイム表示しています。<br><br>
         <div style="background-color: rgba(255, 255, 255, 0.15); padding: 10px 14px; border-radius: 6px; font-size: 14px; color: #ffffff; line-height: 1.8;">
-            📍 <b>【複数エリア監視機能について】</b><br>
-            ・初期状態では<b>日本全国すべての地域が選択</b>されており、選択した地域（関東など）に紐づく情報がすべて自動展開されます。<br>
-            ・ブラウザを閉じれば設定は自動リセットされる安全設計です。<br><br>
+            📍 <b>【マルチセレクト連動について】</b><br>
+            ・選択した地域（例: 関東）に属する登録データが、**該当地域内ですべて抽出され一覧・地図に展開**されます。<br>
+            ・全国すべての細かな市町村データを網羅しきれない部分は、下の**「リアルタイム危機可視化・直リンク集」**から全国の公式詳細へ一発でアクセス可能です。<br><br>
             🌐 <b>【主なデータ提供元】</b><br>
             ・気象庁（キキクル・警報） / 国土交通省（河川水位） / Yahoo!天気
         </div>
@@ -204,34 +204,34 @@ st.markdown("""
 """.format(warning_count), unsafe_allow_html=True)
 
 st.markdown("<h3 style='font-size: 20px; font-weight: bold; margin-bottom: 0rem; color: #1e90ff;'>🛡️ 全国統合防災・リスク管理システム</h3>", unsafe_allow_html=True)
-st.markdown("<p style='color: #dc2626; font-weight: bold; font-size: 14px; margin-top: 4px;'>自宅や通勤経路など、選んだ地域の危険度・交通・河川情報を同時に可視化します。</p>", unsafe_allow_html=True)
+st.markdown("<p style='color: #dc2626; font-weight: bold; font-size: 14px; margin-top: 4px;'>マルチセレクトで選択された地域の登録情報をすべてまとめて可視化します。</p>", unsafe_allow_html=True)
 
 available_regions = ["北海道", "東北", "関東", "中部", "関西", "四国", "九州"]
 if "selected_regions" not in st.session_state:
-    st.session_state["selected_regions"] = available_regions
+    st.session_state["selected_regions"] = ["関東"]
 
 st.markdown("""
 <div style="background-color: #1e293b; border: 1px solid #334155; padding: 12px 16px; border-radius: 8px; margin-bottom: 1rem;">
-    <span style="color: #fef08a; font-weight: bold; font-size: 14px;">📍 監視エリアの選択（選択した地域に該当する情報がすべて自動展開されます）</span>
+    <span style="color: #fef08a; font-weight: bold; font-size: 14px;">📍 監視エリアのマルチセレクト選択</span>
 </div>
 """, unsafe_allow_html=True)
 
 selected_regions = st.multiselect(
-    "確認したい地域を複数選べます",
+    "確認したい地域を複数選べます（選んだ地域のデータがすべて展開されます）",
     options=available_regions,
     default=st.session_state["selected_regions"]
 )
 st.session_state["selected_regions"] = selected_regions
 
-# 危機可視化・直リンクパネル
+# 危機可視化・直リンクパネル（全国すべての市町村・詳細を補うセーフティ機能）
 st.markdown("""
 <div style="background-color: #0f172a; border: 2px solid #ef4444; padding: 14px 18px; border-radius: 8px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
     <div style="color: #fef08a; font-weight: bold; font-size: 15px; margin-bottom: 8px;">
-        ⚡ <b>【リアルタイム危機可視化・直リンク集】今すぐ最新警報・キキクルを確認</b>
+        ⚡ <b>【リアルタイム危機可視化・直リンク集】全国すべての市区町村の最新情報を直接確認</b>
     </div>
     <div style="font-size: 13.5px; color: #f1f5f9; line-height: 1.8;">
-        ・ 🔴 <a href="https://www.jma.go.jp/bosai/warning/" target="_blank" rel="noopener noreferrer" style="color: #fca5a5; font-weight: bold;">気象庁 警報・注意報（市区町村別の最新発令状況）</a><br>
-        ・ ⚠️ <a href="https://www.jma.go.jp/bosai/risk/" target="_blank" rel="noopener noreferrer" style="color: #60a5fa; font-weight: bold;">気象庁 キキクル（土砂・浸水・洪水危険度分布）</a><br>
+        ・ 🔴 <a href="https://www.jma.go.jp/bosai/warning/" target="_blank" rel="noopener noreferrer" style="color: #fca5a5; font-weight: bold;">気象庁 警報・注意報（日本全国の市区町村別の最新発令状況）</a><br>
+        ・ ⚠️ <a href="https://www.jma.go.jp/bosai/risk/" target="_blank" rel="noopener noreferrer" style="color: #60a5fa; font-weight: bold;">気象庁 キキクル（全国の土砂・浸水・洪水危険度分布）</a><br>
         ・ ☂️ <a href="https://weathernews.jp/" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; font-weight: bold;">ウェザーニュース（最新の天気・台風解説）</a><br>
         ・ 🌧️ <a href="https://weather.yahoo.co.jp/weather/zoomradar/" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; font-weight: bold;">Yahoo!天気・災害（雨雲レーダー・避難情報）</a><br>
         ・ 🚆 <a href="https://transit.yahoo.co.jp/traininfo/top" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; font-weight: bold;">Yahoo!路線・運行情報（電車の遅延・見合わせ）</a>
@@ -259,7 +259,7 @@ else:
 
 filtered_locations = sorted(filtered_locations, key=lambda x: x["priority"])
 
-m = folium.Map(location=[37.5, 138.0], zoom_start=5, control_scale=True)
+m = folium.Map(location=[36.0, 139.5] if selected_regions else [37.5, 138.0], zoom_start=8 if selected_regions else 5, control_scale=True)
 
 for idx, loc in enumerate(filtered_locations):
     lat, lon = loc.get("lat"), loc.get("lon")
@@ -301,11 +301,9 @@ st.markdown(f"<h3 style='font-size: 20px; font-weight: bold; margin-top: 1rem;'>
 if not filtered_locations and selected_regions:
     st.markdown("""
     <div style="background-color: #1e293b; border-left: 5px solid #3b82f6; padding: 16px; border-radius: 6px; margin-bottom: 1rem;">
-        <span style="color: #93c5fd; font-weight: bold; font-size: 15px;">ℹ️ 選択された地域（{}）の詳細個別サンプルは現在登録されていません。</span><br><br>
+        <span style="color: #93c5fd; font-weight: bold; font-size: 15px;">ℹ️ 選択された地域（{}）の個別登録データは現在ありません。</span><br><br>
         <span style="color: #f1f5f9; font-size: 13.5px;">
-            しかし、お住まいや通勤・お出かけ先のリアルタイムな気象警報・キキクル等の情報は、以下の公式ページから一発で直接ご確認いただけます：<br>
-            ・ 🔴 <a href="https://www.jma.go.jp/bosai/warning/" target="_blank" rel="noopener noreferrer" style="color: #fca5a5; font-weight: bold;">気象庁 警報・注意報（市区町村別の最新発令状況）</a><br>
-            ・ ⚠️ <a href="https://www.jma.go.jp/bosai/risk/" target="_blank" rel="noopener noreferrer" style="color: #60a5fa; font-weight: bold;">気象庁 キキクル（土砂・浸水・洪水危険度分布）</a>
+            しかし、お住まいや通勤・お出かけ先のリアルタイムな気象警報・キキクル等の情報は、上の<b>【リアルタイム危機可視化・直リンク集】</b>から直接ご確認いただけます。
         </span>
     </div>
     """.format(", ".join(selected_regions)), unsafe_allow_html=True)
