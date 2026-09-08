@@ -197,9 +197,9 @@ if st.session_state["first_visit"]:
     
     st.stop()
 
-# --- メイン画面上部のシステムタイトル（余白を 1.4rem に調整） ---
+# --- メイン画面上部のシステムタイトル（左右のボーダーを削除し、余白を調整） ---
 st.markdown("""
-<div style="border-left: 5px solid #3b82f6; border-right: 5px solid #3b82f6; padding-left: 12px; padding-right: 12px; margin-bottom: 1.4rem;">
+<div style="margin-bottom: 1.4rem;">
     <div style="color: #60a5fa; font-size: 20px; font-weight: bold; margin-bottom: 4px;">
         🛡️ 全国総合防災・気象庁データ統合システム
     </div>
