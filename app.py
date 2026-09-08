@@ -13,7 +13,6 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-/* ボタン全体のデザイン調整 */
 div.stButton > button {
     width: 100%;
     border-radius: 6px;
@@ -28,8 +27,6 @@ button[kind="primary"] {
     color: #ffffff !important;
     font-weight: 800 !important;
 }
-
-/* スマホ等でサイドバーや上部が隠れないよう調整 */
 section[data-testid="stSidebar"] {
     padding-top: 1rem;
 }
@@ -210,18 +207,19 @@ st.markdown("""
 st.markdown("<h3 style='font-size: 20px; font-weight: bold; margin-bottom: 0rem; color: #1e90ff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3), 0 0 10px rgba(30,144,255,0.4);'>🛡️ 全国統合防災・リスク管理システム</h3>", unsafe_allow_html=True)
 st.markdown("<p style='color: #dc2626; font-weight: bold; font-size: 15px; margin-top: 4px;'>主要一級河川や道路冠水情報を警戒レベル・ライブ映像リンク付きで一元管理するシステムです。</p>", unsafe_allow_html=True)
 
-# ★【追加・強化】「今、自分に何が迫っているか」を一目で可視化・直リンクする緊急パネル
+# ★【最重要強化】文字ベースによる「全国リアルタイム危機可視化・直リンクパネル」
 st.markdown("""
-<div style="background-color: #0f172a; border: 2px solid #ef4444; padding: 14px 18px; border-radius: 8px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
-    <div style="color: #fef08a; font-weight: bold; font-size: 15px; margin-bottom: 8px;">
-        ⚡ <b>【危機可視化・リアルタイム直リンク】今すぐご自身の周辺の危険度を確認</b>
+<div style="background-color: #0f172a; border: 2px solid #ef4444; padding: 16px 20px; border-radius: 8px; margin-bottom: 1.2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+    <div style="color: #fef08a; font-weight: bold; font-size: 16px; margin-bottom: 10px;">
+        ⚡ <b>【全国リアルタイム危機可視化・直リンク集】今すぐお住まいの地域・最新警報を確認</b>
     </div>
-    <div style="font-size: 13.5px; color: #f1f5f9; line-height: 1.6;">
-        お住まいの地域に迫る大雨の危険度や雨雲・気象情報を、主要各社の専門サービスで一発確認できます。<br>
-        ・ <a href="https://www.jma.go.jp/bosai/risk/" target="_blank" rel="noopener noreferrer" style="color: #60a5fa; font-weight: bold;">気象庁 キキクル（危険度分布：土砂・浸水・洪水）</a><br>
-        ・ <a href="https://weathernews.jp/" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; font-weight: bold;">ウェザーニュース（最新の天気・警報・台風情報）</a><br>
-        ・ <a href="https://weather.yahoo.co.jp/weather/zoomradar/" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; font-weight: bold;">Yahoo!天気・災害（雨雲レーダー・落雷情報）</a><br>
-        ・ <a href="https://transit.yahoo.co.jp/traininfo/top" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; font-weight: bold;">Yahoo!路線・運行情報（電車の遅延・見合わせ）</a>
+    <div style="font-size: 14px; color: #f1f5f9; line-height: 1.8;">
+        古河市をはじめ、たった今全国各地で発表されているレベル3（高齢者等避難）や警報・危険度は、以下の公式リアルタイムサービスから文字・詳細地図で一発確認できます。<br>
+        ・ 🔴 <a href="https://www.jma.go.jp/bosai/warning/" target="_blank" rel="noopener noreferrer" style="color: #fca5a5; font-weight: bold;">気象庁 警報・注意報（全国の市町村別リアルタイム発令状況）</a><br>
+        ・ ⚠️ <a href="https://www.jma.go.jp/bosai/risk/" target="_blank" rel="noopener noreferrer" style="color: #60a5fa; font-weight: bold;">気象庁 キキクル（危険度分布：土砂災害・浸水・洪水）</a><br>
+        ・ ☂️ <a href="https://weathernews.jp/" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; font-weight: bold;">ウェザーニュース（最新の天気・警報・台風・リアルタイム解説）</a><br>
+        ・ 🌧️ <a href="https://weather.yahoo.co.jp/weather/zoomradar/" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; font-weight: bold;">Yahoo!天気・災害（雨雲レーダー・落雷・自治体ごとの避難情報）</a><br>
+        ・ 🚆 <a href="https://transit.yahoo.co.jp/traininfo/top" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; font-weight: bold;">Yahoo!路線・運行情報（電車の遅延・運転見合わせ状況）</a>
     </div>
 </div>
 """, unsafe_allow_html=True)
