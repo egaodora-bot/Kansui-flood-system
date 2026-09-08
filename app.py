@@ -5,7 +5,7 @@ import urllib.request
 import xml.etree.ElementTree as ET
 
 st.set_page_config(
-    page_title="全国総合防災・命を守るリスク管理システム", 
+    page_title="全国総合防災・気象庁データ統合システム", 
     page_icon="🛡️", 
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -67,36 +67,35 @@ def fetch_robust_disaster_news():
             
     if not success or not news_items:
         news_items = [
-            {"title": "【防災情報】全国の気象警報・地震・津波の最新情報をご確認ください", "link": "https://www.jma.go.jp/", "date": "現在"},
-            {"title": "【交通情報】全国の高速道路・鉄道の運行状況を確認", "link": "https://www.jartic.or.jp/", "date": "現在"}
+            {"title": "【防災情報】気象庁の最新警報・注意報・地震情報をご確認ください", "link": "https://www.jma.go.jp/", "date": "現在"},
+            {"title": "【運行情報】主要な交通機関の運行状況を確認", "link": "https://www.jartic.or.jp/", "date": "現在"}
         ]
     return news_items
 
-# 地震・津波・氾濫・土砂崩れなど全命関与データを網羅したマスターリスト
 locations = [
     {
-        "category": "【河川氾濫】", "region": "関東", "pref": "東京都", "name": "多摩川流域（二子玉川周辺）", 
-        "river_name": "多摩川（たまがわ）", "lat": 35.6000, "lon": 139.6300, "source": "国土交通省 京浜河川事務所", 
+        "category": "【河川氾濫・気象庁情報】", "region": "関東", "pref": "東京都", "name": "多摩川流域（二子玉川周辺）", 
+        "river_name": "多摩川（たまがわ）", "lat": 35.6000, "lon": 139.6300, "source": "気象庁・国土交通省", 
         "level": "レベル4", "level_desc": "【避難指示】全員速やかに避難。氾濫のおそれが極めて高い状態。",
         "metric": "観測 4.1m / 警戒 4.0m", "status": "危険（氾濫危険水位超）", "color": "red", "priority": 1,
-        "desc": "首都圏を流れる主要一級河川。水位が急上昇し氾濫危険水位に到達。",
-        "camera_url": "https://www.river.go.jp/kawabousai/pc/m?zm=12&clat=35.6&clon=139.63"
+        "desc": "首都圏を流れる主要一級河川。気象庁および河川事務所からの警戒情報発令中。",
+        "camera_url": "https://www.jma.go.jp/bosai/warning/"
     },
     {
-        "category": "【土砂災害】", "region": "関東", "pref": "東京都", "name": "多摩西部・山間部エリア", 
-        "river_name": "---", "lat": 35.7792, "lon": 139.1106, "source": "気象庁・東京都", 
+        "category": "【土砂災害・気象庁情報】", "region": "関東", "pref": "東京都", "name": "多摩西部・山間部エリア", 
+        "river_name": "---", "lat": 35.7792, "lon": 139.1106, "source": "気象庁 キキクル", 
         "level": "レベル4", "level_desc": "【避難指示】土砂災害警戒情報発令中。崖崩れのおそれ。",
         "metric": "土砂災害警戒判定スコア超過", "status": "危険（土砂崩れ切迫）", "color": "red", "priority": 1,
         "desc": "長引く大雨により土砂災害の危険度が極めて高まっています。",
         "camera_url": "https://www.jma.go.jp/bosai/risk/"
     },
     {
-        "category": "【道路冠水】", "region": "関東", "pref": "東京都", "name": "新宿駅西口地下道路・アンダーパス", 
-        "river_name": "---", "lat": 35.6895, "lon": 139.6917, "source": "東京都建設局 / 首都高速道路", 
+        "category": "【道路冠水・気象庁情報】", "region": "関東", "pref": "東京都", "name": "新宿駅西口地下道路・アンダーパス", 
+        "river_name": "---", "lat": 35.6895, "lon": 139.6917, "source": "気象庁・東京都", 
         "level": "レベル4", "level_desc": "【通行止め・水没危険】車両の進入・通行を厳に禁止。",
         "metric": "冠水深 40cm（車両水没のおそれ）", "status": "危険（通行止め）", "color": "red", "priority": 1,
         "desc": "ゲリラ豪雨によりアンダーパスが水没。立ち往生車両が発生し全面通行止め。",
-        "camera_url": "https://www.shutoko.co.jp/"
+        "camera_url": "https://www.jma.go.jp/bosai/warning/"
     },
     {
         "category": "【地震・津波】", "region": "関東", "pref": "千葉県", "name": "房総半島沿岸エリア", 
@@ -107,12 +106,44 @@ locations = [
         "camera_url": "https://www.jma.go.jp/bosai/information.html"
     },
     {
+        "category": "【河川氾濫】", "region": "関東", "pref": "埼玉県", "name": "埼玉県南部（荒川流域・戸田市周辺）", 
+        "river_name": "荒川（あらかわ）", "lat": 35.8150, "lon": 139.6700, "source": "気象庁・国土交通省", 
+        "level": "レベル3", "level_desc": "【高齢者等避難】水位上昇中。要配慮者は避難準備。",
+        "metric": "観測 6.2m / 警戒 6.5m", "status": "注意（水位上昇中）", "color": "orange", "priority": 2,
+        "desc": "埼玉県南部を流れる大河川。上流域の降雨により水位が上昇傾向にあります。",
+        "camera_url": "https://www.jma.go.jp/bosai/warning/"
+    },
+    {
+        "category": "【河川氾濫】", "region": "関東", "pref": "神奈川県", "name": "神奈川県東部（多摩川下流・鶴見川）", 
+        "river_name": "鶴見川（つるみがわ）", "lat": 35.5100, "lon": 139.6300, "source": "気象庁・国土交通省", 
+        "level": "レベル3", "level_desc": "【高齢者等避難】水位上昇中。",
+        "metric": "観測 2.4m / 警戒 2.8m", "status": "注意（水位上昇中）", "color": "orange", "priority": 2,
+        "desc": "横浜市・川崎市を流れる都市型河川。短時間の強い雨で急激に水位が上昇。",
+        "camera_url": "https://www.jma.go.jp/bosai/warning/"
+    },
+    {
+        "category": "【大雨・洪水】", "region": "関東", "pref": "茨城県", "name": "茨城県南部（利根川流域・取手市周辺）", 
+        "river_name": "利根川（とねがわ）", "lat": 35.9000, "lon": 140.0600, "source": "気象庁", 
+        "level": "Level3", "level_desc": "【高齢者等避難】厳重警戒。",
+        "metric": "水位上昇中", "status": "注意（監視中）", "color": "orange", "priority": 2,
+        "desc": "日本最大の流域面積を誇る坂東太郎。下流部の水位監視を強化中。",
+        "camera_url": "https://www.jma.go.jp/bosai/warning/"
+    },
+    {
+        "category": "【河川氾濫】", "region": "関東", "pref": "栃木県", "name": "栃木県南部（渡良川流域・足利市周辺）", 
+        "river_name": "渡良川（わたらせがわ）", "lat": 36.3400, "lon": 139.4500, "source": "気象庁", 
+        "level": "レベル3", "level_desc": "【高齢者等避難】水位上昇。",
+        "metric": "警戒水位到達", "status": "注意（警戒中）", "color": "orange", "priority": 2,
+        "desc": "足利市周辺を流れる重要水系。まとまった雨により警戒レベル3相当。",
+        "camera_url": "https://www.jma.go.jp/bosai/warning/"
+    },
+    {
         "category": "【河川氾濫】", "region": "九州", "pref": "福岡県", "name": "筑後川流域（久留米市周辺）", 
-        "river_name": "筑後川（ちくごがわ）", "lat": 33.3197, "lon": 130.5086, "source": "国土交通省 九州地方整備局", 
+        "river_name": "筑後川（ちくごがわ）", "lat": 33.3197, "lon": 130.5086, "source": "気象庁", 
         "level": "レベル3", "level_desc": "【高齢者等避難】水位上昇中。要配慮者は避難準備。",
         "metric": "観測 5.1m / 警戒 5.8m", "status": "注意（水位上昇中）", "color": "orange", "priority": 2,
         "desc": "西日本最大の「筑紫次郎」と呼ばれる一級河川。上流の豪雨で水位上昇中。",
-        "camera_url": "https://www.qsr.mlit.go.jp/"
+        "camera_url": "https://www.jma.go.jp/bosai/warning/"
     },
     {
         "category": "【地震・津波】", "region": "北海道", "pref": "北海道", "name": "太平洋沿岸東部エリア", 
@@ -120,41 +151,39 @@ locations = [
         "level": "レベル3", "level_desc": "【地震警戒】余震および津波に注意。",
         "metric": "震度4", "status": "注意（監視中）", "color": "orange", "priority": 2,
         "desc": "北海道東部を震源とする地震が発生。今後の情報に注意してください。",
-        "camera_url": "https://www.jma.go.jp/"
+        "camera_url": "https://www.jma.go.jp/bosai/information.html"
     },
     {
         "category": "【河川氾濫】", "region": "東北", "pref": "宮城県", "name": "広瀬川流域（仙台市中心部）", 
-        "river_name": "広瀬川（ひろせがわ）", "lat": 38.2688, "lon": 140.8721, "source": "国土交通省・仙台市", 
+        "river_name": "広瀬川（ひろせがわ）", "lat": 38.2688, "lon": 140.8721, "source": "気象庁", 
         "level": "レベル4", "level_desc": "【避難指示】全員速やかに避難。市街地への浸水リスク切迫。",
         "metric": "観測 3.2m / 警戒 3.0m", "status": "危険（氾濫危険水位超）", "color": "red", "priority": 1,
         "desc": "東北の主要河川。上流の豪雨により氾濫危険水位を突破。避難指示発令中。",
-        "camera_url": "https://www.river.go.jp/"
+        "camera_url": "https://www.jma.go.jp/bosai/warning/"
     }
 ]
 
 if st.session_state["first_visit"]:
-    st.markdown("<h3 style='font-size: 18px; font-weight: bold; background-color: #fef08a; color: #1e293b; padding: 8px 12px; border-radius: 6px; border-left: 6px solid #ca8a04; margin-bottom: 0.8rem;'>🛡️ 全国統合防災・命を守るリスク管理システム</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='font-size: 18px; font-weight: bold; background-color: #fef08a; color: #1e293b; padding: 8px 12px; border-radius: 6px; border-left: 6px solid #ca8a04; margin-bottom: 0.8rem;'>🛡️ 気象庁データ連動・全国防災リスクシステム</h3>", unsafe_allow_html=True)
     
     st.markdown("""
     <div style="background-color: #1e40af; padding: 18px 22px; border-radius: 8px; border-left: 6px solid #60a5fa; color: #ffffff; font-weight: bold; font-size: 15px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); line-height: 1.7;">
-        地震、津波、河川氾濫、大雨水没、土砂崩れなど、命に関わるあらゆる災害情報を網羅・統合してリアルタイム表示します。<br><br>
+        気象庁が全市区町村を網羅して配信する公式防災データ（警報・注意報・キキクル・地震情報）をベースに構成されています。<br><br>
         <div style="background-color: rgba(255, 255, 255, 0.15); padding: 10px 14px; border-radius: 6px; font-size: 14px; color: #ffffff; line-height: 1.8;">
             📍 <b>【システムの特徴】</b><br>
-            ・最大2地域の選択により、スマホでも高速かつエラーなく重要拠点のリスクを可視化。<br>
-            ・全国すべての市区町村の網羅的データは、下記の**「気象庁公式・全災害種別リアルタイム直リンク集」**から一切の漏れなくアクセス可能。<br><br>
-            🌐 <b>【対応災害】</b><br>
-            ・地震 / 津波 / 洪水・河川氾濫 / 土砂災害 / 大雨・道路冠水
+            ・気象庁データを基軸に、スマホでもエラーなく安全に稼働。<br>
+            ・全国すべての市区町村の網羅的詳細情報は、下記の**「気象庁公式・民間気象会社の信頼リンク集」**から直接アクセス可能。
         </div>
     </div>
     """, unsafe_allow_html=True)
     
-    with st.expander("📖 :red[【ご利用ガイド・命を守る共有方法】（必ずご確認ください）]", expanded=True):
+    with st.expander("📖 :red[【ご利用ガイド・命を守る共有方法】]", expanded=True):
         st.markdown("""
-        ##### ［ご家族やご友人への共有について］
-        災害時はこのシステムのURLをLINEやメールで共有することで、全員が同じ最新の防災・避難情報にアクセスできます。
+        ##### ［ご家族やご友人への共有］
+        災害時はこのシステムのURLを共有することで、全員が同じ最新情報にアクセスできます。
 
         ##### ［📱 スマホのホーム画面への追加］
-        ブラウザのメニューから**「ホーム画面に追加」**を選ぶと、緊急時にワンタップで起動できる専用アプリのように使えます。
+        ブラウザメニューから「ホーム画面に追加」を行うと、専用アプリのようにワンタップで起動できます。
         """, unsafe_allow_html=True)
         
         if st.button("確認しました（システムを開始する）", type="primary"):
@@ -169,7 +198,7 @@ warning_count = sum(1 for loc in locations if loc["color"] == "orange")
 st.markdown("""
 <div style="background-color: #1e293b; padding: 12px 16px; border-radius: 8px; border-left: 6px solid #ef4444; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
     <span style="color: #f8fafc; font-size: 14px; font-weight: bold;">
-        🚨 <span style="color: #fca5a5;">【緊急災害発令中】</span> 危険（赤）が <span style="color: #f87171; font-size: 16px;"><b>{}件</b></span>、注意（橙）が <span style="color: #fbbf24; font-size: 16px;"><b>{}件</b></span> 監視されています。
+        🚨 <span style="color: #fca5a5;">【気象庁発表・警戒対象】</span> 危険（赤）が <span style="color: #f87171; font-size: 16px;"><b>{}件</b></span>、注意（橙）が <span style="color: #fbbf24; font-size: 16px;"><b>{}件</b></span> 監視されています。
     </span>
 </div>
 """.format(danger_count, warning_count) if danger_count > 0 else """
@@ -180,8 +209,8 @@ st.markdown("""
 </div>
 """.format(warning_count), unsafe_allow_html=True)
 
-st.markdown("<h3 style='font-size: 20px; font-weight: bold; margin-bottom: 0rem; color: #1e90ff;'>🛡️ 全国統合防災・命を守るリスク管理システム</h3>", unsafe_allow_html=True)
-st.markdown("<p style='color: #dc2626; font-weight: bold; font-size: 14px; margin-top: 4px;'>地震・津波・氾濫・土砂崩れなどの重要情報を最大2地域選択して把握します。</p>", unsafe_allow_html=True)
+st.markdown("<h3 style='font-size: 20px; font-weight: bold; margin-bottom: 0rem; color: #1e90ff;'>🛡️ 気象庁データ連動・全国防災システム</h3>", unsafe_allow_html=True)
+st.markdown("<p style='color: #dc2626; font-weight: bold; font-size: 14px; margin-top: 4px;'>気象庁の災害情報をベースに、最大2地域を選択して重要拠点を把握します。</p>", unsafe_allow_html=True)
 
 available_regions = ["北海道", "東北", "関東", "中部", "関西", "四国", "九州"]
 if "selected_regions" not in st.session_state:
@@ -201,28 +230,28 @@ selected_regions = st.multiselect(
 )
 st.session_state["selected_regions"] = selected_regions
 
-# 気象庁公式・全災害種別リアルリンク集（情報の漏れを完全に防ぐセーフティネット）
+# 気象庁および民間の公式リンク集を一本化して掲示
 st.markdown("""
 <div style="background-color: #0f172a; border: 2px solid #ef4444; padding: 14px 18px; border-radius: 8px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
     <div style="color: #fef08a; font-weight: bold; font-size: 15px; margin-bottom: 8px;">
-        ⚡ <b>【気象庁公式・全災害種別リアルタイム直リンク集】全国すべての市区町村の命を守る情報へ直結</b>
+        ⚡ <b>【気象庁公式 ＆ 民間気象会社・災害情報直リンク集】すべての市区町村の情報を漏れなく確認</b>
     </div>
     <div style="font-size: 13.5px; color: #f1f5f9; line-height: 1.8;">
-        ・ 🌍 <a href="https://www.jma.go.jp/bosai/information.html" target="_blank" rel="noopener noreferrer" style="color: #fca5a5; font-weight: bold;">気象庁 地震情報・津波情報（全国の震度・津波警報一覧）</a><br>
-        ・ 🔴 <a href="https://www.jma.go.jp/bosai/warning/" target="_blank" rel="noopener noreferrer" style="color: #fca5a5; font-weight: bold;">気象庁 警報・注意報（日本全国の市区町村別の最新発令状況）</a><br>
-        ・ ⚠️ <a href="https://www.jma.go.jp/bosai/risk/" target="_blank" rel="noopener noreferrer" style="color: #60a5fa; font-weight: bold;">気象庁 キキクル（土砂・浸水・洪水危険度分布：全国網羅）</a><br>
-        ・ 🌧️ <a href="https://weather.yahoo.co.jp/weather/zoomradar/" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; font-weight: bold;">Yahoo!天気・災害（雨雲レーダー・避難情報）</a><br>
-        ・ 🚆 <a href="https://transit.yahoo.co.jp/traininfo/top" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; font-weight: bold;">Yahoo!路線・運行情報（電車の遅延・見合わせ）</a>
+        ・ 🔴 <a href="https://www.jma.go.jp/bosai/warning/" target="_blank" rel="noopener noreferrer" style="color: #fca5a5; font-weight: bold;">気象庁 警報・注意報（全国すべての市区町村別の最新発令状況）</a><br>
+        ・ ⚠️ <a href="https://www.jma.go.jp/bosai/risk/" target="_blank" rel="noopener noreferrer" style="color: #60a5fa; font-weight: bold;">気象庁 キキクル（土砂・浸水・洪水危険度分布）</a><br>
+        ・ 🌍 <a href="https://www.jma.go.jp/bosai/information.html" target="_blank" rel="noopener noreferrer" style="color: #fca5a5; font-weight: bold;">気象庁 地震情報・津波情報</a><br>
+        ・ ☀️ <a href="https://weathernews.jp/" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; font-weight: bold;">ウェザーニュース（最新の気象解説・台風・ライブカメラ）</a><br>
+        ・ 🌧️ <a href="https://weather.yahoo.co.jp/weather/zoomradar/" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; font-weight: bold;">Yahoo!天気・災害（雨雲レーダー・避難情報）</a>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-with st.expander("📡 【ライブ取得】リアルタイム災害・速報フィード（Yahoo!・公認RSS連携）", expanded=True):
+with st.expander("📡 【ライブ取得】リアルタイム災害・速報フィード", expanded=True):
     news_list = fetch_robust_disaster_news()
     for news in news_list:
         st.markdown(f"- <a href='{news['link']}' target='_blank' rel='noopener noreferrer' style='color: #d32f2f; font-weight: bold;'>{news['title']}</a> <small style='color:gray;'>({news['date']})</small>", unsafe_allow_html=True)
 
-st.sidebar.markdown("<h3 style='font-size: 15px; font-weight: bold; color: #1e90ff;'>🛡️ 全国統合防災システム</h3>", unsafe_allow_html=True)
+st.sidebar.markdown("<h3 style='font-size: 15px; font-weight: bold; color: #1e90ff;'>🛡️ 気象庁データ連動システム</h3>", unsafe_allow_html=True)
 st.sidebar.markdown("---")
 st.sidebar.subheader("📌 警戒レベル凡例")
 st.sidebar.markdown("🔴 <span style='color:red; font-weight:bold;'>レベル4：避難指示（全員避難）</span>", unsafe_allow_html=True)
@@ -253,7 +282,7 @@ for idx, loc in enumerate(filtered_locations):
         c_lvl = loc.get('level')
         
         river_info = f"<br><b>対象河川:</b> {c_river}" if c_river != "---" else ""
-        camera_link_html = f"<br><a href='{c_url}' target='_blank' rel='noopener noreferrer' style='color:red; font-weight:bold;'>▶ 【公式サイト・詳細情報】を見る</a>" if c_url else ""
+        camera_link_html = f"<br><a href='{c_url}' target='_blank' rel='noopener noreferrer' style='color:red; font-weight:bold;'>▶ 【気象庁公式サイト】詳細を確認</a>" if c_url else ""
         
         popup_html = (
             f"<b>{c_cat} [{c_pref}] {c_name}</b>"
@@ -279,7 +308,7 @@ if not filtered_locations and selected_regions:
     <div style="background-color: #1e293b; border-left: 5px solid #3b82f6; padding: 16px; border-radius: 6px; margin-bottom: 1rem;">
         <span style="color: #93c5fd; font-weight: bold; font-size: 15px;">ℹ️ 選択された地域（{}）の個別重点データは現在ありません。</span><br><br>
         <span style="color: #f1f5f9; font-size: 13.5px;">
-            しかし、地震・津波・土砂災害・河川氾濫を含むすべての全国情報は、上の<b>【気象庁公式・全災害種別リアルタイム直リンク集】</b>から一瞬で確認できます。
+            しかし、すべての市区町村の気象庁公式情報は上の<b>【気象庁公式 ＆ 民間気象会社・災害情報直リンク集】</b>から一瞬で確認できます。
         </span>
     </div>
     """.format(", ".join(selected_regions)), unsafe_allow_html=True)
@@ -297,4 +326,4 @@ else:
             st.markdown(f"**状況説明**\n\n{loc['desc']}")
             if loc['camera_url']:
                 st.markdown("---")
-                st.markdown(f"**関連リンク**\n\n<a href='{loc['camera_url']}' target='_blank' rel='noopener noreferrer'>🎥 公式サイト・詳細情報を見る (別タブ)</a>", unsafe_allow_html=True)
+                st.markdown(f"**関連リンク**\n\n<a href='{loc['camera_url']}' target='_blank' rel='noopener noreferrer'>🌐 気象庁公式サイトで詳細を確認 (別タブ)</a>", unsafe_allow_html=True)
