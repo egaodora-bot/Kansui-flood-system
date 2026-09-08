@@ -132,7 +132,7 @@ locations = [
     {
         "category": "【河川氾濫】", "region": "関東", "pref": "栃木県", "name": "栃木県南部（渡良川流域・足利市周辺）", 
         "river_name": "渡良川（わたらせがわ）", "lat": 36.3400, "lon": 139.4500, "source": "気象庁", 
-        "level": "レベル3", "level_desc": "【高齢者等避難】水位上昇。",
+        "level": "Level3", "level_desc": "【高齢者等避難】水位上昇。",
         "metric": "警戒水位到達", "status": "注意（警戒中）", "color": "orange", "priority": 2,
         "desc": "足利市周辺を流れる重要水系。まとまった雨により警戒レベル3相当。",
         "camera_url": "https://www.jma.go.jp/bosai/warning/"
@@ -210,29 +210,31 @@ st.markdown("""
 """.format(warning_count), unsafe_allow_html=True)
 
 st.markdown("<h3 style='font-size: 20px; font-weight: bold; margin-bottom: 0rem; color: #1e90ff;'>🛡️ 気象庁データ連動・全国防災システム</h3>", unsafe_allow_html=True)
-st.markdown("<p style='color: #dc2626; font-weight: bold; font-size: 14px; margin-top: 4px;'>気象庁の災害情報をベースに、最大2地域を選択して重要拠点を把握します。</p>", unsafe_allow_html=True)
+st.markdown("<p style='color: #dc2626; font-weight: bold; font-size: 14px; margin-top: 4px;'>気象庁の災害情報をベースに、重要拠点の状況を把握します。</p>", unsafe_allow_html=True)
 
 available_regions = ["北海道", "東北", "関東", "中部", "関西", "四国", "九州"]
 if "selected_regions" not in st.session_state:
     st.session_state["selected_regions"] = ["関東"]
 
+# 枠組みとセレクトボックスを一体化
 st.markdown("""
-<div style="background-color: #1e293b; border: 1px solid #334155; padding: 12px 16px; border-radius: 8px; margin-bottom: 1rem;">
+<div style="background-color: #1e293b; border: 1px solid #334155; padding: 14px 18px; border-radius: 8px; margin-bottom: 0.5rem;">
     <span style="color: #fef08a; font-weight: bold; font-size: 14px;">📍 監視エリアの選択（最大2箇所まで選択可能）</span>
 </div>
 """, unsafe_allow_html=True)
 
 selected_regions = st.multiselect(
-    "確認したい地域を最大2つまで選べます",
+    "確認したい地域を選ぶ（最大2つまで）",
     options=available_regions,
     default=st.session_state["selected_regions"],
-    max_selections=2
+    max_selections=2,
+    label_visibility="collapsed"
 )
 st.session_state["selected_regions"] = selected_regions
 
 # 気象庁および民間の公式リンク集を一本化して掲示
 st.markdown("""
-<div style="background-color: #0f172a; border: 2px solid #ef4444; padding: 14px 18px; border-radius: 8px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+<div style="background-color: #0f172a; border: 2px solid #ef4444; padding: 14px 18px; border-radius: 8px; margin-top: 1rem; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
     <div style="color: #fef08a; font-weight: bold; font-size: 15px; margin-bottom: 8px;">
         ⚡ <b>【気象庁公式 ＆ 民間気象会社・災害情報直リンク集】すべての市区町村の情報を漏れなく確認</b>
     </div>
