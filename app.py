@@ -29,7 +29,6 @@ button[kind="primary"] {
 section[data-testid="stSidebar"] {
     padding-top: 1rem;
 }
-/* 監視エリア選択ボックスの左側に黄色いアクセントラインを追加 */
 div[data-testid="stMultiSelect"] {
     border-left: 5px solid #fde047;
     padding-left: 10px;
@@ -201,7 +200,6 @@ if st.session_state["first_visit"]:
     
     st.stop()
 
-# --- メイン画面上部のシステムタイトル（左寄せ・マージン調整） ---
 st.markdown("""
 <div style="margin-left: 0px; margin-bottom: 1.4rem;">
     <div style="color: #60a5fa; font-size: 20px; font-weight: bold; margin-bottom: 4px;">
@@ -224,7 +222,7 @@ with col_f1:
     st.markdown("""
     <div style="border-left: 5px solid #fde047; padding-left: 10px; margin-bottom: 6px;">
         <span style="color: #fef08a; font-weight: bold; font-size: 14px;">
-            📍 地方エリアの選択（最大2つ）
+            📍 地方エリアの選択（複数選択可）
         </span>
     </div>
     """, unsafe_allow_html=True)
@@ -232,39 +230,39 @@ with col_f1:
         "地域を選ぶ",
         options=available_regions,
         default=st.session_state["selected_regions"],
-        max_selections=2,
         label_visibility="collapsed"
     )
     st.session_state["selected_regions"] = selected_regions
+
+# --- 1段階目で選ばれた地方エリアに含まれるデータだけに絞り込みベースを作る ---
+if selected_regions:
+    base_locations = [loc for loc in locations if loc["region"] in selected_regions]
+else:
+    base_locations = locations.copy()
 
 with col_f2:
     st.markdown("""
     <div style="border-left: 5px solid #38bdf8; padding-left: 10px; margin-bottom: 6px;">
         <span style="color: #7dd3fc; font-weight: bold; font-size: 14px;">
-            🔍 ピンポイント都道府県・河川で絞り込み
+            🔍 ピンポイント都道府県で絞り込み
         </span>
     </div>
     """, unsafe_allow_html=True)
     
-    # 選択された地域に紐づく都道府県リストを自動抽出
-    available_prefs = ["すべて表示"] + sorted(list(set([loc["pref"] for loc in locations if not selected_regions or loc["region"] in selected_regions])))
+    # 選択中の地方エリアに属する都道府県だけをリストアップする
+    available_prefs = ["すべて表示"] + sorted(list(set([loc["pref"] for loc in base_locations])))
     selected_pref = st.selectbox(
         "都道府県絞り込み",
         options=available_prefs,
         label_visibility="collapsed"
     )
 
-# --- フィルター適用のロジック ---
-if selected_regions:
-    filtered_locations = [loc for loc in locations if loc["region"] in selected_regions]
-else:
-    filtered_locations = locations.copy()
-
-# さらに都道府県が指定されていれば絞り込む
+# --- 最終的な絞り込みロジック ---
+filtered_locations = base_locations.copy()
 if selected_pref != "すべて表示":
     filtered_locations = [loc for loc in filtered_locations if loc["pref"] == selected_pref]
 
-# 地域・都道府県選択に連動して数値が変化するサマリー計算
+# サマリー計算
 danger_count = sum(1 for loc in filtered_locations if loc["color"] == "red")
 warning_count = sum(1 for loc in filtered_locations if loc["color"] == "orange")
 
@@ -289,7 +287,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# 気象庁および民間の公式リンク集（河川の水位情報リンクを含む）
+# 国土交通省の川の防災情報を含む公式リンク集
 st.markdown("""
 <div style="background-color: #0f172a; border: 2px solid #ef4444; padding: 14px 18px; border-radius: 8px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
     <div style="color: #fef08a; font-weight: bold; font-size: 15px; margin-bottom: 8px;">
@@ -312,7 +310,6 @@ with st.expander("📡 【ライブ取得】リアルタイム災害・速報フ
     for news in news_list:
         st.markdown(f"- <a href='{news['link']}' target='_blank' rel='noopener noreferrer' style='color: #d32f2f; font-weight: bold;'>{news['title']}</a> <small style='color:gray;'>({news['date']})</small>", unsafe_allow_html=True)
 
-# --- 左側メニュー（サイドバー） ---
 st.sidebar.markdown("<h3 style='font-size: 14px; font-weight: bold; color: #60a5fa; line-height: 1.5;'>🛡️ 全国総合防災・<br>気象庁データ統合システム</h3>", unsafe_allow_html=True)
 st.sidebar.markdown("---")
 st.sidebar.subheader("📌 警戒レベル凡例")
@@ -322,7 +319,6 @@ st.sidebar.markdown("🔵 **Level1〜2**：監視中", unsafe_allow_html=True)
 
 filtered_locations = sorted(filtered_locations, key=lambda x: x["priority"])
 
-# マップの中心を絞り込みに合わせて動的に調整
 map_center_lat = filtered_locations[0]["lat"] if filtered_locations else (36.0 if selected_regions else 37.5)
 map_center_lon = filtered_locations[0]["lon"] if filtered_locations else (139.5 if selected_regions else 138.0)
 map_zoom = 10 if selected_pref != "すべて表示" else (8 if selected_regions else 5)
