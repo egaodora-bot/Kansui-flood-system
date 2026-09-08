@@ -29,7 +29,7 @@ button[kind="primary"] {
     font-weight: 800 !important;
 }
 
-/* スマホ等でサイドバーの閉じるボタンや上部が隠れてしまわないよう調整 */
+/* スマホ等でサイドバーや上部が隠れないよう調整 */
 section[data-testid="stSidebar"] {
     padding-top: 1rem;
 }
@@ -162,22 +162,19 @@ locations = [
 if st.session_state["first_visit"]:
     st.markdown("<h3 style='font-size: 18px; font-weight: bold; background-color: #fef08a; color: #1e293b; padding: 8px 12px; border-radius: 6px; border-left: 6px solid #ca8a04; margin-bottom: 0.8rem;'>🛡️ 全国統合防災・リスク管理システムへようこそ</h3>", unsafe_allow_html=True)
     
-    # 案内画面上部に情報元を明記
     st.markdown("""
     <div style="background-color: #1e40af; padding: 18px 22px; border-radius: 8px; border-left: 6px solid #60a5fa; color: #ffffff; font-weight: bold; font-size: 15px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); line-height: 1.7;">
-        当システムでは、気象庁や国土交通省などの公的機関が提供するオープンデータおよび信頼性の高いRSSフィードを統合してリアルタイム表示しています。<br><br>
+        当システムでは、気象庁や国土交通省などの公的機関が提供するオープンデータおよび信頼性の高い情報を統合してリアルタイム表示しています。<br><br>
         <div style="background-color: rgba(255, 255, 255, 0.15); padding: 10px 14px; border-radius: 6px; font-size: 14px; color: #ffffff; line-height: 1.8;">
             🌐 <b>【主なデータ提供元・連携機関】</b><br>
-            ・気象庁（警報・注意報・RSS）<br>
+            ・気象庁（警報・注意報・キキクル危険度分布）<br>
             ・国土交通省 / 各地方整備局（川の水位情報）<br>
-            ・高速道路会社：NEXCO東日本・NEXCO中日本・NEXCO西日本、首都高速、阪神高速等<br>
-            ・鉄道会社：JR東日本・JR東海・JR西日本・JR九州等 各旅客鉄道会社<br>
-            ・Yahoo!ニュース RSS 他公的機関
+            ・ウェザーニュース / Yahoo!天気（各種雨雲レーダー・予報）<br>
+            ・高速道路会社（NEXCO各社）・鉄道各社 運行情報
         </div>
     </div>
     """, unsafe_allow_html=True)
     
-    # エクスパンダー内からは重複するデータソースの表記を削除
     with st.expander("📖 :red[【ご利用ガイド・システム共有方法】（必ずご確認ください）]", expanded=True):
         st.markdown("""
         ##### ［ご家族やご友人への共有について］
@@ -213,20 +210,26 @@ st.markdown("""
 st.markdown("<h3 style='font-size: 20px; font-weight: bold; margin-bottom: 0rem; color: #1e90ff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3), 0 0 10px rgba(30,144,255,0.4);'>🛡️ 全国統合防災・リスク管理システム</h3>", unsafe_allow_html=True)
 st.markdown("<p style='color: #dc2626; font-weight: bold; font-size: 15px; margin-top: 4px;'>主要一級河川や道路冠水情報を警戒レベル・ライブ映像リンク付きで一元管理するシステムです。</p>", unsafe_allow_html=True)
 
+# ★【追加・強化】「今、自分に何が迫っているか」を一目で可視化・直リンクする緊急パネル
+st.markdown("""
+<div style="background-color: #0f172a; border: 2px solid #ef4444; padding: 14px 18px; border-radius: 8px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+    <div style="color: #fef08a; font-weight: bold; font-size: 15px; margin-bottom: 8px;">
+        ⚡ <b>【危機可視化・リアルタイム直リンク】今すぐご自身の周辺の危険度を確認</b>
+    </div>
+    <div style="font-size: 13.5px; color: #f1f5f9; line-height: 1.6;">
+        お住まいの地域に迫る大雨の危険度や雨雲・気象情報を、主要各社の専門サービスで一発確認できます。<br>
+        ・ <a href="https://www.jma.go.jp/bosai/risk/" target="_blank" rel="noopener noreferrer" style="color: #60a5fa; font-weight: bold;">気象庁 キキクル（危険度分布：土砂・浸水・洪水）</a><br>
+        ・ <a href="https://weathernews.jp/" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; font-weight: bold;">ウェザーニュース（最新の天気・警報・台風情報）</a><br>
+        ・ <a href="https://weather.yahoo.co.jp/weather/zoomradar/" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; font-weight: bold;">Yahoo!天気・災害（雨雲レーダー・落雷情報）</a><br>
+        ・ <a href="https://transit.yahoo.co.jp/traininfo/top" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; font-weight: bold;">Yahoo!路線・運行情報（電車の遅延・見合わせ）</a>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
 with st.expander("📡 【ライブ取得】リアルタイム災害・速報フィード（Yahoo!・公認RSS連携）", expanded=True):
     news_list = fetch_robust_disaster_news()
     for news in news_list:
         st.markdown(f"- <a href='{news['link']}' target='_blank' rel='noopener noreferrer' style='color: #d32f2f; font-weight: bold;'>{news['title']}</a> <small style='color:gray;'>({news['date']})</small>", unsafe_allow_html=True)
-    
-    st.markdown("---")
-    st.markdown("⚡ **【クイック気象・交通リンク】** （※すべて新しいタブで開きます）")
-    col_l1, col_l2, col_l3 = st.columns(3)
-    with col_l1:
-        st.markdown("<a href='https://weather.yahoo.co.jp/weather/zoomradar/' target='_blank' rel='noopener noreferrer'>🌧️ Yahoo!雨雲レーダー</a>", unsafe_allow_html=True)
-    with col_l2:
-        st.markdown("<a href='https://weather.yahoo.co.jp/weather/lightning/' target='_blank' rel='noopener noreferrer'>⚡ Yahoo!落雷情報</a>", unsafe_allow_html=True)
-    with col_l3:
-        st.markdown("<a href='https://transit.yahoo.co.jp/traininfo/top' target='_blank' rel='noopener noreferrer'>🚆 Yahoo!路線・運行情報</a>", unsafe_allow_html=True)
 
 if "selected_region" not in st.session_state:
     st.session_state["selected_region"] = "日本全国"
@@ -273,7 +276,7 @@ st.sidebar.markdown("🟠 <span style='color:darkorange; font-weight:bold;'>レ�
 st.sidebar.markdown("🔵 **Level1〜2**：早期注意・安全監視中", unsafe_allow_html=True)
 st.sidebar.markdown("---")
 st.sidebar.subheader("📡 主なデータ連携元")
-st.sidebar.markdown("<span style='font-size: 12.5px; color: #cbd5e1; line-height: 1.5;'>・気象庁（警報・注意報・RSS）<br>・国土交通省（川の水位情報）<br>・NEXCO東/中/西日本・首都高等<br>・JR東/中/西/九州等 旅客鉄道各社<br>・Yahoo!ニュース RSS</span>", unsafe_allow_html=True)
+st.sidebar.markdown("<span style='font-size: 12.5px; color: #cbd5e1; line-height: 1.5;'>・気象庁（キキクル・警報・RSS）<br>・国土交通省（川の水位情報）<br>・ウェザーニュース / Yahoo!天気<br>・NEXCO各社・JR各社運行情報</span>", unsafe_allow_html=True)
 
 current_center = st.session_state.get("center", [37.5, 138.0])
 current_zoom = st.session_state.get("zoom", 5)
