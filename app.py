@@ -108,7 +108,7 @@ locations = [
     {
         "category": "【河川氾濫】", "region": "関東", "pref": "埼玉県", "name": "埼玉県南部（荒川流域・戸田市周辺）", 
         "river_name": "荒川（あらかわ）", "lat": 35.8150, "lon": 139.6700, "source": "気象庁・国土交通省", 
-        "level": "レベル3", "level_desc": "【高齢者等避難】水位上昇中。要配慮者は避難準備。",
+        "level": "Level3", "level_desc": "【高齢者等避難】水位上昇中。要配慮者は避難準備。",
         "metric": "観測 6.2m / 警戒 6.5m", "status": "注意（水位上昇中）", "color": "orange", "priority": 2,
         "desc": "埼玉県南部を流れる大河川。上流域の降雨により水位が上昇傾向にあります。",
         "camera_url": "https://www.jma.go.jp/bosai/warning/"
@@ -116,7 +116,7 @@ locations = [
     {
         "category": "【河川氾濫】", "region": "関東", "pref": "神奈川県", "name": "神奈川県東部（多摩川下流・鶴見川）", 
         "river_name": "鶴見川（つるみがわ）", "lat": 35.5100, "lon": 139.6300, "source": "気象庁・国土交通省", 
-        "level": "レベル3", "level_desc": "【高齢者等避難】水位上昇中。",
+        "level": "Level3", "level_desc": "【高齢者等避難】水位上昇中。",
         "metric": "観測 2.4m / 警戒 2.8m", "status": "注意（水位上昇中）", "color": "orange", "priority": 2,
         "desc": "横浜市・川崎市を流れる都市型河川。短時間の強い雨で急激に水位が上昇。",
         "camera_url": "https://www.jma.go.jp/bosai/warning/"
@@ -140,7 +140,7 @@ locations = [
     {
         "category": "【河川氾濫】", "region": "九州", "pref": "福岡県", "name": "筑後川流域（久留米市周辺）", 
         "river_name": "筑後川（ちくごがわ）", "lat": 33.3197, "lon": 130.5086, "source": "気象庁", 
-        "level": "レベル3", "level_desc": "【高齢者等避難】水位上昇中。要配慮者は避難準備。",
+        "level": "Level3", "level_desc": "【高齢者等避難】水位上昇中。要配慮者は避難準備。",
         "metric": "観測 5.1m / 警戒 5.8m", "status": "注意（水位上昇中）", "color": "orange", "priority": 2,
         "desc": "西日本最大の「筑紫次郎」と呼ばれる一級河川。上流の豪雨で水位上昇中。",
         "camera_url": "https://www.qsr.mlit.go.jp/"
@@ -148,7 +148,7 @@ locations = [
     {
         "category": "【地震・津波】", "region": "北海道", "pref": "北海道", "name": "太平洋沿岸東部エリア", 
         "river_name": "---", "lat": 42.9833, "lon": 144.3833, "source": "気象庁", 
-        "level": "レベル3", "level_desc": "【地震警戒】余震および津波に注意。",
+        "level": "Level3", "level_desc": "【地震警戒】余震および津波に注意。",
         "metric": "震度4", "status": "注意（監視中）", "color": "orange", "priority": 2,
         "desc": "北海道東部を震源とする地震が発生。今後の情報に注意してください。",
         "camera_url": "https://www.jma.go.jp/bosai/information.html"
@@ -208,12 +208,11 @@ available_regions = ["北海道", "東北", "関東", "中部", "関西", "四�
 if "selected_regions" not in st.session_state:
     st.session_state["selected_regions"] = ["関東"]
 
-# --- 監視エリアの選択を1つのまとまったカード枠内に統合 ---
+# --- 監視エリアの選択 ---
 st.markdown("""
-<div style="background-color: #1e293b; border: 1px solid #334155; padding: 16px 18px; border-radius: 8px; margin-bottom: 0.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
-    <div style="color: #fef08a; font-weight: bold; font-size: 15px; margin-bottom: 10px;">
-        📍 知りたい監視エリアの選択（最大2箇所まで選択可能）
-    </div>
+<div style="color: #fef08a; font-weight: bold; font-size: 15px; margin-bottom: 6px;">
+    📍 知りたい監視エリアの選択（最大2箇所まで選択可能）
+</div>
 """, unsafe_allow_html=True)
 
 selected_regions = st.multiselect(
@@ -224,7 +223,6 @@ selected_regions = st.multiselect(
     label_visibility="collapsed"
 )
 
-st.markdown("</div>", unsafe_allow_html=True)
 st.session_state["selected_regions"] = selected_regions
 
 if selected_regions:
@@ -237,7 +235,7 @@ danger_count = sum(1 for loc in filtered_locations if loc["color"] == "red")
 warning_count = sum(1 for loc in filtered_locations if loc["color"] == "orange")
 
 st.markdown(f"""
-<div style="background-color: #1e293b; padding: 12px 16px; border-radius: 8px; border-left: 6px solid #ef4444; margin-top: 10px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+<div style="background-color: #1e293b; padding: 12px 16px; border-radius: 8px; border-left: 6px solid #ef4444; margin-top: 15px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
     <span style="color: #f8fafc; font-size: 14px; font-weight: bold;">
         🚨 <span style="color: #fca5a5;">【気象庁発表・警戒対象】</span> 選択エリアの危険（赤）が <span style="color: #f87171; font-size: 16px;"><b>{danger_count}件</b></span>、注意（橙）が <span style="color: #fbbf24; font-size: 16px;"><b>{warning_count}件</b></span> 監視されています。
     </span>
