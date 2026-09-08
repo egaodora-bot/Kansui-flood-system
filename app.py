@@ -90,6 +90,22 @@ locations = [
         "camera_url": "https://www.shutoko.co.jp/"
     },
     {
+        "category": "【高速道路】", "region": "関東", "pref": "埼玉県", "name": "東北自動車道（羽生IC〜館林IC）", 
+        "river_name": "---", "lat": 36.1700, "lon": 139.5500, "source": "NEXCO東日本", 
+        "level": "Level3", "level_desc": "【交通規制】迂回ルートの検討および安全確認が必須。",
+        "metric": "冠水影響による通行止め", "status": "注意（災害影響）", "color": "orange", "priority": 2,
+        "desc": "NEXCO東日本管内。大雨に伴う道路冠水のため、該当区間で上下線とも通行止め。",
+        "camera_url": "https://www.e-nexco.co.jp/"
+    },
+    {
+        "category": "【鉄道影響】", "region": "関東", "pref": "東京都", "name": "JR山手線・中央線", 
+        "river_name": "---", "lat": 35.6812, "lon": 139.7671, "source": "JR東日本 運行情報", 
+        "level": "Level3", "level_desc": "【運行障害】運転見合わせ・大幅な遅延が発生中。",
+        "metric": "一部運転見合わせ", "status": "注意（ダイヤ乱れ）", "color": "orange", "priority": 2,
+        "desc": "JR東日本管内。大雨の影響および線路内点検のため、一部区間で運転見合わせ。",
+        "camera_url": "https://www.jreast.co.jp/"
+    },
+    {
         "category": "【河川氾濫】", "region": "九州", "pref": "福岡県", "name": "筑後川流域（久留米市周辺）", 
         "river_name": "筑後川（ちくごがわ）", "lat": 33.3197, "lon": 130.5086, "source": "国土交通省 九州地方整備局", 
         "level": "レベル3", "level_desc": "【高齢者等避難】水位上昇中。要配慮者は避難準備。",
@@ -130,22 +146,6 @@ locations = [
         "camera_url": "https://www.westjr.co.jp/"
     },
     {
-        "category": "【高速道路】", "region": "関東", "pref": "埼玉県", "name": "東北自動車道（羽生IC〜館林IC）", 
-        "river_name": "---", "lat": 36.1700, "lon": 139.5500, "source": "NEXCO東日本", 
-        "level": "Level3", "level_desc": "【交通規制】迂回ルートの検討および安全確認が必須。",
-        "metric": "冠水影響による通行止め", "status": "注意（災害影響）", "color": "orange", "priority": 2,
-        "desc": "NEXCO東日本管内。大雨に伴う道路冠水のため、該当区間で上下線とも通行止め。",
-        "camera_url": "https://www.e-nexco.co.jp/"
-    },
-    {
-        "category": "【鉄道影響】", "region": "関東", "pref": "東京都", "name": "JR山手線・中央線", 
-        "river_name": "---", "lat": 35.6812, "lon": 139.7671, "source": "JR東日本 運行情報", 
-        "level": "Level3", "level_desc": "【運行障害】運転見合わせ・大幅な遅延が発生中。",
-        "metric": "一部運転見合わせ", "status": "注意（ダイヤ乱れ）", "color": "orange", "priority": 2,
-        "desc": "JR東日本管内。大雨の影響および線路内点検のため、一部区間で運転見合わせ。",
-        "camera_url": "https://www.jreast.co.jp/"
-    },
-    {
         "category": "【高速道路】", "region": "九州", "pref": "福岡県", "name": "九州自動車道（太宰府IC〜鳥栖JCT）", 
         "river_name": "---", "lat": 33.4800, "lon": 130.5200, "source": "NEXCO西日本", 
         "level": "Level1", "level_desc": "【早期注意情報】平常時・安全監視中。",
@@ -162,9 +162,9 @@ if st.session_state["first_visit"]:
     <div style="background-color: #1e40af; padding: 18px 22px; border-radius: 8px; border-left: 6px solid #60a5fa; color: #ffffff; font-weight: bold; font-size: 15px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); line-height: 1.7;">
         当システムでは、気象庁や国土交通省などの公的機関が提供するオープンデータおよび信頼性の高い情報を統合してリアルタイム表示しています。<br><br>
         <div style="background-color: rgba(255, 255, 255, 0.15); padding: 10px 14px; border-radius: 6px; font-size: 14px; color: #ffffff; line-height: 1.8;">
-            📍 <b>【マルチセレクト連動について】</b><br>
-            ・選択した地域（例: 関東）に属する登録データが、**該当地域内ですべて抽出され一覧・地図に展開**されます。<br>
-            ・全国すべての細かな市町村データを網羅しきれない部分は、下の**「リアルタイム危機可視化・直リンク集」**から全国の公式詳細へ一発でアクセス可能です。<br><br>
+            📍 <b>【最大2地域までの絞り込み設計について】</b><br>
+            ・出発地や到着地など、**最大2箇所まで**の地域を選択して、負荷を抑えながら確実かつスピーディーに状況を確認できます。<br>
+            ・家族や友人へURLをそのまま共有して、みんなで同時に最新情報を確認可能です。<br><br>
             🌐 <b>【主なデータ提供元】</b><br>
             ・気象庁（キキクル・警報） / 国土交通省（河川水位） / Yahoo!天気
         </div>
@@ -204,7 +204,7 @@ st.markdown("""
 """.format(warning_count), unsafe_allow_html=True)
 
 st.markdown("<h3 style='font-size: 20px; font-weight: bold; margin-bottom: 0rem; color: #1e90ff;'>🛡️ 全国統合防災・リスク管理システム</h3>", unsafe_allow_html=True)
-st.markdown("<p style='color: #dc2626; font-weight: bold; font-size: 14px; margin-top: 4px;'>マルチセレクトで選択された地域の登録情報をすべてまとめて可視化します。</p>", unsafe_allow_html=True)
+st.markdown("<p style='color: #dc2626; font-weight: bold; font-size: 14px; margin-top: 4px;'>出発地や到着地など、最大2箇所を選んで効率よく安全に状況を把握します。</p>", unsafe_allow_html=True)
 
 available_regions = ["北海道", "東北", "関東", "中部", "関西", "四国", "九州"]
 if "selected_regions" not in st.session_state:
@@ -212,18 +212,19 @@ if "selected_regions" not in st.session_state:
 
 st.markdown("""
 <div style="background-color: #1e293b; border: 1px solid #334155; padding: 12px 16px; border-radius: 8px; margin-bottom: 1rem;">
-    <span style="color: #fef08a; font-weight: bold; font-size: 14px;">📍 監視エリアのマルチセレクト選択</span>
+    <span style="color: #fef08a; font-weight: bold; font-size: 14px;">📍 監視エリアの選択（最大2箇所まで選択可能）</span>
 </div>
 """, unsafe_allow_html=True)
 
 selected_regions = st.multiselect(
-    "確認したい地域を複数選べます（選んだ地域のデータがすべて展開されます）",
+    "確認したい地域を最大2つまで選べます",
     options=available_regions,
-    default=st.session_state["selected_regions"]
+    default=st.session_state["selected_regions"],
+    max_selections=2
 )
 st.session_state["selected_regions"] = selected_regions
 
-# 危機可視化・直リンクパネル（全国すべての市町村・詳細を補うセーフティ機能）
+# 危機可視化・直リンクパネル
 st.markdown("""
 <div style="background-color: #0f172a; border: 2px solid #ef4444; padding: 14px 18px; border-radius: 8px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
     <div style="color: #fef08a; font-weight: bold; font-size: 15px; margin-bottom: 8px;">
