@@ -34,6 +34,10 @@ div[data-testid="stMultiSelect"] {
     border-left: 5px solid #fde047;
     padding-left: 10px;
 }
+div[data-testid="stSelectbox"] {
+    border-left: 5px solid #38bdf8;
+    padding-left: 10px;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -105,7 +109,7 @@ locations = [
     {
         "category": "【地震・津波】", "region": "関東", "pref": "千葉県", "name": "房総半島沿岸エリア", 
         "river_name": "---", "lat": 35.0000, "lon": 140.0000, "source": "気象庁 地震情報", 
-        "level": "レベル3", "level_desc": "【津波注意報・地震警戒】海岸付近から離れてください。",
+        "level": "Level3", "level_desc": "【津波注意報・地震警戒】海岸付近から離れてください。",
         "metric": "震度4 / 津波注意報", "status": "注意（沿岸部警戒）", "color": "orange", "priority": 2,
         "desc": "地震発生に伴う津波注意報および強い揺れへの警戒が発表されています。",
         "camera_url": "https://www.jma.go.jp/bosai/information.html"
@@ -213,38 +217,61 @@ available_regions = ["北海道", "東北", "関東", "中部", "関西", "四�
 if "selected_regions" not in st.session_state:
     st.session_state["selected_regions"] = ["関東"]
 
-# --- 監視エリアの選択（タイトルラベル） ---
-st.markdown("""
-<div style="border-left: 5px solid #fde047; padding-left: 10px; margin-bottom: 6px;">
-    <span style="color: #fef08a; font-weight: bold; font-size: 15px;">
-        📍 知りたい監視エリアの選択（最大2箇所まで選択可能）
-    </span>
-</div>
-""", unsafe_allow_html=True)
+# --- エリアおよびピンポイント（都道府県）選択セクション ---
+col_f1, col_f2 = st.columns(2)
 
-selected_regions = st.multiselect(
-    "確認したい地域を選ぶ（最大2つまで）",
-    options=available_regions,
-    default=st.session_state["selected_regions"],
-    max_selections=2,
-    label_visibility="collapsed"
-)
+with col_f1:
+    st.markdown("""
+    <div style="border-left: 5px solid #fde047; padding-left: 10px; margin-bottom: 6px;">
+        <span style="color: #fef08a; font-weight: bold; font-size: 14px;">
+            📍 地方エリアの選択（最大2つ）
+        </span>
+    </div>
+    """, unsafe_allow_html=True)
+    selected_regions = st.multiselect(
+        "地域を選ぶ",
+        options=available_regions,
+        default=st.session_state["selected_regions"],
+        max_selections=2,
+        label_visibility="collapsed"
+    )
+    st.session_state["selected_regions"] = selected_regions
 
-st.session_state["selected_regions"] = selected_regions
+with col_f2:
+    st.markdown("""
+    <div style="border-left: 5px solid #38bdf8; padding-left: 10px; margin-bottom: 6px;">
+        <span style="color: #7dd3fc; font-weight: bold; font-size: 14px;">
+            🔍 ピンポイント都道府県・河川で絞り込み
+        </span>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # 選択された地域に紐づく都道府県リストを自動抽出
+    available_prefs = ["すべて表示"] + sorted(list(set([loc["pref"] for loc in locations if not selected_regions or loc["region"] in selected_regions])))
+    selected_pref = st.selectbox(
+        "都道府県絞り込み",
+        options=available_prefs,
+        label_visibility="collapsed"
+    )
 
+# --- フィルター適用のロジック ---
 if selected_regions:
     filtered_locations = [loc for loc in locations if loc["region"] in selected_regions]
 else:
-    filtered_locations = []
+    filtered_locations = locations.copy()
 
-# 地域選択に連動して数値が変化するサマリー計算
+# さらに都道府県が指定されていれば絞り込む
+if selected_pref != "すべて表示":
+    filtered_locations = [loc for loc in filtered_locations if loc["pref"] == selected_pref]
+
+# 地域・都道府県選択に連動して数値が変化するサマリー計算
 danger_count = sum(1 for loc in filtered_locations if loc["color"] == "red")
 warning_count = sum(1 for loc in filtered_locations if loc["color"] == "orange")
 
 st.markdown(f"""
 <div style="background-color: #1e293b; padding: 12px 16px; border-radius: 8px; border-left: 6px solid #ef4444; margin-top: 15px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
     <span style="color: #f8fafc; font-size: 14px; font-weight: bold;">
-        🚨 <span style="color: #fca5a5;">【気象庁発表・警戒対象】</span> 選択エリアの危険（赤）が <span style="color: #f87171; font-size: 16px;"><b>{danger_count}件</b></span>、注意（橙）が <span style="color: #fbbf24; font-size: 16px;"><b>{warning_count}件</b></span> 監視されています。
+        🚨 <span style="color: #fca5a5;">【気象庁発表・警戒対象】</span> 選択条件の危険（赤）が <span style="color: #f87171; font-size: 16px;"><b>{danger_count}件</b></span>、注意（橙）が <span style="color: #fbbf24; font-size: 16px;"><b>{warning_count}件</b></span> 監視されています。
     </span>
 </div>
 """, unsafe_allow_html=True)
@@ -262,7 +289,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# 気象庁および民間の公式リンク集（国土交通省の川の水位情報リンクを追加）
+# 気象庁および民間の公式リンク集（河川の水位情報リンクを含む）
 st.markdown("""
 <div style="background-color: #0f172a; border: 2px solid #ef4444; padding: 14px 18px; border-radius: 8px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
     <div style="color: #fef08a; font-weight: bold; font-size: 15px; margin-bottom: 8px;">
@@ -295,7 +322,12 @@ st.sidebar.markdown("🔵 **Level1〜2**：監視中", unsafe_allow_html=True)
 
 filtered_locations = sorted(filtered_locations, key=lambda x: x["priority"])
 
-m = folium.Map(location=[36.0, 139.5] if selected_regions else [37.5, 138.0], zoom_start=8 if selected_regions else 5, control_scale=True)
+# マップの中心を絞り込みに合わせて動的に調整
+map_center_lat = filtered_locations[0]["lat"] if filtered_locations else (36.0 if selected_regions else 37.5)
+map_center_lon = filtered_locations[0]["lon"] if filtered_locations else (139.5 if selected_regions else 138.0)
+map_zoom = 10 if selected_pref != "すべて表示" else (8 if selected_regions else 5)
+
+m = folium.Map(location=[map_center_lat, map_center_lon], zoom_start=map_zoom, control_scale=True)
 
 for idx, loc in enumerate(filtered_locations):
     lat, lon = loc.get("lat"), loc.get("lon")
@@ -331,17 +363,17 @@ map_left, map_center, map_right = st.columns([0.08, 0.84, 0.08])
 with map_center:
     st_folium(m, width="100%", height=380, key="multi_region_map")
 
-st.markdown(f"<h3 style='font-size: 20px; font-weight: bold; margin-top: 1rem;'>📋 選択エリアのリスク・警戒レベル一覧</h3>", unsafe_allow_html=True)
+st.markdown(f"<h3 style='font-size: 20px; font-weight: bold; margin-top: 1rem;'>📋 選択条件のリスク・警戒レベル一覧</h3>", unsafe_allow_html=True)
 
-if not filtered_locations and selected_regions:
+if not filtered_locations:
     st.markdown("""
     <div style="background-color: #1e293b; border-left: 5px solid #3b82f6; padding: 16px; border-radius: 6px; margin-bottom: 1rem;">
-        <span style="color: #93c5fd; font-weight: bold; font-size: 15px;">ℹ️ 選択された地域（{}）の個別重点データは現在ありません。</span><br><br>
+        <span style="color: #93c5fd; font-weight: bold; font-size: 15px;">ℹ️ 選択された条件に一致する個別重点データは現在ありません。</span><br><br>
         <span style="color: #f1f5f9; font-size: 13.5px;">
-            しかし、すべての市区町村や河川の水位情報は上の<b>【国土交通省・気象庁公式リンク集】</b>から一瞬で確認できます。
+            すべての市区町村や河川の水位情報は上の<b>【国土交通省・気象庁公式リンク集】</b>から一瞬で確認できます。
         </span>
     </div>
-    """.format(", ".join(selected_regions)), unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 else:
     for idx, loc in enumerate(filtered_locations):
         badge = "🔴【レベル4】" if loc["color"] == "red" else ("🟠【レベル3】" if loc["color"] == "orange" else "🔵【レベル1】")
