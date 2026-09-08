@@ -29,6 +29,11 @@ button[kind="primary"] {
 section[data-testid="stSidebar"] {
     padding-top: 1rem;
 }
+/* 監視エリア選択ボックスの左側に黄色いアクセントラインを追加 */
+div[data-testid="stMultiSelect"] {
+    border-left: 5px solid #fde047;
+    padding-left: 10px;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -192,9 +197,9 @@ if st.session_state["first_visit"]:
     
     st.stop()
 
-# --- メイン画面上部のシステムタイトル ---
+# --- メイン画面上部のシステムタイトル（左右両端に青いアクセントライン） ---
 st.markdown("""
-<div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 1px solid #334155; border-left: 6px solid #3b82f6; padding: 16px 20px; border-radius: 8px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+<div style="border-left: 5px solid #3b82f6; border-right: 5px solid #3b82f6; padding-left: 12px; padding-right: 12px; margin-bottom: 1.2rem;">
     <div style="color: #60a5fa; font-size: 20px; font-weight: bold; margin-bottom: 4px;">
         🛡️ 全国総合防災・気象庁データ統合システム
     </div>
@@ -208,10 +213,12 @@ available_regions = ["北海道", "東北", "関東", "中部", "関西", "四�
 if "selected_regions" not in st.session_state:
     st.session_state["selected_regions"] = ["関東"]
 
-# --- 監視エリアの選択 ---
+# --- 監視エリアの選択（タイトルラベル） ---
 st.markdown("""
-<div style="color: #fef08a; font-weight: bold; font-size: 15px; margin-bottom: 6px;">
-    📍 知りたい監視エリアの選択（最大2箇所まで選択可能）
+<div style="border-left: 5px solid #fde047; padding-left: 10px; margin-bottom: 6px;">
+    <span style="color: #fef08a; font-weight: bold; font-size: 15px;">
+        📍 知りたい監視エリアの選択（最大2箇所まで選択可能）
+    </span>
 </div>
 """, unsafe_allow_html=True)
 
