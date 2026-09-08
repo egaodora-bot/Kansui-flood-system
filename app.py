@@ -163,8 +163,8 @@ if st.session_state["first_visit"]:
         当システムでは、気象庁や国土交通省などの公的機関が提供するオープンデータおよび信頼性の高い情報を統合してリアルタイム表示しています。<br><br>
         <div style="background-color: rgba(255, 255, 255, 0.15); padding: 10px 14px; border-radius: 6px; font-size: 14px; color: #ffffff; line-height: 1.8;">
             📍 <b>【複数エリア監視機能について】</b><br>
-            ・自宅や勤務先、通勤経路など<b>複数の地域を同時に選択</b>して、それぞれの危険度をまとめて確認できます（ブラウザを閉じればリセットされる安全設計です）。<br>
-            ・選択した地域にサンプルが無い場合でも、**公式リアルタイム警報・キキクルへの直リンクが自動案内**されるため情報が途絶えません。<br><br>
+            ・初期状態では<b>日本全国すべての地域が選択</b>されており、選択した地域（関東など）に紐づく情報がすべて自動展開されます。<br>
+            ・ブラウザを閉じれば設定は自動リセットされる安全設計です。<br><br>
             🌐 <b>【主なデータ提供元】</b><br>
             ・気象庁（キキクル・警報） / 国土交通省（河川水位） / Yahoo!天気
         </div>
@@ -204,21 +204,20 @@ st.markdown("""
 """.format(warning_count), unsafe_allow_html=True)
 
 st.markdown("<h3 style='font-size: 20px; font-weight: bold; margin-bottom: 0rem; color: #1e90ff;'>🛡️ 全国統合防災・リスク管理システム</h3>", unsafe_allow_html=True)
-st.markdown("<p style='color: #dc2626; font-weight: bold; font-size: 14px; margin-top: 4px;'>通勤・お出かけ先とご自宅など、複数のエリアの危険度を同時に可視化します。</p>", unsafe_allow_html=True)
+st.markdown("<p style='color: #dc2626; font-weight: bold; font-size: 14px; margin-top: 4px;'>自宅や通勤経路など、選んだ地域の危険度・交通・河川情報を同時に可視化します。</p>", unsafe_allow_html=True)
 
-# 複数選択（マルチセレクト）による地域設定機能
 available_regions = ["北海道", "東北", "関東", "中部", "関西", "四国", "九州"]
 if "selected_regions" not in st.session_state:
-    st.session_state["selected_regions"] = ["関東"]
+    st.session_state["selected_regions"] = available_regions
 
 st.markdown("""
 <div style="background-color: #1e293b; border: 1px solid #334155; padding: 12px 16px; border-radius: 8px; margin-bottom: 1rem;">
-    <span style="color: #fef08a; font-weight: bold; font-size: 14px;">📍 監視エリアの選択（通勤経路・自宅などの複数選択が可能）</span>
+    <span style="color: #fef08a; font-weight: bold; font-size: 14px;">📍 監視エリアの選択（選択した地域に該当する情報がすべて自動展開されます）</span>
 </div>
 """, unsafe_allow_html=True)
 
 selected_regions = st.multiselect(
-    "確認したい地域を複数選べます（通勤・お出かけ先と自宅の同時チェックに便利）",
+    "確認したい地域を複数選べます",
     options=available_regions,
     default=st.session_state["selected_regions"]
 )
@@ -260,7 +259,7 @@ else:
 
 filtered_locations = sorted(filtered_locations, key=lambda x: x["priority"])
 
-m = folium.Map(location=[36.0, 139.5] if selected_regions else [37.5, 138.0], zoom_start=8 if selected_regions else 5, control_scale=True)
+m = folium.Map(location=[37.5, 138.0], zoom_start=5, control_scale=True)
 
 for idx, loc in enumerate(filtered_locations):
     lat, lon = loc.get("lat"), loc.get("lon")
@@ -299,13 +298,12 @@ with map_center:
 
 st.markdown(f"<h3 style='font-size: 20px; font-weight: bold; margin-top: 1rem;'>📋 選択エリアのリスク・警戒レベル一覧</h3>", unsafe_allow_html=True)
 
-# ★【安全設計・フォールバック対応】選択されたエリアにサンプルが無い場合の救済表示
 if not filtered_locations and selected_regions:
     st.markdown("""
     <div style="background-color: #1e293b; border-left: 5px solid #3b82f6; padding: 16px; border-radius: 6px; margin-bottom: 1rem;">
         <span style="color: #93c5fd; font-weight: bold; font-size: 15px;">ℹ️ 選択された地域（{}）の詳細個別サンプルは現在登録されていません。</span><br><br>
         <span style="color: #f1f5f9; font-size: 13.5px;">
-            しかし、お住まいや通勤・お出かけ先のリアルタイムな気象警報・キキクル（土砂・浸水）等の情報は、以下の公式ページから一発で直接ご確認いただけます：<br>
+            しかし、お住まいや通勤・お出かけ先のリアルタイムな気象警報・キキクル等の情報は、以下の公式ページから一発で直接ご確認いただけます：<br>
             ・ 🔴 <a href="https://www.jma.go.jp/bosai/warning/" target="_blank" rel="noopener noreferrer" style="color: #fca5a5; font-weight: bold;">気象庁 警報・注意報（市区町村別の最新発令状況）</a><br>
             ・ ⚠️ <a href="https://www.jma.go.jp/bosai/risk/" target="_blank" rel="noopener noreferrer" style="color: #60a5fa; font-weight: bold;">気象庁 キキクル（土砂・浸水・洪水危険度分布）</a>
         </span>
