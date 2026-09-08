@@ -177,7 +177,7 @@ if st.session_state["first_visit"]:
         <div style="background-color: rgba(255, 255, 255, 0.15); padding: 10px 14px; border-radius: 6px; font-size: 14px; color: #ffffff; line-height: 1.8;">
             📍 <b>【システムの特徴】</b><br>
             ・気象庁データを基軸に、スマホでもエラーなく安全に稼働。<br>
-            ・全国すべての市区町村の網羅的詳細情報は、下記の**「気象庁公式・民間気象会社の信頼リンク集」**から直接アクセス可能。
+            ・全国すべての市区町村の網羅的詳細情報は、下記の**「気象庁公式・国土交通省・民間気象会社の信頼リンク集」**から直接アクセス可能。
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -197,9 +197,9 @@ if st.session_state["first_visit"]:
     
     st.stop()
 
-# --- メイン画面上部のシステムタイトル（左右のボーダーを削除し、余白を調整） ---
+# --- メイン画面上部のシステムタイトル（左寄せ・マージン調整） ---
 st.markdown("""
-<div style="margin-bottom: 1.4rem;">
+<div style="margin-left: 0px; margin-bottom: 1.4rem;">
     <div style="color: #60a5fa; font-size: 20px; font-weight: bold; margin-bottom: 4px;">
         🛡️ 全国総合防災・気象庁データ統合システム
     </div>
@@ -262,13 +262,15 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# 気象庁および民間の公式リンク集
+# 気象庁および民間の公式リンク集（国土交通省の川の水位情報リンクを追加）
 st.markdown("""
 <div style="background-color: #0f172a; border: 2px solid #ef4444; padding: 14px 18px; border-radius: 8px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
     <div style="color: #fef08a; font-weight: bold; font-size: 15px; margin-bottom: 8px;">
-        ⚡ <b>【気象庁公式 ＆ 民間気象会社・災害情報直リンク集】すべての市区町村の情報を漏れなく確認</b>
+        ⚡ <b>【気象庁公式 ＆ 国土交通省・民間気象会社リンク集】すべての市区町村・河川の水位を確認</b>
     </div>
     <div style="font-size: 13.5px; color: #f1f5f9; line-height: 1.8;">
+        ・ 🌊 <a href="https://www.river.go.jp/" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; font-weight: bold;">国土交通省 川の防災情報（全国のリアルタイム河川水位・ライブカメラ）</a><br>
+        ・ 💧 <a href="https://www.jma.go.jp/bosai/flood/" target="_blank" rel="noopener noreferrer" style="color: #60a5fa; font-weight: bold;">気象庁 洪水警報の危険度分布（指定河川洪水予報・水位情報）</a><br>
         ・ 🔴 <a href="https://www.jma.go.jp/bosai/warning/" target="_blank" rel="noopener noreferrer" style="color: #fca5a5; font-weight: bold;">気象庁 警報・注意報（全国すべての市区町村別の最新発令状況）</a><br>
         ・ ⚠️ <a href="https://www.jma.go.jp/bosai/risk/" target="_blank" rel="noopener noreferrer" style="color: #60a5fa; font-weight: bold;">気象庁 キキクル（土砂・浸水・洪水危険度分布）</a><br>
         ・ 🌍 <a href="https://www.jma.go.jp/bosai/information.html" target="_blank" rel="noopener noreferrer" style="color: #fca5a5; font-weight: bold;">気象庁 地震情報・津波情報</a><br>
@@ -310,7 +312,7 @@ for idx, loc in enumerate(filtered_locations):
         c_lvl = loc.get('level')
         
         river_info = f"<br><b>対象河川:</b> {c_river}" if c_river != "---" else ""
-        camera_link_html = f"<br><a href='{c_url}' target='_blank' rel='noopener noreferrer' style='color:red; font-weight:bold;'>▶ 【気象庁公式サイト】詳細を確認</a>" if c_url else ""
+        camera_link_html = f"<br><a href='{c_url}' target='_blank' rel='noopener noreferrer' style='color:red; font-weight:bold;'>▶ 【公式サイト】詳細を確認</a>" if c_url else ""
         
         popup_html = (
             f"<b>{c_cat} [{c_pref}] {c_name}</b>"
@@ -336,7 +338,7 @@ if not filtered_locations and selected_regions:
     <div style="background-color: #1e293b; border-left: 5px solid #3b82f6; padding: 16px; border-radius: 6px; margin-bottom: 1rem;">
         <span style="color: #93c5fd; font-weight: bold; font-size: 15px;">ℹ️ 選択された地域（{}）の個別重点データは現在ありません。</span><br><br>
         <span style="color: #f1f5f9; font-size: 13.5px;">
-            しかし、すべての市区町村の気象庁公式情報は上の<b>【気象庁公式 ＆ 民間気象会社・災害情報直リンク集】</b>から一瞬で確認できます。
+            しかし、すべての市区町村や河川の水位情報は上の<b>【国土交通省・気象庁公式リンク集】</b>から一瞬で確認できます。
         </span>
     </div>
     """.format(", ".join(selected_regions)), unsafe_allow_html=True)
@@ -352,6 +354,7 @@ else:
             st.markdown(f"**警戒レベル**\n\n`{loc['level']}` — {loc['level_desc']}")
             st.markdown("---")
             st.markdown(f"**状況説明**\n\n{loc['desc']}")
+            st.markdown("---")
+            st.markdown("**水位・河川のリアルタイム確認**\n\n- <a href='https://www.river.go.jp/' target='_blank' rel='noopener noreferrer'>🌊 国土交通省 川の防災情報（全国の水位・ライブカメラ）</a>", unsafe_allow_html=True)
             if loc['camera_url']:
-                st.markdown("---")
-                st.markdown(f"**関連リンク**\n\n<a href='{loc['camera_url']}' target='_blank' rel='noopener noreferrer'>🌐 気象庁公式サイトで詳細を確認 (別タブ)</a>", unsafe_allow_html=True)
+                st.markdown(f"- <a href='{loc['camera_url']}' target='_blank' rel='noopener noreferrer'>🌐 気象庁公式サイトで詳細を確認 (別タブ)</a>", unsafe_allow_html=True)
