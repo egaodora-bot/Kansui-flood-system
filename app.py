@@ -17,9 +17,8 @@ div.stButton > button {
     width: 100%;
     border-radius: 6px;
     font-weight: bold;
-    padding: 4px 8px !important;
+    padding: 6px 10px !important;
     font-size: 13px !important;
-    transition: all 0.3s ease;
 }
 button[kind="primary"] {
     background-color: #0056b3 !important;
@@ -163,11 +162,11 @@ if st.session_state["first_visit"]:
     <div style="background-color: #1e40af; padding: 18px 22px; border-radius: 8px; border-left: 6px solid #60a5fa; color: #ffffff; font-weight: bold; font-size: 15px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); line-height: 1.7;">
         当システムでは、気象庁や国土交通省などの公的機関が提供するオープンデータおよび信頼性の高い情報を統合してリアルタイム表示しています。<br><br>
         <div style="background-color: rgba(255, 255, 255, 0.15); padding: 10px 14px; border-radius: 6px; font-size: 14px; color: #ffffff; line-height: 1.8;">
-            🌐 <b>【主なデータ提供元・連携機関】</b><br>
-            ・気象庁（警報・注意報・キキクル危険度分布）<br>
-            ・国土交通省 / 各地方整備局（川の水位情報）<br>
-            ・ウェザーニュース / Yahoo!天気（各種雨雲レーダー・予報）<br>
-            ・高速道路会社（NEXCO各社）・鉄道各社 運行情報
+            📍 <b>【複数エリア監視機能について】</b><br>
+            ・自宅や勤務先、通勤経路など<b>複数の地域を同時に選択</b>して、それぞれの危険度をまとめて確認できます（ブラウザを閉じればリセットされる安全設計です）。<br><br>
+            🌐 <b>【主なデータ提供元】</b><br>
+            ・気象庁（キキクル・警報・危険度分布）<br>
+            ・国土交通省（河川水位） / ウェザーニュース / Yahoo!天気
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -178,7 +177,7 @@ if st.session_state["first_visit"]:
         このシステムを他の人に教えるときは、ブラウザの上部にあるアドレスバーのURLをコピーして、LINEやメールで送ってあげてください。
 
         ##### ［📱 スマホのホーム画面にアイコンを作る方法（おすすめ）］
-        スマホでこのページを開き、ブラウザのメニューから**「ホーム画面に追加」**を選ぶと、専用アプリのようなアイコンをホーム画面に配置できます。一度配置すれば、次回からアイコンをワンタップで起動できます。
+        スマホでこのページを開き、ブラウザのメニューから**「ホーム画面に追加」**を選ぶと、専用アプリのようなアイコンをホーム画面に配置できます。
         """, unsafe_allow_html=True)
         
         if st.button("確認しました（システムを開始する）", type="primary"):
@@ -193,33 +192,49 @@ warning_count = sum(1 for loc in locations if loc["color"] == "orange")
 st.markdown("""
 <div style="background-color: #1e293b; padding: 12px 16px; border-radius: 8px; border-left: 6px solid #ef4444; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
     <span style="color: #f8fafc; font-size: 14px; font-weight: bold;">
-        🚨 <span style="color: #fca5a5;">【緊急警報発令中】</span> 危険（赤）が <span style="color: #f87171; font-size: 16px;"><b>{}件</b></span>、注意（橙）が <span style="color: #fbbf24; font-size: 16px;"><b>{}件</b></span> 発生しています。警戒レベルを確認し、速やかな避難・安全確保を行ってください。
+        🚨 <span style="color: #fca5a5;">【緊急警報発令中】</span> 危険（赤）が <span style="color: #f87171; font-size: 16px;"><b>{}件</b></span>、注意（橙）が <span style="color: #fbbf24; font-size: 16px;"><b>{}件</b></span> 発生しています。
     </span>
 </div>
 """.format(danger_count, warning_count) if danger_count > 0 else """
 <div style="background-color: #1e293b; padding: 12px 16px; border-radius: 8px; border-left: 6px solid #f59e0b; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
     <span style="color: #f8fafc; font-size: 14px; font-weight: bold;">
-        ⚠️ <span style="color: #fde047;">【注意喚起】</span> 重大な危険（赤）はありませんが、<span style="color: #fbbf24; font-size: 16px;"><b>{}件</b></span> の注意情報が発表されています。
+        ⚠️ <span style="color: #fde047;">【注意喚起】</span> 重大な危険はありませんが、<span style="color: #fbbf24; font-size: 16px;"><b>{}件</b></span> の注意情報が発表されています。
     </span>
 </div>
 """.format(warning_count), unsafe_allow_html=True)
 
-st.markdown("<h3 style='font-size: 20px; font-weight: bold; margin-bottom: 0rem; color: #1e90ff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3), 0 0 10px rgba(30,144,255,0.4);'>🛡️ 全国統合防災・リスク管理システム</h3>", unsafe_allow_html=True)
-st.markdown("<p style='color: #dc2626; font-weight: bold; font-size: 15px; margin-top: 4px;'>主要一級河川や道路冠水情報を警戒レベル・ライブ映像リンク付きで一元管理するシステムです。</p>", unsafe_allow_html=True)
+st.markdown("<h3 style='font-size: 20px; font-weight: bold; margin-bottom: 0rem; color: #1e90ff;'>🛡️ 全国統合防災・リスク管理システム</h3>", unsafe_allow_html=True)
+st.markdown("<p style='color: #dc2626; font-weight: bold; font-size: 14px; margin-top: 4px;'>通勤・お出かけ先とご自宅など、複数のエリアの危険度を同時に可視化します。</p>", unsafe_allow_html=True)
 
-# ★【最重要強化】文字ベースによる「全国リアルタイム危機可視化・直リンクパネル」
+# 複数選択（マルチセレクト）による地域設定機能
+available_regions = ["日本全国", "北海道", "東北", "関東", "中部", "関西", "四国", "九州"]
+if "selected_regions" not in st.session_state:
+    st.session_state["selected_regions"] = ["日本全国"]
+
 st.markdown("""
-<div style="background-color: #0f172a; border: 2px solid #ef4444; padding: 16px 20px; border-radius: 8px; margin-bottom: 1.2rem; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
-    <div style="color: #fef08a; font-weight: bold; font-size: 16px; margin-bottom: 10px;">
-        ⚡ <b>【全国リアルタイム危機可視化・直リンク集】今すぐお住まいの地域・最新警報を確認</b>
+<div style="background-color: #1e293b; border: 1px solid #334155; padding: 12px 16px; border-radius: 8px; margin-bottom: 1rem;">
+    <span style="color: #fef08a; font-weight: bold; font-size: 14px;">📍 監視エリアの選択（通勤経路・自宅などの複数選択が可能）</span>
+</div>
+""", unsafe_allow_html=True)
+
+selected_regions = st.multiselect(
+    "確認したい地域を複数選べます（通勤・お出かけ先と自宅の同時チェックに便利）",
+    options=["北海道", "東北", "関東", "中部", "関西", "四国", "九州"],
+    default=["関東"] if "関東" in [l["region"] for l in locations] else []
+)
+
+# 危機可視化・直リンクパネル
+st.markdown("""
+<div style="background-color: #0f172a; border: 2px solid #ef4444; padding: 14px 18px; border-radius: 8px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+    <div style="color: #fef08a; font-weight: bold; font-size: 15px; margin-bottom: 8px;">
+        ⚡ <b>【リアルタイム危機可視化・直リンク集】今すぐ最新警報・キキクルを確認</b>
     </div>
-    <div style="font-size: 14px; color: #f1f5f9; line-height: 1.8;">
-        古河市をはじめ、たった今全国各地で発表されているレベル3（高齢者等避難）や警報・危険度は、以下の公式リアルタイムサービスから文字・詳細地図で一発確認できます。<br>
-        ・ 🔴 <a href="https://www.jma.go.jp/bosai/warning/" target="_blank" rel="noopener noreferrer" style="color: #fca5a5; font-weight: bold;">気象庁 警報・注意報（全国の市町村別リアルタイム発令状況）</a><br>
-        ・ ⚠️ <a href="https://www.jma.go.jp/bosai/risk/" target="_blank" rel="noopener noreferrer" style="color: #60a5fa; font-weight: bold;">気象庁 キキクル（危険度分布：土砂災害・浸水・洪水）</a><br>
-        ・ ☂️ <a href="https://weathernews.jp/" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; font-weight: bold;">ウェザーニュース（最新の天気・警報・台風・リアルタイム解説）</a><br>
-        ・ 🌧️ <a href="https://weather.yahoo.co.jp/weather/zoomradar/" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; font-weight: bold;">Yahoo!天気・災害（雨雲レーダー・落雷・自治体ごとの避難情報）</a><br>
-        ・ 🚆 <a href="https://transit.yahoo.co.jp/traininfo/top" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; font-weight: bold;">Yahoo!路線・運行情報（電車の遅延・運転見合わせ状況）</a>
+    <div style="font-size: 13.5px; color: #f1f5f9; line-height: 1.8;">
+        ・ 🔴 <a href="https://www.jma.go.jp/bosai/warning/" target="_blank" rel="noopener noreferrer" style="color: #fca5a5; font-weight: bold;">気象庁 警報・注意報（市区町村別の最新発令状況）</a><br>
+        ・ ⚠️ <a href="https://www.jma.go.jp/bosai/risk/" target="_blank" rel="noopener noreferrer" style="color: #60a5fa; font-weight: bold;">気象庁 キキクル（土砂・浸水・洪水危険度分布）</a><br>
+        ・ ☂️ <a href="https://weathernews.jp/" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; font-weight: bold;">ウェザーニュース（最新の天気・台風解説）</a><br>
+        ・ 🌧️ <a href="https://weather.yahoo.co.jp/weather/zoomradar/" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; font-weight: bold;">Yahoo!天気・災害（雨雲レーダー・避難情報）</a><br>
+        ・ 🚆 <a href="https://transit.yahoo.co.jp/traininfo/top" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; font-weight: bold;">Yahoo!路線・運行情報（電車の遅延・見合わせ）</a>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -229,58 +244,24 @@ with st.expander("📡 【ライブ取得】リアルタイム災害・速報フ
     for news in news_list:
         st.markdown(f"- <a href='{news['link']}' target='_blank' rel='noopener noreferrer' style='color: #d32f2f; font-weight: bold;'>{news['title']}</a> <small style='color:gray;'>({news['date']})</small>", unsafe_allow_html=True)
 
-if "selected_region" not in st.session_state:
-    st.session_state["selected_region"] = "日本全国"
-if "center" not in st.session_state:
-    st.session_state["center"] = [37.5, 138.0]
-if "zoom" not in st.session_state:
-    st.session_state["zoom"] = 5
-
-st.markdown("<h3 style='font-size: 20px; font-weight: bold; margin-top: 1rem; margin-bottom: 0.5rem;'>📍 表示地域の選択</h3>", unsafe_allow_html=True)
-st.markdown("<p style='font-size: 13px; color: #d32f2f; font-weight: bold; margin-bottom: 0.5rem;'>💡 スマホは画面を横向きにするとボタンが綺麗に並びやすくなります</p>", unsafe_allow_html=True)
-
-col1, col2, col3, col4, col5, col6, col7 = st.columns(7)
-
-regions = [
-    ("日本全国", [37.5, 138.0], 5, col1),
-    ("北海道", [43.0642, 141.3469], 7, col2),
-    ("東北", [38.2688, 140.8721], 8, col3),
-    ("関東", [35.6895, 139.6917], 9, col4),
-    ("関西", [34.6937, 135.5022], 9, col5),
-    ("四国", [33.5500, 133.5333], 8, col6),
-    ("九州", [33.5902, 130.4017], 8, col7)
-]
-
-for name, coords, zoom_level, col in regions:
-    is_selected = (st.session_state["selected_region"] == name)
-    button_label = f"📌 {name}" if is_selected else name
-    
-    with col:
-        if is_selected:
-            if st.button(button_label, key=f"btn_{name}", type="primary"):
-                pass
-        else:
-            if st.button(button_label, key=f"btn_{name}", type="secondary"):
-                st.session_state["selected_region"] = name
-                st.session_state["center"] = coords
-                st.session_state["zoom"] = zoom_level
-                st.rerun()
-
-st.sidebar.markdown("<h3 style='font-size: 15px; font-weight: bold; color: #1e90ff; text-shadow: 1px 1px 2px rgba(0,0,0,0.3), 0 0 8px rgba(30,144,255,0.4); margin-bottom: 0px; line-height: 1.4; white-space: nowrap;'>🛡️ 全国統合防災・リスク管理システム</h3>", unsafe_allow_html=True)
+st.sidebar.markdown("<h3 style='font-size: 15px; font-weight: bold; color: #1e90ff;'>🛡️ 全国統合防災システム</h3>", unsafe_allow_html=True)
 st.sidebar.markdown("---")
-st.sidebar.subheader("📌 防災警戒レベル凡例")
+st.sidebar.subheader("📌 警戒レベル凡例")
 st.sidebar.markdown("🔴 <span style='color:red; font-weight:bold;'>レベル4：避難指示（全員避難）</span>", unsafe_allow_html=True)
-st.sidebar.markdown("🟠 <span style='color:darkorange; font-weight:bold;'>レベル3：高齢者等避難・交通規制</span>", unsafe_allow_html=True)
-st.sidebar.markdown("🔵 **Level1〜2**：早期注意・安全監視中", unsafe_allow_html=True)
-st.sidebar.markdown("---")
-st.sidebar.subheader("📡 主なデータ連携元")
-st.sidebar.markdown("<span style='font-size: 12.5px; color: #cbd5e1; line-height: 1.5;'>・気象庁（キキクル・警報・RSS）<br>・国土交通省（川の水位情報）<br>・ウェザーニュース / Yahoo!天気<br>・NEXCO各社・JR各社運行情報</span>", unsafe_allow_html=True)
+st.sidebar.markdown("🟠 <span style='color:darkorange; font-weight:bold;'>レベル3：高齢者等避難・規制</span>", unsafe_allow_html=True)
+st.sidebar.markdown("🔵 **Level1〜2**：監視中", unsafe_allow_html=True)
 
-current_center = st.session_state.get("center", [37.5, 138.0])
-current_zoom = st.session_state.get("zoom", 5)
+# 選択された地域に基づいてロケーションをフィルタリング
+if selected_regions:
+    filtered_locations = [loc for loc in locations if loc["region"] in selected_regions]
+    if not filtered_locations:
+        filtered_locations = locations  # 該当がなければ全体を表示
+else:
+    filtered_locations = locations
 
-m = folium.Map(location=current_center, zoom_start=current_zoom, control_scale=True)
-filtered_locations = sorted(locations, key=lambda x: x["priority"])
+filtered_locations = sorted(filtered_locations, key=lambda x: x["priority"])
+
+m = folium.Map(location=[36.0, 139.5] if selected_regions else [37.5, 138.0], zoom_start=8 if selected_regions else 5, control_scale=True)
 
 for idx, loc in enumerate(filtered_locations):
     lat, lon = loc.get("lat"), loc.get("lon")
@@ -298,17 +279,14 @@ for idx, loc in enumerate(filtered_locations):
         c_lvldesc = loc.get('level_desc')
         
         river_info = f"<br><b>対象河川:</b> {c_river}" if c_river != "---" else ""
-        camera_link_html = f"<br><a href='{c_url}' target='_blank' rel='noopener noreferrer' style='color:red; font-weight:bold;'>▶ 【事業者公式サイト・ライブ情報】を見る</a>" if c_url else ""
+        camera_link_html = f"<br><a href='{c_url}' target='_blank' rel='noopener noreferrer' style='color:red; font-weight:bold;'>▶ 【公式サイト・ライブ情報】を見る</a>" if c_url else ""
         
         popup_html = (
             f"<b>{c_cat} [{c_pref}] {c_name}</b>"
             f"{river_info}<br>"
             f"警戒レベル: <span style='color:{c_color}; font-weight:bold;'>{c_lvl}</span><br>"
-            f"レベル説明: {c_lvldesc}<br>"
-            f"情報元: {c_source}<br>"
             f"状況: <span style='color:{c_color}; font-weight:bold;'>{c_status}</span><br>"
-            f"{c_desc}"
-            f"{camera_link_html}"
+            f"{c_desc}{camera_link_html}"
         )
         folium.Marker(
             [lat, lon],
@@ -316,39 +294,23 @@ for idx, loc in enumerate(filtered_locations):
             icon=folium.Icon(color=c_color, icon="warning" if c_color!="blue" else "info-sign")
         ).add_to(m)
 
-map_left_space, map_center_col, map_right_space = st.columns([0.08, 0.84, 0.08])
-with map_center_col:
-    st_folium(m, width="100%", height=400, key=f"map_{current_center[0]}_{current_center[1]}_{current_zoom}")
-    st.markdown("<p style='font-size: 11px; color: gray; text-align: center; margin-top: 4px;'>※地図の左右にある余白部分を指でなぞると、スムーズにページ全体の上下スクロールができます</p>", unsafe_allow_html=True)
+map_left, map_center, map_right = st.columns([0.08, 0.84, 0.08])
+with map_center:
+    st_folium(m, width="100%", height=380, key="multi_region_map")
 
-st.markdown(f"<h3 style='font-size: 20px; font-weight: bold; margin-top: 1rem; margin-bottom: 0.5rem;'>📋 全国統合リスク・警戒レベル一覧</h3>", unsafe_allow_html=True)
-st.markdown("<p style='font-size: 12px; color: #555;'>表示順：[レベル] ＞ [都道府県] ＞ [対象（地点・河川）] ＞ [状況]</p>", unsafe_allow_html=True)
+st.markdown(f"<h3 style='font-size: 20px; font-weight: bold; margin-top: 1rem;'>📋 選択エリアのリスク・警戒レベル一覧</h3>", unsafe_allow_html=True)
 
 for idx, loc in enumerate(filtered_locations):
     badge = "🔴【レベル4】" if loc["color"] == "red" else ("🟠【レベル3】" if loc["color"] == "orange" else "🔵【レベル1】")
     river_tag = f" ｜ 対象: **{loc['river_name']}**" if loc['river_name'] != "---" else ""
-    
-    title_text = f"{badge} ｜ {loc['pref']} ｜ 対象: **{loc['name']}**{river_tag} ｜ 状況: **{loc['status']}**"
+    title_text = f"{badge} ｜ {loc['pref']} ({loc['region']}) ｜ **{loc['name']}**{river_tag} ｜ 状況: **{loc['status']}**"
     
     with st.expander(title_text):
-        st.markdown(f"**情報元（データソース）**\n\n`{loc['source']}`")
+        st.markdown(f"**情報元**\n\n`{loc['source']}`")
         st.markdown("---")
-
-        if loc['river_name'] != "---":
-            st.markdown(f"**対象水系**\n\n{loc['river_name']}")
-            st.markdown("---")
-        
         st.markdown(f"**警戒レベル**\n\n`{loc['level']}` — {loc['level_desc']}")
         st.markdown("---")
-        
-        st.markdown(f"**ステータス詳細**\n\n{loc['status']}")
-        st.markdown("---")
-        
-        st.markdown(f"**規制・水位指標**\n\n{loc['metric']}")
-        st.markdown("---")
-        
         st.markdown(f"**状況説明**\n\n{loc['desc']}")
-        
         if loc['camera_url']:
             st.markdown("---")
-            st.markdown(f"**関連リンク**\n\n<a href='{loc['camera_url']}' target='_blank' rel='noopener noreferrer'>🎥 公式サイト・関連詳細情報はこちら (別タブで開きます)</a>", unsafe_allow_html=True)
+            st.markdown(f"**関連リンク**\n\n<a href='{loc['camera_url']}' target='_blank' rel='noopener noreferrer'>🎥 公式サイト・関連詳細情報を見る (別タブ)</a>", unsafe_allow_html=True)
