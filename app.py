@@ -163,10 +163,10 @@ if st.session_state["first_visit"]:
         当システムでは、気象庁や国土交通省などの公的機関が提供するオープンデータおよび信頼性の高い情報を統合してリアルタイム表示しています。<br><br>
         <div style="background-color: rgba(255, 255, 255, 0.15); padding: 10px 14px; border-radius: 6px; font-size: 14px; color: #ffffff; line-height: 1.8;">
             📍 <b>【複数エリア監視機能について】</b><br>
-            ・自宅や勤務先、通勤経路など<b>複数の地域を同時に選択</b>して、それぞれの危険度をまとめて確認できます（ブラウザを閉じればリセットされる安全設計です）。<br><br>
+            ・自宅や勤務先、通勤経路など<b>複数の地域を同時に選択</b>して、それぞれの危険度をまとめて確認できます（ブラウザを閉じればリセットされる安全設計です）。<br>
+            ・選択した地域にサンプルが無い場合でも、**公式リアルタイム警報・キキクルへの直リンクが自動案内**されるため情報が途絶えません。<br><br>
             🌐 <b>【主なデータ提供元】</b><br>
-            ・気象庁（キキクル・警報・危険度分布）<br>
-            ・国土交通省（河川水位） / ウェザーニュース / Yahoo!天気
+            ・気象庁（キキクル・警報） / 国土交通省（河川水位） / Yahoo!天気
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -207,9 +207,9 @@ st.markdown("<h3 style='font-size: 20px; font-weight: bold; margin-bottom: 0rem;
 st.markdown("<p style='color: #dc2626; font-weight: bold; font-size: 14px; margin-top: 4px;'>通勤・お出かけ先とご自宅など、複数のエリアの危険度を同時に可視化します。</p>", unsafe_allow_html=True)
 
 # 複数選択（マルチセレクト）による地域設定機能
-available_regions = ["日本全国", "北海道", "東北", "関東", "中部", "関西", "四国", "九州"]
+available_regions = ["北海道", "東北", "関東", "中部", "関西", "四国", "九州"]
 if "selected_regions" not in st.session_state:
-    st.session_state["selected_regions"] = ["日本全国"]
+    st.session_state["selected_regions"] = ["関東"]
 
 st.markdown("""
 <div style="background-color: #1e293b; border: 1px solid #334155; padding: 12px 16px; border-radius: 8px; margin-bottom: 1rem;">
@@ -219,9 +219,10 @@ st.markdown("""
 
 selected_regions = st.multiselect(
     "確認したい地域を複数選べます（通勤・お出かけ先と自宅の同時チェックに便利）",
-    options=["北海道", "東北", "関東", "中部", "関西", "四国", "九州"],
-    default=["関東"] if "関東" in [l["region"] for l in locations] else []
+    options=available_regions,
+    default=st.session_state["selected_regions"]
 )
+st.session_state["selected_regions"] = selected_regions
 
 # 危機可視化・直リンクパネル
 st.markdown("""
@@ -254,10 +255,8 @@ st.sidebar.markdown("🔵 **Level1〜2**：監視中", unsafe_allow_html=True)
 # 選択された地域に基づいてロケーションをフィルタリング
 if selected_regions:
     filtered_locations = [loc for loc in locations if loc["region"] in selected_regions]
-    if not filtered_locations:
-        filtered_locations = locations  # 該当がなければ全体を表示
 else:
-    filtered_locations = locations
+    filtered_locations = []
 
 filtered_locations = sorted(filtered_locations, key=lambda x: x["priority"])
 
@@ -300,17 +299,30 @@ with map_center:
 
 st.markdown(f"<h3 style='font-size: 20px; font-weight: bold; margin-top: 1rem;'>📋 選択エリアのリスク・警戒レベル一覧</h3>", unsafe_allow_html=True)
 
-for idx, loc in enumerate(filtered_locations):
-    badge = "🔴【レベル4】" if loc["color"] == "red" else ("🟠【レベル3】" if loc["color"] == "orange" else "🔵【レベル1】")
-    river_tag = f" ｜ 対象: **{loc['river_name']}**" if loc['river_name'] != "---" else ""
-    title_text = f"{badge} ｜ {loc['pref']} ({loc['region']}) ｜ **{loc['name']}**{river_tag} ｜ 状況: **{loc['status']}**"
-    
-    with st.expander(title_text):
-        st.markdown(f"**情報元**\n\n`{loc['source']}`")
-        st.markdown("---")
-        st.markdown(f"**警戒レベル**\n\n`{loc['level']}` — {loc['level_desc']}")
-        st.markdown("---")
-        st.markdown(f"**状況説明**\n\n{loc['desc']}")
-        if loc['camera_url']:
+# ★【安全設計・フォールバック対応】選択されたエリアにサンプルが無い場合の救済表示
+if not filtered_locations and selected_regions:
+    st.markdown("""
+    <div style="background-color: #1e293b; border-left: 5px solid #3b82f6; padding: 16px; border-radius: 6px; margin-bottom: 1rem;">
+        <span style="color: #93c5fd; font-weight: bold; font-size: 15px;">ℹ️ 選択された地域（{}）の詳細個別サンプルは現在登録されていません。</span><br><br>
+        <span style="color: #f1f5f9; font-size: 13.5px;">
+            しかし、お住まいや通勤・お出かけ先のリアルタイムな気象警報・キキクル（土砂・浸水）等の情報は、以下の公式ページから一発で直接ご確認いただけます：<br>
+            ・ 🔴 <a href="https://www.jma.go.jp/bosai/warning/" target="_blank" rel="noopener noreferrer" style="color: #fca5a5; font-weight: bold;">気象庁 警報・注意報（市区町村別の最新発令状況）</a><br>
+            ・ ⚠️ <a href="https://www.jma.go.jp/bosai/risk/" target="_blank" rel="noopener noreferrer" style="color: #60a5fa; font-weight: bold;">気象庁 キキクル（土砂・浸水・洪水危険度分布）</a>
+        </span>
+    </div>
+    """.format(", ".join(selected_regions)), unsafe_allow_html=True)
+else:
+    for idx, loc in enumerate(filtered_locations):
+        badge = "🔴【レベル4】" if loc["color"] == "red" else ("🟠【レベル3】" if loc["color"] == "orange" else "🔵【レベル1】")
+        river_tag = f" ｜ 対象: **{loc['river_name']}**" if loc['river_name'] != "---" else ""
+        title_text = f"{badge} ｜ {loc['pref']} ({loc['region']}) ｜ **{loc['name']}**{river_tag} ｜ 状況: **{loc['status']}**"
+        
+        with st.expander(title_text):
+            st.markdown(f"**情報元**\n\n`{loc['source']}`")
             st.markdown("---")
-            st.markdown(f"**関連リンク**\n\n<a href='{loc['camera_url']}' target='_blank' rel='noopener noreferrer'>🎥 公式サイト・関連詳細情報を見る (別タブ)</a>", unsafe_allow_html=True)
+            st.markdown(f"**警戒レベル**\n\n`{loc['level']}` — {loc['level_desc']}")
+            st.markdown("---")
+            st.markdown(f"**状況説明**\n\n{loc['desc']}")
+            if loc['camera_url']:
+                st.markdown("---")
+                st.markdown(f"**関連リンク**\n\n<a href='{loc['camera_url']}' target='_blank' rel='noopener noreferrer'>🎥 公式サイト・関連詳細情報を見る (別タブ)</a>", unsafe_allow_html=True)
