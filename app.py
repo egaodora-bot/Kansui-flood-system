@@ -143,7 +143,7 @@ locations = [
         "level": "レベル3", "level_desc": "【高齢者等避難】水位上昇中。要配慮者は避難準備。",
         "metric": "観測 5.1m / 警戒 5.8m", "status": "注意（水位上昇中）", "color": "orange", "priority": 2,
         "desc": "西日本最大の「筑紫次郎」と呼ばれる一級河川。上流の豪雨で水位上昇中。",
-        "camera_url": "https://www.jma.go.jp/bosai/warning/"
+        "camera_url": "https://www.qsr.mlit.go.jp/"
     },
     {
         "category": "【地震・津波】", "region": "北海道", "pref": "北海道", "name": "太平洋沿岸東部エリア", 
@@ -210,7 +210,8 @@ st.markdown("""
 """.format(warning_count), unsafe_allow_html=True)
 
 st.markdown("<h3 style='font-size: 20px; font-weight: bold; margin-bottom: 0rem; color: #1e90ff;'>🛡️ 気象庁データ連動・全国防災システム</h3>", unsafe_allow_html=True)
-st.markdown("<p style='color: #dc2626; font-weight: bold; font-size: 14px; margin-top: 4px;'>気象庁の災害情報をベースに、重要拠点の状況を把握します。</p>", unsafe_allow_html=True)
+# 赤文字を視認性の高い黄色（#fde047）に変更
+st.markdown("<p style='color: #fde047; font-weight: bold; font-size: 14px; margin-top: 4px;'>気象庁の災害情報をベースに、重要拠点の状況を把握します。</p>", unsafe_allow_html=True)
 
 available_regions = ["北海道", "東北", "関東", "中部", "関西", "四国", "九州"]
 if "selected_regions" not in st.session_state:
@@ -232,9 +233,22 @@ selected_regions = st.multiselect(
 )
 st.session_state["selected_regions"] = selected_regions
 
+# 通勤・鉄道情報の常時確認用「小窓（ミニウィジェット風枠）」を追加
+st.markdown("""
+<div style="background-color: #0f172a; border: 2px solid #38bdf8; padding: 12px 16px; border-radius: 8px; margin-top: 1rem; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+    <div style="color: #38bdf8; font-weight: bold; font-size: 14.5px; margin-bottom: 6px;">
+        🚆 <b>【通勤・鉄道運行情報（小窓）】遅延・見合わせのリアルタイムチェック</b>
+    </div>
+    <div style="font-size: 13px; color: #f1f5f9; line-height: 1.7;">
+        ・ <a href="https://transit.yahoo.co.jp/traininfo/top" target="_blank" rel="noopener noreferrer" style="color: #7dd3fc; font-weight: bold;">Yahoo!路線情報 運行状況（関東・全国の遅延・運転見合わせ一覧）</a><br>
+        ・ <a href="https://www.jartic.or.jp/" target="_blank" rel="noopener noreferrer" style="color: #7dd3fc; font-weight: bold;">JARTIC 日本道路交通情報センター（高速道路・一般道の規制状況）</a>
+    </div>
+</div>
+""", unsafe_allow_html=True)
+
 # 気象庁および民間の公式リンク集を一本化して掲示
 st.markdown("""
-<div style="background-color: #0f172a; border: 2px solid #ef4444; padding: 14px 18px; border-radius: 8px; margin-top: 1rem; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+<div style="background-color: #0f172a; border: 2px solid #ef4444; padding: 14px 18px; border-radius: 8px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
     <div style="color: #fef08a; font-weight: bold; font-size: 15px; margin-bottom: 8px;">
         ⚡ <b>【気象庁公式 ＆ 民間気象会社・災害情報直リンク集】すべての市区町村の情報を漏れなく確認</b>
     </div>
