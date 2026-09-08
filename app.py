@@ -164,7 +164,7 @@ locations = [
 ]
 
 if st.session_state["first_visit"]:
-    st.markdown("<h3 style='font-size: 18px; font-weight: bold; background-color: #fef08a; color: #1e293b; padding: 8px 12px; border-radius: 6px; border-left: 6px solid #ca8a04; margin-bottom: 0.8rem;'>🛡️ 気象庁データ連動・全国防災リスクシステム</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='font-size: 18px; font-weight: bold; background-color: #fef08a; color: #1e293b; padding: 8px 12px; border-radius: 6px; border-left: 6px solid #ca8a04; margin-bottom: 0.8rem;'>🛡️ 全国総合防災・気象庁データ統合システム</h3>", unsafe_allow_html=True)
     
     st.markdown("""
     <div style="background-color: #1e40af; padding: 18px 22px; border-radius: 8px; border-left: 6px solid #60a5fa; color: #ffffff; font-weight: bold; font-size: 15px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); line-height: 1.7;">
@@ -192,27 +192,6 @@ if st.session_state["first_visit"]:
     
     st.stop()
 
-danger_count = sum(1 for loc in locations if loc["color"] == "red")
-warning_count = sum(1 for loc in locations if loc["color"] == "orange")
-
-st.markdown("""
-<div style="background-color: #1e293b; padding: 12px 16px; border-radius: 8px; border-left: 6px solid #ef4444; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
-    <span style="color: #f8fafc; font-size: 14px; font-weight: bold;">
-        🚨 <span style="color: #fca5a5;">【気象庁発表・警戒対象】</span> 危険（赤）が <span style="color: #f87171; font-size: 16px;"><b>{}件</b></span>、注意（橙）が <span style="color: #fbbf24; font-size: 16px;"><b>{}件</b></span> 監視されています。
-    </span>
-</div>
-""".format(danger_count, warning_count) if danger_count > 0 else """
-<div style="background-color: #1e293b; padding: 12px 16px; border-radius: 8px; border-left: 6px solid #f59e0b; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
-    <span style="color: #f8fafc; font-size: 14px; font-weight: bold;">
-        ⚠️ <span style="color: #fde047;">【警戒監視中】</span> 現在発表されている注意情報は <span style="color: #fbbf24; font-size: 16px;"><b>{}件</b></span> です。
-    </span>
-</div>
-""".format(warning_count), unsafe_allow_html=True)
-
-st.markdown("<h3 style='font-size: 20px; font-weight: bold; margin-bottom: 0rem; color: #1e90ff;'>🛡️ 気象庁データ連動・全国防災システム</h3>", unsafe_allow_html=True)
-# 赤文字を視認性の高い黄色（#fde047）に変更
-st.markdown("<p style='color: #fde047; font-weight: bold; font-size: 14px; margin-top: 4px;'>気象庁の災害情報をベースに、重要拠点の状況を把握します。</p>", unsafe_allow_html=True)
-
 available_regions = ["北海道", "東北", "関東", "中部", "関西", "四国", "九州"]
 if "selected_regions" not in st.session_state:
     st.session_state["selected_regions"] = ["関東"]
@@ -233,7 +212,27 @@ selected_regions = st.multiselect(
 )
 st.session_state["selected_regions"] = selected_regions
 
-# 通勤・鉄道情報の常時確認用「小窓（ミニウィジェット風枠）」を追加
+if selected_regions:
+    filtered_locations = [loc for loc in locations if loc["region"] in selected_regions]
+else:
+    filtered_locations = []
+
+# 地域選択に連動して数値が変化するサマリー計算
+danger_count = sum(1 for loc in filtered_locations if loc["color"] == "red")
+warning_count = sum(1 for loc in filtered_locations if loc["color"] == "orange")
+
+st.markdown(f"""
+<div style="background-color: #1e293b; padding: 12px 16px; border-radius: 8px; border-left: 6px solid #ef4444; margin-top: 10px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+    <span style="color: #f8fafc; font-size: 14px; font-weight: bold;">
+        🚨 <span style="color: #fca5a5;">【気象庁発表・警戒対象】</span> 選択エリアの危険（赤）が <span style="color: #f87171; font-size: 16px;"><b>{danger_count}件</b></span>、注意（橙）が <span style="color: #fbbf24; font-size: 16px;"><b>{warning_count}件</b></span> 監視されています。
+    </span>
+</div>
+""", unsafe_allow_html=True)
+
+st.markdown("<h3 style='font-size: 20px; font-weight: bold; margin-bottom: 0rem; color: #1e90ff;'>🛡️ 全国総合防災・気象庁データ統合システム</h3>", unsafe_allow_html=True)
+st.markdown("<p style='color: #fde047; font-weight: bold; font-size: 14px; margin-top: 4px;'>気象庁の災害情報をベースに、重要拠点の状況を把握します。</p>", unsafe_allow_html=True)
+
+# 通勤・鉄道情報の常時確認用「小窓（ミニウィジェット風枠）」
 st.markdown("""
 <div style="background-color: #0f172a; border: 2px solid #38bdf8; padding: 12px 16px; border-radius: 8px; margin-top: 1rem; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
     <div style="color: #38bdf8; font-weight: bold; font-size: 14.5px; margin-bottom: 6px;">
@@ -246,7 +245,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# 気象庁および民間の公式リンク集を一本化して掲示
+# 気象庁および民間の公式リンク集
 st.markdown("""
 <div style="background-color: #0f172a; border: 2px solid #ef4444; padding: 14px 18px; border-radius: 8px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
     <div style="color: #fef08a; font-weight: bold; font-size: 15px; margin-bottom: 8px;">
@@ -267,17 +266,12 @@ with st.expander("📡 【ライブ取得】リアルタイム災害・速報フ
     for news in news_list:
         st.markdown(f"- <a href='{news['link']}' target='_blank' rel='noopener noreferrer' style='color: #d32f2f; font-weight: bold;'>{news['title']}</a> <small style='color:gray;'>({news['date']})</small>", unsafe_allow_html=True)
 
-st.sidebar.markdown("<h3 style='font-size: 15px; font-weight: bold; color: #1e90ff;'>🛡️ 気象庁データ連動システム</h3>", unsafe_allow_html=True)
+st.sidebar.markdown("<h3 style='font-size: 15px; font-weight: bold; color: #1e90ff;'>🛡️ 全国総合防災システム</h3>", unsafe_allow_html=True)
 st.sidebar.markdown("---")
 st.sidebar.subheader("📌 警戒レベル凡例")
 st.sidebar.markdown("🔴 <span style='color:red; font-weight:bold;'>レベル4：避難指示（全員避難）</span>", unsafe_allow_html=True)
 st.sidebar.markdown("🟠 <span style='color:darkorange; font-weight:bold;'>レベル3：高齢者等避難・規制</span>", unsafe_allow_html=True)
 st.sidebar.markdown("🔵 **Level1〜2**：監視中", unsafe_allow_html=True)
-
-if selected_regions:
-    filtered_locations = [loc for loc in locations if loc["region"] in selected_regions]
-else:
-    filtered_locations = []
 
 filtered_locations = sorted(filtered_locations, key=lambda x: x["priority"])
 
