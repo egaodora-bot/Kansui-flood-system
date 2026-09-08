@@ -192,7 +192,7 @@ if st.session_state["first_visit"]:
     
     st.stop()
 
-# --- メイン画面上部のシステムタイトル（カードデザインで綺麗に改修） ---
+# --- メイン画面上部のシステムタイトル ---
 st.markdown("""
 <div style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); border: 1px solid #334155; border-left: 6px solid #3b82f6; padding: 16px 20px; border-radius: 8px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
     <div style="color: #60a5fa; font-size: 20px; font-weight: bold; margin-bottom: 4px;">
@@ -208,11 +208,12 @@ available_regions = ["北海道", "東北", "関東", "中部", "関西", "四�
 if "selected_regions" not in st.session_state:
     st.session_state["selected_regions"] = ["関東"]
 
-# 枠組みとセレクトボックスを一体化
+# --- 監視エリアの選択を1つのまとまったカード枠内に統合 ---
 st.markdown("""
-<div style="background-color: #1e293b; border: 1px solid #334155; padding: 14px 18px; border-radius: 8px; margin-bottom: 0.5rem;">
-    <span style="color: #fef08a; font-weight: bold; font-size: 14px;">📍 監視エリアの選択（最大2箇所まで選択可能）</span>
-</div>
+<div style="background-color: #1e293b; border: 1px solid #334155; padding: 16px 18px; border-radius: 8px; margin-bottom: 0.5rem; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+    <div style="color: #fef08a; font-weight: bold; font-size: 15px; margin-bottom: 10px;">
+        📍 知りたい監視エリアの選択（最大2箇所まで選択可能）
+    </div>
 """, unsafe_allow_html=True)
 
 selected_regions = st.multiselect(
@@ -222,6 +223,8 @@ selected_regions = st.multiselect(
     max_selections=2,
     label_visibility="collapsed"
 )
+
+st.markdown("</div>", unsafe_allow_html=True)
 st.session_state["selected_regions"] = selected_regions
 
 if selected_regions:
@@ -275,7 +278,7 @@ with st.expander("📡 【ライブ取得】リアルタイム災害・速報フ
     for news in news_list:
         st.markdown(f"- <a href='{news['link']}' target='_blank' rel='noopener noreferrer' style='color: #d32f2f; font-weight: bold;'>{news['title']}</a> <small style='color:gray;'>({news['date']})</small>", unsafe_allow_html=True)
 
-# --- 左側メニュー（サイドバー）のシステム名も完全に統一 ---
+# --- 左側メニュー（サイドバー） ---
 st.sidebar.markdown("<h3 style='font-size: 14px; font-weight: bold; color: #60a5fa; line-height: 1.5;'>🛡️ 全国総合防災・<br>気象庁データ統合システム</h3>", unsafe_allow_html=True)
 st.sidebar.markdown("---")
 st.sidebar.subheader("📌 警戒レベル凡例")
