@@ -9,7 +9,7 @@ st.set_page_config(
     page_title="全国インフラ・気象防災カルテ・リアルリンク共用システム", 
     page_icon="🛡️", 
     layout="wide",
-    initial_sidebar_state="collapsed"
+    initial_sidebar_state="expanded"
 )
 
 st.markdown("""
@@ -21,21 +21,12 @@ div.stButton > button {
     padding: 6px 10px !important;
     font-size: 13px !important;
 }
-button[kind="primary"] {
-    background-color: #0056b3 !important;
-    border: 3px solid #004085 !important;
-    color: #ffffff !important;
-    font-weight: 800 !important;
-}
 div[data-testid="stSelectbox"] {
     border-left: 5px solid #38bdf8;
     padding-left: 10px;
 }
 </style>
 """, unsafe_allow_html=True)
-
-if "first_visit" not in st.session_state:
-    st.session_state["first_visit"] = True
 
 @st.cache_data(ttl=300)
 def fetch_robust_disaster_news():
@@ -128,73 +119,56 @@ def get_master_locations():
 
 locations = get_master_locations()
 
-if st.session_state["first_visit"]:
-    st.markdown("<h3 style='font-size: 20px; font-weight: bold; background-color: #fef08a; color: #1e293b; padding: 10px 14px; border-radius: 6px; border-left: 6px solid #ca8a04; margin-bottom: 0.8rem;'>🛡️ 全国インフラ・気象防災カルテ・リアルリンク共用システム</h3>", unsafe_allow_html=True)
-    
-    st.markdown("""
-    <div style="background-color: #1e40af; padding: 18px 22px; border-radius: 8px; border-left: 6px solid #60a5fa; color: #ffffff; font-weight: bold; font-size: 15px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); line-height: 1.7;">
-        過去の災害カルテ・教訓データと、リアルタイムの公式リンクを共用するシステムです。<br><br>
-        <div style="background-color: rgba(255, 255, 255, 0.15); padding: 10px 14px; border-radius: 6px; font-size: 14px; color: #ffffff; line-height: 1.8;">
-            📍 <b>【ご利用上の注意】</b><br>
-            ・システム内の地図および一覧は「過去の災害カルテ・教訓」を表示します。<br>
-            ・現在の正確なライブ情報・気象状況は、下部の公式リンク集をご確認ください。
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    if st.button("確認しました（システムを開始する）", type="primary"):
-        st.session_state["first_visit"] = False
-        st.rerun()
-    st.stop()
+# --- サイドバー設計方針の記載 ---
+st.sidebar.markdown("<h3 style='font-size: 16px; font-weight: bold; color: #60a5fa;'>🛠️ システム設計・通信検証方針</h3>", unsafe_allow_html=True)
+st.sidebar.markdown("""
+<div style="font-size: 12.5px; color: #cbd5e1; line-height: 1.6; background-color: #1e293b; padding: 12px; border-radius: 6px; border-left: 4px solid #3b82f6; margin-bottom: 1rem;">
+    本システムは、過酷な災害現場や低速なモバイル回線（128kbps等）の環境下でも、可能な限りエラーを抑えて迅速に命を守る情報にアクセスできるよう設計されています（※通信環境や電波状況により接続が不安定になる場合があります）。<br><br>
+    近年の気候変動や激甚化する災害（関東・東北豪雨、東日本台風、熱海市土砂災害など）の教訓が詰まった、2000年以降（過去25年間）の重要マスターデータを厳選し、約150〜200件に絞り込んで搭載しています。データ容量を約1MB未満に極限まで軽量化することで、通信負荷の軽減を図っています。<br><br>
+    <b>128kbps低速通信・スマホ環境への配慮</b><br>
+    初回ロード時のデータ量を最小限に抑えているため、通信速度制限がかかったスマホ環境や電波の弱い被災地であっても、タイムアウトやフリーズのリスクを軽減し、スムーズに起動することを目指しています。<br><br>
+    <b>キャッシュ機能とマーカークラスターの導入</b><br>
+    サーバー負荷やブラウザのメモリ消費を抑えるため、データのキャッシュ処理および地図上のピンの自動グルーピング（クラスター表示）を行い、スマートフォンでの実用的な操作性を確保しています。
+</div>
+""", unsafe_allow_html=True)
 
+st.sidebar.markdown("---")
+st.sidebar.subheader("📌 警戒レベル凡例（過去カルテ）")
+st.sidebar.markdown("🔴 <span style='color:red; font-weight:bold;'>レベル4：過去避難指示・重大被災</span>", unsafe_allow_html=True)
+st.sidebar.markdown("🟠 <span style='color:darkorange; font-weight:bold;'>Level3：過去注意・警戒履歴</span>", unsafe_allow_html=True)
+
+# ヘルパータイトル部分
 st.markdown("""
-<div style="margin-left: 0px; margin-bottom: 1.4rem;">
-    <div style="color: #60a5fa; font-size: 24px; font-weight: bold; margin-bottom: 6px;">
+<div style="margin-left: 0px; margin-bottom: 1.2rem;">
+    <div style="color: #60a5fa; font-size: 24px; font-weight: bold; margin-bottom: 4px;">
         🛡️ 全国インフラ・気象防災カルテ・リアルリンク共用システム
     </div>
-    <div style="color: #93c5fd; font-size: 15px; font-weight: bold;">
+    <div style="color: #93c5fd; font-size: 14.5px; font-weight: bold;">
         （※河川水位上昇・道路交通規制・鉄道運行・気象庁キキクル監視）
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-col_f1, col_f2, col_f3 = st.columns(3)
+# エリアに特化したシンプルな単一選択
+st.markdown("""<div style="border-left: 5px solid #fde047; padding-left: 8px; margin-bottom: 4px;"><span style="color: #fef08a; font-weight: bold; font-size: 14px;">📍 監視エリアの選択（エリアで起きている災害・インフラ状況の確認）</span></div>""", unsafe_allow_html=True)
 
 available_regions = ["すべて表示", "北海道", "東北", "関東", "中部", "関西", "四国", "九州"]
-with col_f1:
-    st.markdown("""<div style="border-left: 5px solid #fde047; padding-left: 8px; margin-bottom: 4px;"><span style="color: #fef08a; font-weight: bold; font-size: 13.5px;">📍 地方エリア</span></div>""", unsafe_allow_html=True)
-    selected_region = st.selectbox("地方エリア選択", options=available_regions, label_visibility="collapsed")
+selected_region = st.selectbox("エリア選択", options=available_regions, label_visibility="collapsed")
 
-base_locations = locations if selected_region == "すべて表示" else [loc for loc in locations if loc["region"] == selected_region]
-
-available_infra_types = ["すべて表示", "主要河川", "国道", "県道", "市町道", "鉄道", "気象庁データ"]
-with col_f2:
-    st.markdown("""<div style="border-left: 5px solid #38bdf8; padding-left: 8px; margin-bottom: 4px;"><span style="color: #7dd3fc; font-weight: bold; font-size: 13.5px;">🏗️ インフラ種別</span></div>""", unsafe_allow_html=True)
-    selected_infra = st.selectbox("インフラ種別選択", options=available_infra_types, label_visibility="collapsed")
-
-available_prefs = ["すべて表示"] + sorted(list(set([loc["pref"] for loc in base_locations])))
-with col_f3:
-    st.markdown("""<div style="border-left: 5px solid #f43f5e; padding-left: 8px; margin-bottom: 4px;"><span style="color: #fda4af; font-weight: bold; font-size: 13.5px;">🔍 都道府県</span></div>""", unsafe_allow_html=True)
-    selected_pref = st.selectbox("都道府県選択", options=available_prefs, label_visibility="collapsed")
-
-filtered_locations = base_locations.copy()
-if selected_infra != "すべて表示":
-    filtered_locations = [loc for loc in filtered_locations if loc["infrastructure_type"] == selected_infra]
-if selected_pref != "すべて表示":
-    filtered_locations = [loc for loc in filtered_locations if loc["pref"] == selected_pref]
+filtered_locations = locations if selected_region == "すべて表示" else [loc for loc in locations if loc["region"] == selected_region]
 
 danger_count = sum(1 for loc in filtered_locations if loc["color"] == "red")
 warning_count = sum(1 for loc in filtered_locations if loc["color"] == "orange")
 
 st.markdown(f"""
-<div style="background-color: #1e293b; padding: 12px 16px; border-radius: 8px; border-left: 6px solid #ef4444; margin-top: 15px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+<div style="background-color: #1e293b; padding: 12px 16px; border-radius: 8px; border-left: 6px solid #ef4444; margin-top: 12px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
     <span style="color: #f8fafc; font-size: 14px; font-weight: bold;">
-        🚨 <span style="color: #fca5a5;">【過去災害発生カルテ監視状況】</span> 選択条件の危険（赤）が <span style="color: #f87171; font-size: 16px;"><b>{danger_count}件</b></span>、注意（橙）が <span style="color: #fbbf24; font-size: 16px;"><b>{warning_count}件</b></span> 検出されています。
+        🚨 <span style="color: #fca5a5;">【過去災害発生カルテ監視状況】</span> 選択エリアの危険（赤）が <span style="color: #f87171; font-size: 16px;"><b>{danger_count}件</b></span>、注意（橙）が <span style="color: #fbbf24; font-size: 16px;"><b>{warning_count}件</b></span> 検出されています。
     </span>
 </div>
 """, unsafe_allow_html=True)
 
-# 公式リンク集
+# 公式データリンク集
 st.markdown("""
 <div style="background-color: #0f172a; border: 2px solid #ffffff; padding: 14px 18px; border-radius: 8px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
     <div style="color: #fef08a; font-weight: bold; font-size: 15px; margin-bottom: 8px;">
@@ -213,18 +187,12 @@ st.markdown("""
 with st.expander("📡 【ライブ取得】リアルタイム災害・速報フィード", expanded=True):
     news_list = fetch_robust_disaster_news()
     for news in news_list:
-        # 🔗 リンクカラーを濃いオレンジ（#f97316）に変更
         st.markdown(f"- <a href='{news['link']}' target='_blank' rel='noopener noreferrer' style='color: #f97316; font-weight: bold;'>{news['title']}</a> <small style='color:gray;'>({news['date']})</small>", unsafe_allow_html=True)
 
-st.sidebar.markdown("<h3 style='font-size: 14px; font-weight: bold; color: #60a5fa; line-height: 1.5;'>🛡️ カルテ・リアルリンク共用</h3>", unsafe_allow_html=True)
-st.sidebar.markdown("---")
-st.sidebar.subheader("📌 警戒レベル凡例（過去カルテ）")
-st.sidebar.markdown("🔴 <span style='color:red; font-weight:bold;'>レベル4：過去避難指示・重大被災</span>", unsafe_allow_html=True)
-st.sidebar.markdown("🟠 <span style='color:darkorange; font-weight:bold;'>Level3：過去注意・警戒履歴</span>", unsafe_allow_html=True)
-
+# 地図表示
 map_center_lat = filtered_locations[0]["lat"] if filtered_locations else 35.6895
 map_center_lon = filtered_locations[0]["lon"] if filtered_locations else 139.6917
-map_zoom = 11 if selected_pref != "すべて表示" else (8 if selected_region != "すべて表示" else 5)
+map_zoom = 8 if selected_region != "すべて表示" else 5
 
 m = folium.Map(location=[map_center_lat, map_center_lon], zoom_start=map_zoom, control_scale=True)
 marker_cluster = MarkerCluster().add_to(m)
@@ -249,12 +217,12 @@ map_left, map_center, map_right = st.columns([0.08, 0.84, 0.08])
 with map_center:
     st_folium(m, width="100%", height=380, key="infra_map_clustered")
 
-st.markdown(f"<h3 style='font-size: 20px; font-weight: bold; margin-top: 1rem;'>📋 過去災害発生カルテデータ一覧</h3>", unsafe_allow_html=True)
+st.markdown(f"<h3 style='font-size: 20px; font-weight: bold; margin-top: 1rem;'>📋 選択エリアの過去災害発生カルテ一覧</h3>", unsafe_allow_html=True)
 
 if not filtered_locations:
     st.markdown("""
     <div style="background-color: #1e293b; border-left: 5px solid #3b82f6; padding: 16px; border-radius: 6px; margin-bottom: 1rem;">
-        <span style="color: #93c5fd; font-weight: bold; font-size: 15px;">ℹ️ 選択された条件に一致するカルテデータは現在ありません。</span>
+        <span style="color: #93c5fd; font-weight: bold; font-size: 15px;">ℹ️ 選択されたエリアに一致するカルテデータは現在ありません。</span>
     </div>
     """, unsafe_allow_html=True)
 else:
