@@ -659,6 +659,115 @@ div[data-testid="stExpander"] {
         font-weight: 800 !important;
     }
 }
+
+/* ==========================================
+   V7：選択後も背景ブラックを絶対維持
+   「選択前ブラック → 選択後ホワイト」問題を防止
+   ========================================== */
+
+/* Selectbox本体・選択済み状態 */
+div[data-testid="stSelectbox"],
+div[data-testid="stSelectbox"] [data-baseweb="select"],
+div[data-testid="stSelectbox"] [data-baseweb="select"] > div,
+div[data-testid="stSelectbox"] [data-baseweb="select"] [role="combobox"] {
+    background: #000000 !important;
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    opacity: 1 !important;
+}
+
+/* 内部要素：選択後にBaseWebが白背景を付けるのを阻止 */
+div[data-testid="stSelectbox"] [data-baseweb="select"] div,
+div[data-testid="stSelectbox"] [data-baseweb="select"] span,
+div[data-testid="stSelectbox"] [data-baseweb="select"] input,
+div[data-testid="stSelectbox"] [data-baseweb="select"] p {
+    background: transparent !important;
+    background-color: transparent !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    opacity: 1 !important;
+}
+
+/* 選択された値のコンテナ */
+div[data-testid="stSelectbox"] [data-baseweb="value-container"],
+div[data-testid="stSelectbox"] [data-baseweb="value-container"] * {
+    background: transparent !important;
+    background-color: transparent !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+/* input要素に白背景が入るケースを直接阻止 */
+div[data-testid="stSelectbox"] input {
+    background: #000000 !important;
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    caret-color: #ffffff !important;
+}
+
+/* フォーカス・選択後もブラック */
+div[data-testid="stSelectbox"] [data-baseweb="select"]:focus,
+div[data-testid="stSelectbox"] [data-baseweb="select"]:focus-within,
+div[data-testid="stSelectbox"] [aria-expanded="false"],
+div[data-testid="stSelectbox"] [aria-expanded="true"] {
+    background: #000000 !important;
+    background-color: #000000 !important;
+    color: #ffffff !important;
+}
+
+/* 選択欄の外枠だけ状態を変える */
+div[data-testid="stSelectbox"] [data-baseweb="select"] > div {
+    border: 2px solid #64748b !important;
+    border-radius: 8px !important;
+}
+
+div[data-testid="stSelectbox"] [data-baseweb="select"]:focus-within > div,
+div[data-testid="stSelectbox"] [aria-expanded="true"] > div {
+    border-color: #ffe600 !important;
+}
+
+/* ==========================================
+   iPad / iOS Safari 最終上書き
+   ========================================== */
+@supports (-webkit-touch-callout: none) {
+    div[data-testid="stSelectbox"],
+    div[data-testid="stSelectbox"] [data-baseweb="select"],
+    div[data-testid="stSelectbox"] [data-baseweb="select"] > div,
+    div[data-testid="stSelectbox"] [data-baseweb="select"] input {
+        background: #000000 !important;
+        background-color: #000000 !important;
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
+        opacity: 1 !important;
+    }
+
+    div[data-testid="stSelectbox"] [data-baseweb="select"] [data-baseweb="value-container"],
+    div[data-testid="stSelectbox"] [data-baseweb="select"] [data-baseweb="value-container"] * {
+        background: transparent !important;
+        background-color: transparent !important;
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
+    }
+}
+
+/* ==========================================
+   Android / Chrome / iPhone等でも同じ表示
+   ========================================== */
+@media (max-width: 1366px) {
+    div[data-testid="stSelectbox"] [data-baseweb="select"] > div {
+        background: #000000 !important;
+        background-color: #000000 !important;
+    }
+
+    div[data-testid="stSelectbox"] [data-baseweb="select"] span {
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
+        font-weight: 900 !important;
+    }
+}
+
 </style>
 """, unsafe_allow_html=True)
 
