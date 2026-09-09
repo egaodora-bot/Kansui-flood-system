@@ -799,6 +799,18 @@ REGION_CODES = {
     "九州": {"code": "400000", "lat": 33.6064, "lon": 130.4181}
 }
 
+# 関東選択時に表示する都県別の気象庁エリアコード
+# 「関東」は東京だけではなく、7都県を個別に取得します。
+KANTO_PREFECTURES = {
+    "茨城県": {"code": "080000"},
+    "栃木県": {"code": "090000"},
+    "群馬県": {"code": "100000"},
+    "埼玉県": {"code": "110000"},
+    "千葉県": {"code": "120000"},
+    "東京都": {"code": "130000"},
+    "神奈川県": {"code": "140000"},
+}
+
 @st.cache_data(ttl=300)
 def fetch_jma_realtime_data(region_name):
     """気象庁の公式JSON APIから指定エリアのリアルタイム予報・気象データを取得"""
@@ -837,6 +849,59 @@ def fetch_jma_realtime_data(region_name):
             "office": "気象庁（オフライン/フォールバック）",
             "forecasts": [f"【{region_name}】 &nbsp; &nbsp; リアルタイムAPI接続確認中（通信環境または制限によりキャッシュ表示中）"]
         }
+
+@st.cache_data(ttl=300)
+def fetch_kanto_prefecture_weather():
+    """関東7都県の気象庁公式JSON APIから都県別の天気情報を取得"""
+    results = []
+
+    for prefecture, info in KANTO_PREFECTURES.items():
+        code = info["code"]
+        url = f"https://www.jma.go.jp/bosai/forecast/data/forecast/{code}.json"
+
+        try:
+            req = urllib.request.Request(
+                url,
+                headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
+            )
+            with urllib.request.urlopen(req, timeout=3) as response:
+                data = json.loads(response.read().decode('utf-8'))
+
+            office = data[0].get("publishingOffice", "気象庁")
+            weather = ""
+            time_label = ""
+
+            for series in data[0].get("timeSeries", []):
+                for area in series.get("areas", []):
+                    weathers = area.get("weathers", [])
+                    if weathers:
+                        weather = weathers[0]
+                        time_defines = series.get("timeDefines", [])
+                        if time_defines:
+                            time_label = time_defines[0]
+                        break
+                if weather:
+                    break
+
+            results.append({
+                "prefecture": prefecture,
+                "success": True,
+                "office": office,
+                "weather": weather or "天気情報を取得しました。",
+                "time": time_label
+            })
+
+        except Exception:
+            results.append({
+                "prefecture": prefecture,
+                "success": False,
+                "office": "気象庁（オフライン/フォールバック）",
+                "weather": "リアルタイム気象情報を取得できませんでした。通信環境またはAPIの状態をご確認ください。",
+                "time": ""
+            })
+
+    return results
+
 
 @st.cache_data(ttl=300)
 def fetch_robust_disaster_news():
@@ -975,6 +1040,27 @@ st.markdown(f"""
     </span>
 </div>
 """, unsafe_allow_html=True)
+
+# 関東を選択した場合：7都県の気象情報を個別表示
+if selected_region == "関東":
+    st.markdown("### 🗾 関東7都県の気象情報")
+    st.markdown(
+        "関東を選択した場合は、東京だけではなく、"
+        "**茨城・栃木・群馬・埼玉・千葉・東京・神奈川**の7都県を"
+        "気象庁公式データから個別に取得して表示します。"
+    )
+
+    kanto_weather = fetch_kanto_prefecture_weather()
+
+    for item in kanto_weather:
+        status = "🟢 取得済み" if item["success"] else "🟠 フォールバック"
+        st.markdown(
+            f"**{item['prefecture']}**　{status}\n\n"
+            f"{item['weather']}"
+        )
+
+    st.markdown("---")
+
 
 # 気象庁キキクル・天気予報リアルタイムフィード
 st.markdown("""
