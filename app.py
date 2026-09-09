@@ -5,6 +5,7 @@ import urllib.request
 import json
 import xml.etree.ElementTree as ET
 import re
+import textwrap
 
 st.set_page_config(
     page_title="全国インフラ・気象防災カルテ・リアルリンク共用システム", 
@@ -870,50 +871,58 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # タイトル直下：スマホ・タブレット向け案内（折りたたみ式）
-# ※元コードにあった案内内容は削らず、視認性だけ改善しています。
+# ※元コードの案内内容は削らず、HTMLのインデントによる「コード表示」を防止しています。
 with st.expander("📱 スマホ・タブレットご利用の方へ", expanded=False):
-    st.markdown("""
-    <div class="mobile-guide" style="
-        background-color: #111827;
-        border: 1px solid #475569;
-        border-left: 7px solid #38bdf8;
-        padding: 12px 14px;
-        border-radius: 6px;
-        margin-bottom: 0.3rem;
-        font-size: 13px;
-        color: #ffffff;
-        line-height: 1.6;
-    ">
-        <div style="color: #ffe600; font-weight: 900; margin-bottom: 7px;">
-            📱 スマホ・タブレットご利用の方へ
-        </div>
-
-        <div style="color: #ffffff; font-weight: 800;">
-            画面を
-            <span style="
-                background-color: #1e3a8a;
-                color: #ffffff;
-                padding: 2px 6px;
-                border-radius: 3px;
-                font-weight: 900;
-            ">「横向き」</span>
-            にすると地図や情報がより見やすくなります。
-        </div>
-
-        <div style="
-            color: #e5e7eb;
-            font-size: 12px;
-            font-weight: 700;
-            margin-top: 8px;
-        ">
-            （※設計方針：直感的なカラーピン設計により、
-            <span style="color: #ff4d4d; font-weight: 900;">赤=Lv4-5</span> /
-            <span style="color: #ffb000; font-weight: 900;">橙=Lv3</span> /
-            <span style="color: #60a5fa; font-weight: 900;">青=Lv2以下</span>
-            を即座に判別可能です）
-        </div>
+    mobile_guide_html = """
+<div class="mobile-guide" style="
+    background-color:#111827 !important;
+    border:1px solid #475569 !important;
+    border-left:7px solid #38bdf8 !important;
+    padding:12px 14px;
+    border-radius:6px;
+    margin:0 0 0.3rem 0;
+    font-size:13px;
+    color:#ffffff !important;
+    line-height:1.7;
+    overflow:visible !important;
+    -webkit-text-fill-color:#ffffff;
+">
+    <div style="color:#ffe600 !important; -webkit-text-fill-color:#ffe600; font-weight:900; margin-bottom:8px;">
+        📱 スマホ・タブレットご利用の方へ
     </div>
-    """, unsafe_allow_html=True)
+
+    <div style="color:#ffffff !important; -webkit-text-fill-color:#ffffff; font-weight:800;">
+        画面を
+        <span style="
+            background-color:#1e3a8a !important;
+            color:#ffffff !important;
+            -webkit-text-fill-color:#ffffff;
+            padding:2px 6px;
+            border-radius:3px;
+            font-weight:900;
+            white-space:nowrap;
+        ">「横向き」</span>
+        にすると地図や情報がより見やすくなります。
+    </div>
+
+    <div style="
+        color:#e5e7eb !important;
+        -webkit-text-fill-color:#e5e7eb;
+        font-size:12px;
+        font-weight:700;
+        margin-top:8px;
+    ">
+        （※設計方針：直感的なカラーピン設計により、
+        <span style="color:#ff4d4d !important; -webkit-text-fill-color:#ff4d4d; font-weight:900;">赤=Lv4-5</span> /
+        <span style="color:#ffb000 !important; -webkit-text-fill-color:#ffb000; font-weight:900;">橙=Lv3</span> /
+        <span style="color:#60a5fa !important; -webkit-text-fill-color:#60a5fa; font-weight:900;">青=Lv2以下</span>
+        を即座に判別可能です）
+    </div>
+</div>
+"""
+    st.markdown(textwrap.dedent(mobile_guide_html).strip(), unsafe_allow_html=True)
+
+st.markdown("---")
 
 st.markdown("---")
 
