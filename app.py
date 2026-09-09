@@ -40,7 +40,7 @@ div.live-feed-expander div[data-testid="stExpander"] {
 REGION_CODES = {
     "北海道": {"code": "016000", "lat": 43.0642, "lon": 141.3469},
     "東北": {"code": "040000", "lat": 38.2688, "lon": 140.8721},
-    "関東": {"code": "130000", "lat": 35.6895, "lon": 139.6917}, # MUST指定対応
+    "関東": {"code": "130000", "lat": 35.6895, "lon": 139.6917},
     "中部": {"code": "230000", "lat": 35.1802, "lon": 136.9066},
     "関西": {"code": "270000", "lat": 34.6937, "lon": 135.5022},
     "四国": {"code": "360000", "lat": 33.8416, "lon": 132.7657},
@@ -61,12 +61,10 @@ def fetch_jma_realtime_data(region_name):
         )
         with urllib.request.urlopen(req, timeout=3) as response:
             data = json.loads(response.read().decode('utf-8'))
-            # 取得データのパース（例：気象オフィス名や天気概要を抽出）
             office = data[0].get("publishingOffice", "気象庁")
             weather_forecasts = []
             
             for series in data[0].get("timeSeries", []):
-                time_defines = series.get("timeDefines", [])
                 areas = series.get("areas", [])
                 for area in areas:
                     area_name = area.get("area", {}).get("name", region_name)
@@ -138,11 +136,12 @@ st.markdown("""
 with st.expander("🛠️ 【重要】システムの設計・通信検証方針について（タップして展開）", expanded=False):
     st.markdown("""
     <div style="font-size: 13px; color: #cbd5e1; line-height: 1.6;">
-        本システムは、選択された対象エリアを基点に気象庁の公式リアルタイムAPIと直接同期し、迅速に命を守る情報にアクセスできるよう設計されています。<br><br>
-        <b>🔹 エリア必須指定（MUST）によるリアルタイム同期</b><br>
-        選択されたエリアコードに基づき、気象庁の最新予報・警報データを非同期で取得。地図およびリアルタイム警戒レベル表示に反映します。<br><br>
-        <b>🔹 キャッシュ機能と通信負荷軽減</b><br>
-        低速通信（128kbps等）や災害時の過酷な通信環境下でもフリーズを防ぐため、データキャッシュとマーカークラスターを実装しています。
+        本システムは、災害現場での「一瞬の判断遅れ」を防ぐため、地図上のピンの色を見るだけで直感的に警戒レベルを把握できるように設計されています。<br><br>
+        <b>🔹 視認性を最優先したカラーピン設計</b><br>
+        ・ 🔴 <b>赤ピン（レベル4・5）</b>：緊急安全確保・避難指示（直ちに行動）<br>
+        ・ 🟠 <b>橙ピン（レベル3）</b>：高齢者等避難（避難準備）<br>
+        ・ 🔵 <b>青ピン（レベル2以下）</b>：気象注意報・平常監視<br>
+        クリックしなくても地図上で危険エリアの分布がひと目でわかるため、タイムロスを最小限に抑えます。
     </div>
     """, unsafe_allow_html=True)
 
@@ -157,7 +156,6 @@ selected_region = st.selectbox("エリア選択 (MUST)", options=available_regio
 # 選択されたエリアのリアルタイム気象庁データを同期取得
 jma_data = fetch_jma_realtime_data(selected_region)
 
-# エリアに応じたリアルタイム警戒データの構築
 base_lat = REGION_CODES[selected_region]["lat"]
 base_lon = REGION_CODES[selected_region]["lon"]
 
@@ -166,7 +164,7 @@ locations = [
         "category": "【河川・リアルタイム監視】", "region": selected_region, "pref": f"{selected_region}管内", "name": f"{selected_region}主要河川 観測ポイントA", 
         "infrastructure_type": "主要河川", "lat": base_lat + 0.05, "lon": base_lon + 0.05, "source": f"国土交通省 / {jma_data['office']}", 
         "level": "Level3", "level_desc": "【レベル3】高齢者等避難発令基準（水位上昇傾向）",
-        "metric": "リアルタイム観測：注意水位到達", "status": "高齢者等避難目安", "color": "orange", "priority": 2,
+        "metric": "リアルタイム観測：注意水位到達", "status": "高齢者等避難", "color": "orange", "priority": 2,
         "desc": f"気象庁発表（{jma_data['office']}）の予報に基づく{selected_region}エリアの河川監視ポイントです。",
         "link_url": "https://www.river.go.jp/"
     },
@@ -196,7 +194,7 @@ warning_count = sum(1 for loc in filtered_locations if loc["color"] == "orange")
 st.markdown(f"""
 <div style="background-color: #1e293b; padding: 12px 16px; border-radius: 8px; border-left: 6px solid #ef4444; margin-top: 12px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
     <span style="color: #f8fafc; font-size: 14px; font-weight: bold;">
-        🚨 <span style="color: #fca5a5;">【{selected_region}エリア 気象庁リアルタイム同期】</span> 発表元：{jma_data['office']} ｜ 危険（赤：Lv4-5） <span style="color: #f87171; font-size: 16px;"><b>{danger_count}件</b></span>、注意（橙：Lv3） <span style="color: #fbbf24; font-size: 16px;"><b>{warning_count}件</b></span>
+        🚨 <span style="color: #fca5a5;">【{selected_region}エリア リアルタイム警戒状況】</span> 発表元：{jma_data['office']} ｜ 危険（赤：Lv4-5） <span style="color: #f87171; font-size: 16px;"><b>{danger_count}件</b></span>、注意（橙：Lv3） <span style="color: #fbbf24; font-size: 16px;"><b>{warning_count}件</b></span>
     </span>
 </div>
 """, unsafe_allow_html=True)
@@ -234,13 +232,16 @@ with st.expander("📡 【ライブ取得】リアルタイム災害・速報フ
         st.markdown(f"- <a href='{news['link']}' target='_blank' rel='noopener noreferrer' style='color: #f97316; font-weight: bold;'>{news['title']}</a> <small style='color:gray;'>({news['date']})</small>", unsafe_allow_html=True)
 st.markdown('</div>', unsafe_allow_html=True)
 
-# 地図表示
+# 地図表示（色で直感的に一目でわかるよう構成）
 m = folium.Map(location=[base_lat, base_lon], zoom_start=9, control_scale=True)
 marker_cluster = MarkerCluster().add_to(m)
 
 for idx, loc in enumerate(filtered_locations):
     lat, lon = loc.get("lat"), loc.get("lon")
     if lat and lon:
+        # ピンの色に連動したアイコン種別の設定（直感的な識別）
+        icon_name = "warning-sign" if loc['color'] == 'red' else ("info-sign" if loc['color'] == 'orange' else "ok-sign")
+        
         popup_html = (
             f"<b>{loc['category']} [{loc['pref']}]</b><br>"
             f"<b>{loc['name']}</b><br>"
@@ -251,7 +252,7 @@ for idx, loc in enumerate(filtered_locations):
         folium.Marker(
             [lat, lon],
             popup=folium.Popup(popup_html, max_width=320),
-            icon=folium.Icon(color=loc['color'], icon="info-sign")
+            icon=folium.Icon(color=loc['color'], icon=icon_name)
         ).add_to(marker_cluster)
 
 map_left, map_center, map_right = st.columns([0.08, 0.84, 0.08])
