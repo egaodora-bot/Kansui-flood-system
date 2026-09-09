@@ -869,14 +869,45 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# タイトル直下に常時表示するスマホ向け案内カード
-st.markdown("""
-<div class="mobile-guide" style="background-color: #0f172a; border: 1px solid #475569; border-left: 7px solid #38bdf8; padding: 10px 14px; border-radius: 6px; margin-bottom: 1rem; font-size: 13px; color: #ffffff; line-height: 1.6;">
-    <span style="color: #ffe600; font-weight: 900;">📱 スマホ・タブレットご利用の方へ：</span>
-    画面を<span style="background-color: #1e3a8a; color: #f8fafc; padding: 1px 4px; border-radius: 3px; font-weight: bold;">「横向き」</span>にすると地図や情報がより見やすくなります。<br>
-    <span style="color: #f1f5f9; font-size: 12px; font-weight: 700;">（※設計方針：直感的なカラーピン設計により、赤=Lv4-5/橙=Lv3/青=Lv2以下を即座に判別可能です）</span>
-</div>
-""", unsafe_allow_html=True)
+# タイトル直下：スマホ・タブレット向け案内（折りたたみ式）
+with st.expander("📱 スマホ・タブレットご利用の方へ", expanded=False):
+    st.markdown("""
+    <div class="mobile-guide" style="
+        background-color: #111827;
+        border: 1px solid #475569;
+        border-left: 7px solid #38bdf8;
+        padding: 12px 14px;
+        border-radius: 6px;
+        margin-bottom: 0.3rem;
+        font-size: 13px;
+        color: #ffffff;
+        line-height: 1.6;
+    ">
+        <div style="color: #ffe600; font-weight: 900; margin-bottom: 6px;">
+            📱 スマホ・タブレットご利用の方へ
+        </div>
+        <div style="color: #ffffff; font-weight: 800;">
+            画面を
+            <span style="
+                background-color: #1e3a8a;
+                color: #ffffff;
+                padding: 2px 6px;
+                border-radius: 3px;
+                font-weight: 900;
+            ">「横向き」</span>
+            にすると地図や情報がより見やすくなります。
+        </div>
+        <div style="
+            color: #e5e7eb;
+            font-size: 12px;
+            font-weight: 700;
+            margin-top: 7px;
+        ">
+            ※設計方針：赤=Lv4-5 / 橙=Lv3 / 青=Lv2以下を、
+            カラーピンと文字で即座に判別できるようにしています。
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 st.markdown("---")
 
