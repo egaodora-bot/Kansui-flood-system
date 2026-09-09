@@ -200,7 +200,6 @@ if st.session_state["first_visit"]:
     """, unsafe_allow_html=True)
     
     with st.expander("📖 :red[【システムの設計・通信検証方針について・ご利用ガイド】]", expanded=True):
-        # ユーザー様ご提示のブラッシュアップされた解説文を反映
         st.markdown("""
         ##### 🛠️ このシステムの設計・通信検証方針について
         本システムは、過酷な災害現場や低速なモバイル回線（128kbps等）の環境下でもエラーを起こさず、確実に命を守る情報にアクセスできることを最優先に設計されています。
@@ -284,9 +283,9 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# 公式リンク集
+# 公式リンク集（枠線を赤から白に変更）
 st.markdown("""
-<div style="background-color: #0f172a; border: 2px solid #ef4444; padding: 14px 18px; border-radius: 8px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+<div style="background-color: #0f172a; border: 2px solid #ffffff; padding: 14px 18px; border-radius: 8px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
     <div style="color: #fef08a; font-weight: bold; font-size: 15px; margin-bottom: 8px;">
         ⚡ <b>【公式データリンク集】河川・国道・県道・市町道・気象庁のリアルタイム状況</b>
     </div>
