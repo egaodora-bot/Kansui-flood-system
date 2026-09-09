@@ -120,60 +120,95 @@ div[data-testid="stExpander"] {
 }
 
 /* ==========================================
-   グレー文字の視認性改善
-   暗い背景上の薄いグレーを明るくする
+   白・グレー文字の視認性を最優先で強化
+   Streamlit Expanderの見出しも確実に対象化
    ========================================== */
+
+/* Expander見出し：薄い白/グレーを使わず純白にする */
+div[data-testid="stExpander"] > details > summary,
+div[data-testid="stExpander"] > details > summary *,
+div[data-testid="stExpander"] summary p,
+div[data-testid="stExpander"] summary span {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    opacity: 1 !important;
+    font-weight: 900 !important;
+    text-shadow: 0 1px 2px #000000 !important;
+}
+
+/* Expander本文も純白ベース */
+div[data-testid="stExpander"] > details > div,
+div[data-testid="stExpander"] > details > div *,
+div[data-testid="stExpander"] p,
+div[data-testid="stExpander"] li {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    opacity: 1 !important;
+}
 
 /* Streamlit標準の補助文字・説明文 */
 [data-testid="stCaptionContainer"],
 [data-testid="stCaptionContainer"] p,
 .stCaption,
 small {
-    color: #d1d5db !important;
-    font-weight: 600 !important;
-}
-
-/* Expander内の本文・説明 */
-div[data-testid="stExpander"] p,
-div[data-testid="stExpander"] li,
-div[data-testid="stExpander"] span {
-    color: #e5e7eb;
+    color: #e5e7eb !important;
+    -webkit-text-fill-color: #e5e7eb !important;
+    opacity: 1 !important;
+    font-weight: 700 !important;
 }
 
 /* ラベル・補助テキスト */
 label,
 div[data-testid="stWidgetLabel"] p {
-    color: #f3f4f6 !important;
-    font-weight: 700 !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    opacity: 1 !important;
+    font-weight: 800 !important;
 }
 
-/* 区切り線や枠線も少し明るく */
+/* 区切り線・Expander枠も少し明るく */
 hr {
-    border-color: #475569 !important;
+    border-color: #64748b !important;
 }
 
 div[data-testid="stExpander"] {
-    border-color: #475569 !important;
+    border-color: #64748b !important;
 }
 
-/* スマホではグレー文字をさらに見やすく */
+/* スマホでは「読む文字」をすべて白寄りに統一 */
 @media (max-width: 768px) {
+    div[data-testid="stExpander"] > details > summary,
+    div[data-testid="stExpander"] > details > summary *,
+    div[data-testid="stExpander"] summary p,
+    div[data-testid="stExpander"] summary span {
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
+        opacity: 1 !important;
+        font-size: 15px !important;
+        font-weight: 900 !important;
+        line-height: 1.5 !important;
+        text-shadow: 0 1px 3px #000000 !important;
+    }
+
+    div[data-testid="stExpander"] > details > div *,
+    div[data-testid="stExpander"] p,
+    div[data-testid="stExpander"] li {
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
+        opacity: 1 !important;
+    }
+
     [data-testid="stCaptionContainer"],
     [data-testid="stCaptionContainer"] p,
     .stCaption,
     small {
-        color: #e5e7eb !important;
-        font-size: 12px !important;
-        font-weight: 700 !important;
-    }
-
-    div[data-testid="stExpander"] p,
-    div[data-testid="stExpander"] li,
-    div[data-testid="stExpander"] span {
         color: #f1f5f9 !important;
+        -webkit-text-fill-color: #f1f5f9 !important;
+        opacity: 1 !important;
+        font-size: 12px !important;
+        font-weight: 800 !important;
     }
 }
-
 </style>
 """, unsafe_allow_html=True)
 
@@ -280,7 +315,7 @@ st.markdown("""
 <div class="mobile-guide" style="background-color: #0f172a; border: 1px solid #475569; border-left: 7px solid #38bdf8; padding: 10px 14px; border-radius: 6px; margin-bottom: 1rem; font-size: 13px; color: #ffffff; line-height: 1.6;">
     <span style="color: #ffe600; font-weight: 900;">📱 スマホ・タブレットご利用の方へ：</span>
     画面を<span style="background-color: #1e3a8a; color: #f8fafc; padding: 1px 4px; border-radius: 3px; font-weight: bold;">「横向き」</span>にすると地図や情報がより見やすくなります。<br>
-    <span style="color: #cbd5e1; font-size: 12px; font-weight: 700;">（※設計方針：直感的なカラーピン設計により、赤=Lv4-5/橙=Lv3/青=Lv2以下を即座に判別可能です）</span>
+    <span style="color: #f1f5f9; font-size: 12px; font-weight: 700;">（※設計方針：直感的なカラーピン設計により、赤=Lv4-5/橙=Lv3/青=Lv2以下を即座に判別可能です）</span>
 </div>
 """, unsafe_allow_html=True)
 
@@ -351,7 +386,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 for f_text in jma_data['forecasts']:
-    st.markdown(f"<div style='font-size: 13px; color: #e2e8f0; margin-left: 10px; margin-bottom: 6px;'>・ {f_text}</div>", unsafe_allow_html=True)
+    st.markdown(f"<div style='font-size: 13px; color: #ffffff; font-weight: 700; margin-left: 10px; margin-bottom: 6px;'>・ {f_text}</div>", unsafe_allow_html=True)
 
 # 公式データリンク集
 st.markdown("""
