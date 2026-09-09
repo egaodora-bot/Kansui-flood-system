@@ -103,7 +103,7 @@ def get_master_locations():
         {
             "category": "【国道・過去規制カルテ】", "region": "中部", "pref": "長野県", "name": "国道19号（木曽路山間部区間）", 
             "infrastructure_type": "国道", "lat": 35.8500, "lon": 137.6000, "source": "国土交通省 中部地方整備局", 
-            "level": "レベル4", "level_desc": "【過去通行止め事例】連続雨量超過",
+            "level": "Level4", "level_desc": "【過去通行止め事例】連続雨量超過",
             "metric": "過去雨量規制値到達履歴", "status": "危険（過去の教訓）", "color": "red", "priority": 1,
             "desc": "過去の土砂崩落・通行止め実績に基づく警戒ポイントです。",
             "link_url": "https://www.jartic.or.jp/"
@@ -194,7 +194,7 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# 公式リンク集（ご指定の変更を反映）
+# 公式リンク集
 st.markdown("""
 <div style="background-color: #0f172a; border: 2px solid #ffffff; padding: 14px 18px; border-radius: 8px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
     <div style="color: #fef08a; font-weight: bold; font-size: 15px; margin-bottom: 8px;">
@@ -213,7 +213,8 @@ st.markdown("""
 with st.expander("📡 【ライブ取得】リアルタイム災害・速報フィード", expanded=True):
     news_list = fetch_robust_disaster_news()
     for news in news_list:
-        st.markdown(f"- <a href='{news['link']}' target='_blank' rel='noopener noreferrer' style='color: #d32f2f; font-weight: bold;'>{news['title']}</a> <small style='color:gray;'>({news['date']})</small>", unsafe_allow_html=True)
+        # 🔗 リンクカラーを濃いオレンジ（#f97316）に変更
+        st.markdown(f"- <a href='{news['link']}' target='_blank' rel='noopener noreferrer' style='color: #f97316; font-weight: bold;'>{news['title']}</a> <small style='color:gray;'>({news['date']})</small>", unsafe_allow_html=True)
 
 st.sidebar.markdown("<h3 style='font-size: 14px; font-weight: bold; color: #60a5fa; line-height: 1.5;'>🛡️ カルテ・リアルリンク共用</h3>", unsafe_allow_html=True)
 st.sidebar.markdown("---")
