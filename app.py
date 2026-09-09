@@ -70,7 +70,6 @@ def fetch_jma_realtime_data(region_name):
                     area_name = area.get("area", {}).get("name", region_name)
                     weathers = area.get("weathers", [])
                     if weathers:
-                        # 取得した気象テキストの単語間に適度なスペース（隙間）を挿入して視認性を高める
                         w_text = weathers[0]
                         w_text_spaced = re.sub(r'([雨曇晴雷])', r' &nbsp; \1 &nbsp; ', w_text)
                         weather_forecasts.append(f"【{area_name}】 &nbsp; &nbsp; {w_text_spaced}")
@@ -135,25 +134,14 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# 携帯でも最初に見えるメイン画面上部に「システム設計・通信検証方針」を配置
-with st.expander("🛠️ 【重要】システムの設計・通信検証方針について（⚠️スマホの方はコチラをタップ）", expanded=False):
-    st.markdown("""
-    <div style="font-size: 13px; color: #cbd5e1; line-height: 1.6;">
-        <div style="background-color: #fef08a; color: #0f172a; padding: 12px; border-radius: 6px; margin-bottom: 12px; border-left: 6px solid #dc2626; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">
-            📱 <span style="font-size: 14.5px; color: #991b1b;">【スマホ・タブレットをご利用の方へ・推奨操作】</span><br>
-            <span style="color: #1e293b; font-size: 13.5px;">画面を必ずガチャッと<span style="background-color: #1e3a8a; color: #f8fafc; padding: 2px 6px; border-radius: 4px; font-weight: bold;">「横向き」</span>にしてご覧ください！ 地図が広く表示され、ピンの位置や詳細リストの視認性が劇的に向上します。</span>
-        </div>
-        本システムは、災害現場での「一瞬の判断遅れ」と「通信障害リスク」を双方向から極小化するため、以下の設計・通信検証方針に基づいて運用されます。<br><br>
-        <b>1. 視認性を最優先したダイレクトカラーピン設計（クラスター廃止）</b><br>
-        ・ 🔴 <b>赤ピン（レベル4・5）</b>：緊急安全確保・避難指示（直ちに行動）<br>
-        ・ 🟠 <b>橙ピン（レベル3）</b>：高齢者等避難（避難準備）<br>
-        ・ 🔵 <b>青ピン（レベル2以下）</b>：気象注意報・平常監視<br>
-        ズームアウト状態やワンタップの工程を省き、地図上の色と分布だけで全容が即座に把握できます。<br><br>
-        <b>2. 災害時の通信障害・回線逼迫に備えた耐障害（フォールバック）設計</b><br>
-        ・ <b>5分間キャッシュ（ttl=300）制御</b>：頻繁な外部API叩きによる回線負荷を防ぎつつ、常に直近5分以内の最新情報を担保します。<br>
-        ・ <b>自動フォールバック機構</b>：万が一の気象庁APIや外部RSSの通信断・タイムアウト発生時においても、システムが停止せず安全に稼働継続（オフライン対応）するロジックを組んでいます。
-    </div>
-    """, unsafe_allow_html=True)
+# 【変更】折りたたみを廃止し、閉じ忘れが起きない常時表示のコンパクト案内カードに変更
+st.markdown("""
+<div style="background-color: #0f172a; border: 1px solid #334155; border-left: 5px solid #38bdf8; padding: 10px 14px; border-radius: 6px; margin-bottom: 1rem; font-size: 12.5px; color: #cbd5e1; line-height: 1.5;">
+    <span style="color: #fef08a; font-weight: bold;">📱 スマホ・タブレットご利用の方へ：</span>
+    画面を<span style="background-color: #1e3a8a; color: #f8fafc; padding: 1px 4px; border-radius: 3px; font-weight: bold;">「横向き」</span>にすると地図や情報がより見やすくなります。<br>
+    <span style="color: #94a3b8; font-size: 11.5px;">（※設計方針：直感的なカラーピン設計により、赤=Lv4-5/橙=Lv3/青=Lv2以下を即座に判別可能です）</span>
+</div>
+""", unsafe_allow_html=True)
 
 st.markdown("---")
 
@@ -209,7 +197,7 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# 気象庁キキクル・天気予報リアルタイムフィード（キキクルを最優先・左寄せ再読み込み案内）
+# 気象庁キキクル・天気予報リアルタイムフィード
 st.markdown("""
 <div style="background-color: #0f172a; border: 1px solid #334155; padding: 12px 16px; border-radius: 6px; margin-bottom: 1rem;">
     <div style="font-size: 14px; color: #f87171; font-weight: bold; margin-bottom: 6px;">
@@ -271,7 +259,7 @@ for idx, loc in enumerate(filtered_locations):
 
 map_left, map_center, map_right = st.columns([0.08, 0.84, 0.08])
 with map_center:
-    st_folium(m, width="100%", height=380, key="infra_map_direct_v10")
+    st_folium(m, width="100%", height=380, key="infra_map_direct_v11")
 
 st.markdown(f"<h3 style='font-size: 20px; font-weight: bold; margin-top: 1rem;'>📋 【{selected_region}】気象庁リアルタイム警戒レベル（レベル2〜5）状況一覧</h3>", unsafe_allow_html=True)
 
