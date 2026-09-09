@@ -156,6 +156,32 @@ def get_master_locations():
             "link_url": "https://www.city.numazu.shizuoka.jp/"
         },
 
+        # --- 鉄道（新規追加） ---
+        {
+            "category": "【鉄道・橋梁流失被災教訓】", "region": "東北", "pref": "岩手県", "name": "三陸鉄道リアス線（閉伊川橋梁周辺区間）", 
+            "infrastructure_type": "鉄道", "lat": 39.6400, "lon": 141.9500, "source": "三陸鉄道 / 国土交通省", 
+            "level": "レベル4", "level_desc": "【運休・災害復旧重要区間】",
+            "metric": "R1東日本台風 橋梁被災", "status": "要警戒（河川増水・運行管理）", "color": "red", "priority": 1,
+            "desc": "令和元年東日本台風などで甚大な被害を受けながらも不屈の復旧を遂げた、沿岸地域のライフライン鉄道路線。",
+            "link_url": "https://www.sanrikutetsudo.com/"
+        },
+        {
+            "category": "【鉄道・土砂被災教訓】", "region": "九州", "pref": "熊本県", "name": "JR肥薩線（球磨川流域・人吉周辺区間）", 
+            "infrastructure_type": "鉄道", "lat": 32.2100, "lon": 130.7600, "source": "JR九州", 
+            "level": "レベル4", "level_desc": "【豪雨被災・復旧検討区間】",
+            "metric": "R2豪雨 甚大被災地", "status": "危険（長期運休・復旧協議中）", "color": "red", "priority": 1,
+            "desc": "令和2年7月豪雨（球磨川氾濫）により多くの橋梁や駅舎が壊滅的な被害を受けた、鉄道防災上の最重要教訓地。",
+            "link_url": "https://www.jrkyushu.co.jp/"
+        },
+        {
+            "category": "【鉄道・大雨計画運休】", "region": "関東", "pref": "東京都", "name": "JR東日本 首都圏在来線各線（中央線・京浜東北線等）", 
+            "infrastructure_type": "鉄道", "lat": 35.6812, "lon": 139.7671, "source": "JR東日本", 
+            "level": "Level3", "level_desc": "【計画運休・暴風大雨警戒】",
+            "metric": "気象レーダー連動規制", "status": "注意（計画運休監視）", "color": "orange", "priority": 2,
+            "desc": "台風や線状降水帯接近時に大規模な計画運休や運転見合わせが実施される首都圏の大動脈ネットワーク。",
+            "link_url": "https://www.jreast.co.jp/"
+        },
+
         # --- ⚠️ 気象庁データ・土砂災害 ---
         {
             "category": "【気象庁・大規模土砂災害】", "region": "中部", "pref": "静岡県", "name": "伊豆山地区周辺（熱海市山間部）", 
@@ -256,7 +282,8 @@ with col_f1:
 
 base_locations = locations if selected_region == "すべて表示" else [loc for loc in locations if loc["region"] == selected_region]
 
-available_infra_types = ["すべて表示", "主要河川", "国道", "県道", "市町道", "気象庁データ"]
+# 「鉄道」をインフラ種別に追加
+available_infra_types = ["すべて表示", "主要河川", "国道", "県道", "市町道", "鉄道", "気象庁データ"]
 with col_f2:
     st.markdown("""<div style="border-left: 5px solid #38bdf8; padding-left: 8px; margin-bottom: 4px;"><span style="color: #7dd3fc; font-weight: bold; font-size: 13.5px;">🏗️ インフラ種別</span></div>""", unsafe_allow_html=True)
     selected_infra = st.selectbox("インフラ種別選択", options=available_infra_types, label_visibility="collapsed")
@@ -283,15 +310,16 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# 公式リンク集（枠線を赤から白に変更）
+# 公式リンク集（枠線を白に維持）
 st.markdown("""
 <div style="background-color: #0f172a; border: 2px solid #ffffff; padding: 14px 18px; border-radius: 8px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
     <div style="color: #fef08a; font-weight: bold; font-size: 15px; margin-bottom: 8px;">
-        ⚡ <b>【公式データリンク集】河川・国道・県道・市町道・気象庁のリアルタイム状況</b>
+        ⚡ <b>【公式データリンク集】河川・国道・県道・市町道・鉄道・気象庁のリアルタイム状況</b>
     </div>
     <div style="font-size: 13.5px; color: #f1f5f9; line-height: 1.8;">
         ・ 🌊 <a href="https://www.river.go.jp/" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; font-weight: bold;">国土交通省 川の防災情報（全国の河川水位・ライブカメラ）</a><br>
         ・ 🚗 <a href="https://www.jartic.or.jp/" target="_blank" rel="noopener noreferrer" style="color: #7dd3fc; font-weight: bold;">JARTIC 日本道路交通情報センター（高速・国道・県道の規制情報）</a><br>
+        ・ 🚆 <a href="https://www.train-info.com/" target="_blank" rel="noopener noreferrer" style="color: #34d399; font-weight: bold;">主要鉄道 運行情報・各社遅延リアルタイム案内</a><br>
         ・ 🔴 <a href="https://www.jma.go.jp/bosai/warning/" target="_blank" rel="noopener noreferrer" style="color: #fca5a5; font-weight: bold;">気象庁 警報・注意報（すべての市区町村別の最新発令状況）</a><br>
         ・ ⚠️ <a href="https://www.jma.go.jp/bosai/risk/" target="_blank" rel="noopener noreferrer" style="color: #60a5fa; font-weight: bold;">気象庁 キキクル（土砂・浸水・洪水危険度分布）</a>
     </div>
@@ -306,11 +334,11 @@ with st.expander("📡 【ライブ取得】リアルタイム災害・速報フ
 st.sidebar.markdown("<h3 style='font-size: 14px; font-weight: bold; color: #60a5fa; line-height: 1.5;'>🛡️ インフラ・気象防災統合システム</h3>", unsafe_allow_html=True)
 st.sidebar.markdown("---")
 st.sidebar.subheader("📌 警戒レベル凡例")
-st.sidebar.markdown("🔴 <span style='color:red; font-weight:bold;'>レベル4：避難指示・通行止め</span>", unsafe_allow_html=True)
-st.sidebar.markdown("🟠 <span style='color:darkorange; font-weight:bold;'>Level3：高齢者等避難・規制</span>", unsafe_allow_html=True)
+st.sidebar.markdown("🔴 <span style='color:red; font-weight:bold;'>レベル4：避難指示・通行止め・運休</span>", unsafe_allow_html=True)
+st.sidebar.markdown("🟠 <span style='color:darkorange; font-weight:bold;'>Level3：高齢者等避難・規制・計画運休</span>", unsafe_allow_html=True)
 st.sidebar.markdown("🔵 **Level1〜2**：監視中", unsafe_allow_html=True)
 
-# --- マップ描画（MarkerCluster導入でスマホでの負荷を大幅軽減） ---
+# --- マップ描画 ---
 filtered_locations = sorted(filtered_locations, key=lambda x: x["priority"])
 
 map_center_lat = filtered_locations[0]["lat"] if filtered_locations else 35.6895
@@ -357,7 +385,7 @@ if not filtered_locations:
     <div style="background-color: #1e293b; border-left: 5px solid #3b82f6; padding: 16px; border-radius: 6px; margin-bottom: 1rem;">
         <span style="color: #93c5fd; font-weight: bold; font-size: 15px;">ℹ️ 選択された条件に一致するインフラデータは現在ありません。</span><br><br>
         <span style="color: #f1f5f9; font-size: 13.5px;">
-            すべての河川・道路・気象情報は上の<b>【公式データリンク集】</b>から直接ご確認いただけます。
+            すべての河川・道路・鉄道・気象情報は上の<b>【公式データリンク集】</b>から直接ご確認いただけます。
         </span>
     </div>
     """, unsafe_allow_html=True)
