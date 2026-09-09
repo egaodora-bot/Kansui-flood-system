@@ -22,7 +22,7 @@ div.stButton > button {
     font-size: 13px !important;
 }
 div[data-testid="stSelectbox"] {
-    border-left: 5px solid #38bdf8;
+    border-left: 5px solid #fde047;
     padding-left: 10px;
 }
 </style>
@@ -131,7 +131,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# 📱 携帯でも最初に見えるメイン画面上部に「システム設計・通信検証方針」を配置
+# 携帯でも最初に見えるメイン画面上部に「システム設計・通信検証方針」を配置
 with st.expander("🛠️ 【重要】システムの設計・通信検証方針について（タップして展開）", expanded=False):
     st.markdown("""
     <div style="font-size: 13px; color: #cbd5e1; line-height: 1.6;">
@@ -165,9 +165,9 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# 公式データリンク集
+# 公式データリンク集（左側枠線を青色 #38bdf8 に変更）
 st.markdown("""
-<div style="background-color: #0f172a; border: 2px solid #ffffff; padding: 14px 18px; border-radius: 8px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
+<div style="background-color: #0f172a; border: 2px solid #ffffff; border-left: 6px solid #38bdf8; padding: 14px 18px; border-radius: 8px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
     <div style="color: #fef08a; font-weight: bold; font-size: 15px; margin-bottom: 8px;">
         ⚡ <b>【公式データリンク集】河川・国道・県道・市町道・鉄道・気象庁のリアルタイム状況</b>
     </div>
