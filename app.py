@@ -25,8 +25,8 @@ div[data-testid="stSelectbox"] {
     border-left: 5px solid #fde047;
     padding-left: 10px;
 }
-/* ライブ取得フィード（expander）全体をオレンジ枠、左側を緑の線に指定 */
-div[data-testid="stExpander"] {
+/* ライブ取得フィード専用の個別デザイン（全体オレンジ枠、左側緑の線） */
+div.live-feed-expander div[data-testid="stExpander"] {
     border: 2px solid #f97316 !important;
     border-left: 6px solid #22c55e !important;
     border-radius: 8px;
@@ -188,10 +188,13 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+# ライブ取得フィード（専用クラスを付与）
+st.markdown('<div class="live-feed-expander">', unsafe_allow_html=True)
 with st.expander("📡 【ライブ取得】リアルタイム災害・速報フィード", expanded=True):
     news_list = fetch_robust_disaster_news()
     for news in news_list:
         st.markdown(f"- <a href='{news['link']}' target='_blank' rel='noopener noreferrer' style='color: #f97316; font-weight: bold;'>{news['title']}</a> <small style='color:gray;'>({news['date']})</small>", unsafe_allow_html=True)
+st.markdown('</div>', unsafe_allow_html=True)
 
 # 地図表示
 map_center_lat = filtered_locations[0]["lat"] if filtered_locations else 35.6895
