@@ -25,6 +25,13 @@ div[data-testid="stSelectbox"] {
     border-left: 5px solid #fde047;
     padding-left: 10px;
 }
+/* ライブ取得フィード（expander）全体をオレンジ枠、左側を緑の線に指定 */
+div[data-testid="stExpander"] {
+    border: 2px solid #f97316 !important;
+    border-left: 6px solid #22c55e !important;
+    border-radius: 8px;
+    background-color: #0f172a;
+}
 </style>
 """, unsafe_allow_html=True)
 
@@ -165,7 +172,7 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# 公式データリンク集（左側枠線を青色 #38bdf8 に変更）
+# 公式データリンク集
 st.markdown("""
 <div style="background-color: #0f172a; border: 2px solid #ffffff; border-left: 6px solid #38bdf8; padding: 14px 18px; border-radius: 8px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
     <div style="color: #fef08a; font-weight: bold; font-size: 15px; margin-bottom: 8px;">
