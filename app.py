@@ -84,6 +84,22 @@ div[style*="border: 2px solid #ffffff"] {
     color: #ffffff !important;
 }
 
+/* iPad / Safari：案内本文は標準Markdown表示。背景と文字を固定 */
+div[data-testid="stExpander"] details,
+div[data-testid="stExpander"] details > div,
+div[data-testid="stExpander"] details > div [data-testid="stMarkdownContainer"] {
+    background-color: #111827 !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+div[data-testid="stExpander"] details > div p,
+div[data-testid="stExpander"] details > div strong {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    opacity: 1 !important;
+}
+
 /* ==========================================
    Streamlit Expander
    ========================================== */
@@ -871,58 +887,19 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # タイトル直下：スマホ・タブレット向け案内（折りたたみ式）
-# ※元コードの案内内容は削らず、HTMLのインデントによる「コード表示」を防止しています。
+# ※ここはHTMLを使わず、Streamlit標準Markdownだけで表示します。
+#   iPad / SafariでHTMLがコード表示になる問題を根本的に避けます。
 with st.expander("📱 スマホ・タブレットご利用の方へ", expanded=False):
-    mobile_guide_html = """
-<div class="mobile-guide" style="
-    background-color:#111827 !important;
-    border:1px solid #475569 !important;
-    border-left:7px solid #38bdf8 !important;
-    padding:12px 14px;
-    border-radius:6px;
-    margin:0 0 0.3rem 0;
-    font-size:13px;
-    color:#ffffff !important;
-    line-height:1.7;
-    overflow:visible !important;
-    -webkit-text-fill-color:#ffffff;
-">
-    <div style="color:#ffe600 !important; -webkit-text-fill-color:#ffe600; font-weight:900; margin-bottom:8px;">
-        📱 スマホ・タブレットご利用の方へ
-    </div>
+    st.markdown(
+        """
+        **📱 スマホ・タブレットご利用の方へ**
 
-    <div style="color:#ffffff !important; -webkit-text-fill-color:#ffffff; font-weight:800;">
-        画面を
-        <span style="
-            background-color:#1e3a8a !important;
-            color:#ffffff !important;
-            -webkit-text-fill-color:#ffffff;
-            padding:2px 6px;
-            border-radius:3px;
-            font-weight:900;
-            white-space:nowrap;
-        ">「横向き」</span>
-        にすると地図や情報がより見やすくなります。
-    </div>
+        画面を **「横向き」** にすると地図や情報がより見やすくなります。
 
-    <div style="
-        color:#e5e7eb !important;
-        -webkit-text-fill-color:#e5e7eb;
-        font-size:12px;
-        font-weight:700;
-        margin-top:8px;
-    ">
-        （※設計方針：直感的なカラーピン設計により、
-        <span style="color:#ff4d4d !important; -webkit-text-fill-color:#ff4d4d; font-weight:900;">赤=Lv4-5</span> /
-        <span style="color:#ffb000 !important; -webkit-text-fill-color:#ffb000; font-weight:900;">橙=Lv3</span> /
-        <span style="color:#60a5fa !important; -webkit-text-fill-color:#60a5fa; font-weight:900;">青=Lv2以下</span>
-        を即座に判別可能です）
-    </div>
-</div>
-"""
-    st.markdown(textwrap.dedent(mobile_guide_html).strip(), unsafe_allow_html=True)
-
-st.markdown("---")
+        （※設計方針：直感的なカラーピン設計により、  
+        🔴 **赤=Lv4-5** / 🟠 **橙=Lv3** / 🔵 **青=Lv2以下** を即座に判別可能です）
+        """
+    )
 
 st.markdown("---")
 
