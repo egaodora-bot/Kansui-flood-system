@@ -131,13 +131,13 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# 携帯でも最初に見えるメイン画面上部に「システム設計・通信検証方針」を配置（スマホ閲覧のヒントを強調）
-with st.expander("🛠️ 【重要】システムの設計・通信検証方針について（⚠️スマホでご覧の方へ：タップして展開）", expanded=False):
+# 携帯でも最初に見えるメイン画面上部に「システム設計・通信検証方針」を配置（スマホ閲覧のヒントを強力にハイライト）
+with st.expander("🛠️ 【重要】システムの設計・通信検証方針について（⚠️スマホの方はコチラをタップ）", expanded=False):
     st.markdown("""
     <div style="font-size: 13px; color: #cbd5e1; line-height: 1.6;">
-        <div style="background-color: #334155; padding: 10px; border-radius: 6px; margin-bottom: 10px; border-left: 4px solid #fde047;">
-            📱 <b>スマホ・タブレットをご利用の方へ</b><br>
-            画面を<b>「横向き」</b>にしていただくと、地図が広く表示され、ピンの位置関係や詳細リストが格段に見やすくなります。ぜひお試しください。
+        <div style="background-color: #fef08a; color: #1e293b; padding: 12px; border-radius: 6px; margin-bottom: 12px; border-left: 6px solid #eab308; font-weight: bold; box-shadow: 0 2px 4px rgba(0,0,0,0.3);">
+            📱 <span style="font-size: 14.5px; color: #b91c1c;">【スマホ・タブレットをご利用の方へ・推奨操作】</span><br>
+            <span style="color: #0f172a; font-size: 13.5px;">画面を必ずガチャッと<span style="background-color: #fca5a5; padding: 0 4px; color: #b91c1c;">「横向き」</span>にしてご覧ください！地図が広く表示され、ピンの位置や詳細リストの視認性が劇的に向上します。</span>
         </div>
         本システムは、災害現場での「一瞬の判断遅れ」と「通信障害リスク」を双方向から極小化するため、以下の設計・通信検証方針に基づいて運用されます。<br><br>
         <b>1. 視認性を最優先したダイレクトカラーピン設計（クラスター廃止）</b><br>
@@ -261,7 +261,7 @@ for idx, loc in enumerate(filtered_locations):
 
 map_left, map_center, map_right = st.columns([0.08, 0.84, 0.08])
 with map_center:
-    st_folium(m, width="100%", height=380, key="infra_map_direct_v3")
+    st_folium(m, width="100%", height=380, key="infra_map_direct_v4")
 
 st.markdown(f"<h3 style='font-size: 20px; font-weight: bold; margin-top: 1rem;'>📋 【{selected_region}】気象庁リアルタイム警戒レベル（レベル2〜5）状況一覧</h3>", unsafe_allow_html=True)
 
