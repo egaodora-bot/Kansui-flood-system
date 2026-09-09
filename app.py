@@ -131,10 +131,14 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# 携帯でも最初に見えるメイン画面上部に「システム設計・通信検証方針」を配置（通信・フォールバック検証を包含）
-with st.expander("🛠️ 【重要】システムの設計・通信検証方針について（タップして展開）", expanded=False):
+# 携帯でも最初に見えるメイン画面上部に「システム設計・通信検証方針」を配置（スマホ閲覧のヒントを強調）
+with st.expander("🛠️ 【重要】システムの設計・通信検証方針について（⚠️スマホでご覧の方へ：タップして展開）", expanded=False):
     st.markdown("""
     <div style="font-size: 13px; color: #cbd5e1; line-height: 1.6;">
+        <div style="background-color: #334155; padding: 10px; border-radius: 6px; margin-bottom: 10px; border-left: 4px solid #fde047;">
+            📱 <b>スマホ・タブレットをご利用の方へ</b><br>
+            画面を<b>「横向き」</b>にしていただくと、地図が広く表示され、ピンの位置関係や詳細リストが格段に見やすくなります。ぜひお試しください。
+        </div>
         本システムは、災害現場での「一瞬の判断遅れ」と「通信障害リスク」を双方向から極小化するため、以下の設計・通信検証方針に基づいて運用されます。<br><br>
         <b>1. 視認性を最優先したダイレクトカラーピン設計（クラスター廃止）</b><br>
         ・ 🔴 <b>赤ピン（レベル4・5）</b>：緊急安全確保・避難指示（直ちに行動）<br>
@@ -181,7 +185,7 @@ locations = [
     {
         "category": "【気象庁キキクル・リアルタイム】", "region": selected_region, "pref": f"{selected_region}管内", "name": f"{selected_region} 警戒土砂災害・浸水想定地区", 
         "infrastructure_type": "気象庁データ", "lat": base_lat + 0.02, "lon": base_lon - 0.04, "source": f"気象庁 ({jma_data['office']})", 
-        "level": "Level5", "level_desc": "【レベル5】緊急安全確保（命の危険）",
+        "level": "Level5", "level_desc": "【Level5】緊急安全確保（命の危険）",
         "metric": "キキクル危険度：極めて高い", "status": "緊急安全確保", "color": "red", "priority": 1,
         "desc": f"気象庁のリアルタイム予報およびキキクル情報に基づき、{selected_region}の一部地域で厳重警戒が必要です。",
         "link_url": "https://www.jma.go.jp/bosai/risk/"
@@ -257,7 +261,7 @@ for idx, loc in enumerate(filtered_locations):
 
 map_left, map_center, map_right = st.columns([0.08, 0.84, 0.08])
 with map_center:
-    st_folium(m, width="100%", height=380, key="infra_map_direct_v2")
+    st_folium(m, width="100%", height=380, key="infra_map_direct_v3")
 
 st.markdown(f"<h3 style='font-size: 20px; font-weight: bold; margin-top: 1rem;'>📋 【{selected_region}】気象庁リアルタイム警戒レベル（レベル2〜5）状況一覧</h3>", unsafe_allow_html=True)
 
