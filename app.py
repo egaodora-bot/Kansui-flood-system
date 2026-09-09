@@ -118,6 +118,62 @@ div[data-testid="stExpander"] a,
 div[data-testid="stExpander"] {
     font-weight: 700;
 }
+
+/* ==========================================
+   グレー文字の視認性改善
+   暗い背景上の薄いグレーを明るくする
+   ========================================== */
+
+/* Streamlit標準の補助文字・説明文 */
+[data-testid="stCaptionContainer"],
+[data-testid="stCaptionContainer"] p,
+.stCaption,
+small {
+    color: #d1d5db !important;
+    font-weight: 600 !important;
+}
+
+/* Expander内の本文・説明 */
+div[data-testid="stExpander"] p,
+div[data-testid="stExpander"] li,
+div[data-testid="stExpander"] span {
+    color: #e5e7eb;
+}
+
+/* ラベル・補助テキスト */
+label,
+div[data-testid="stWidgetLabel"] p {
+    color: #f3f4f6 !important;
+    font-weight: 700 !important;
+}
+
+/* 区切り線や枠線も少し明るく */
+hr {
+    border-color: #475569 !important;
+}
+
+div[data-testid="stExpander"] {
+    border-color: #475569 !important;
+}
+
+/* スマホではグレー文字をさらに見やすく */
+@media (max-width: 768px) {
+    [data-testid="stCaptionContainer"],
+    [data-testid="stCaptionContainer"] p,
+    .stCaption,
+    small {
+        color: #e5e7eb !important;
+        font-size: 12px !important;
+        font-weight: 700 !important;
+    }
+
+    div[data-testid="stExpander"] p,
+    div[data-testid="stExpander"] li,
+    div[data-testid="stExpander"] span {
+        color: #f1f5f9 !important;
+    }
+}
+
 </style>
 """, unsafe_allow_html=True)
 
@@ -318,7 +374,7 @@ st.markdown('<div class="live-feed-expander">', unsafe_allow_html=True)
 with st.expander("📡 【ライブ取得】リアルタイム災害・速報フィード", expanded=True):
     news_list = fetch_robust_disaster_news()
     for news in news_list:
-        st.markdown(f"- <a href='{news['link']}' target='_blank' rel='noopener noreferrer' style='color: #f97316; font-weight: bold;'>{news['title']}</a> <small style='color:gray;'>({news['date']})</small>", unsafe_allow_html=True)
+        st.markdown(f"- <a href='{news['link']}' target='_blank' rel='noopener noreferrer' style='color: #f97316; font-weight: bold;'>{news['title']}</a> <small style='color:#cbd5e1; font-weight:700;'>({news['date']})</small>", unsafe_allow_html=True)
 st.markdown('</div>', unsafe_allow_html=True)
 
 # 地図表示（クラスター廃止・個別直接展開）
