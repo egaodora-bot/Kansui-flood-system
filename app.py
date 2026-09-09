@@ -9,7 +9,7 @@ st.set_page_config(
     page_title="全国インフラ・気象防災カルテ・リアルリンク共用システム", 
     page_icon="🛡️", 
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="collapsed"
 )
 
 st.markdown("""
@@ -119,35 +119,32 @@ def get_master_locations():
 
 locations = get_master_locations()
 
-# --- サイドバー設計方針の記載 ---
-st.sidebar.markdown("<h3 style='font-size: 16px; font-weight: bold; color: #60a5fa;'>🛠️ システム設計・通信検証方針</h3>", unsafe_allow_html=True)
-st.sidebar.markdown("""
-<div style="font-size: 12.5px; color: #cbd5e1; line-height: 1.6; background-color: #1e293b; padding: 12px; border-radius: 6px; border-left: 4px solid #3b82f6; margin-bottom: 1rem;">
-    本システムは、過酷な災害現場や低速なモバイル回線（128kbps等）の環境下でも、可能な限りエラーを抑えて迅速に命を守る情報にアクセスできるよう設計されています（※通信環境や電波状況により接続が不安定になる場合があります）。<br><br>
-    近年の気候変動や激甚化する災害（関東・東北豪雨、東日本台風、熱海市土砂災害など）の教訓が詰まった、2000年以降（過去25年間）の重要マスターデータを厳選し、約150〜200件に絞り込んで搭載しています。データ容量を約1MB未満に極限まで軽量化することで、通信負荷の軽減を図っています。<br><br>
-    <b>128kbps低速通信・スマホ環境への配慮</b><br>
-    初回ロード時のデータ量を最小限に抑えているため、通信速度制限がかかったスマホ環境や電波の弱い被災地であっても、タイムアウトやフリーズのリスクを軽減し、スムーズに起動することを目指しています。<br><br>
-    <b>キャッシュ機能とマーカークラスターの導入</b><br>
-    サーバー負荷やブラウザのメモリ消費を抑えるため、データのキャッシュ処理および地図上のピンの自動グルーピング（クラスター表示）を行い、スマートフォンでの実用的な操作性を確保しています。
-</div>
-""", unsafe_allow_html=True)
-
-st.sidebar.markdown("---")
-st.sidebar.subheader("📌 警戒レベル凡例（過去カルテ）")
-st.sidebar.markdown("🔴 <span style='color:red; font-weight:bold;'>レベル4：過去避難指示・重大被災</span>", unsafe_allow_html=True)
-st.sidebar.markdown("🟠 <span style='color:darkorange; font-weight:bold;'>Level3：過去注意・警戒履歴</span>", unsafe_allow_html=True)
-
 # ヘルパータイトル部分
 st.markdown("""
-<div style="margin-left: 0px; margin-bottom: 1.2rem;">
-    <div style="color: #60a5fa; font-size: 24px; font-weight: bold; margin-bottom: 4px;">
+<div style="margin-left: 0px; margin-bottom: 1rem;">
+    <div style="color: #60a5fa; font-size: 22px; font-weight: bold; margin-bottom: 4px;">
         🛡️ 全国インフラ・気象防災カルテ・リアルリンク共用システム
     </div>
-    <div style="color: #93c5fd; font-size: 14.5px; font-weight: bold;">
+    <div style="color: #93c5fd; font-size: 13.5px; font-weight: bold;">
         （※河川水位上昇・道路交通規制・鉄道運行・気象庁キキクル監視）
     </div>
 </div>
 """, unsafe_allow_html=True)
+
+# 📱 携帯でも最初に見えるメイン画面上部に「システム設計・通信検証方針」を配置
+with st.expander("🛠️ 【重要】システムの設計・通信検証方針について（タップして展開）", expanded=False):
+    st.markdown("""
+    <div style="font-size: 13px; color: #cbd5e1; line-height: 1.6;">
+        本システムは、過酷な災害現場や低速なモバイル回線（128kbps等）の環境下でも、可能な限りエラーを抑えて迅速に命を守る情報にアクセスできるよう設計されています（※通信環境や電波状況により接続が不安定になる場合があります）。<br><br>
+        近年の気候変動や激甚化する災害（関東・東北豪雨、東日本台風、熱海市土砂災害など）の教訓が詰まった、2000年以降（過去25年間）の重要マスターデータを厳選し、約150〜200件に絞り込んで搭載しています。データ容量を約1MB未満に極限まで軽量化することで、通信負荷の軽減を図っています。<br><br>
+        <b>🔹 128kbps低速通信・スマホ環境への配慮</b><br>
+        初回ロード時のデータ量を最小限に抑えているため、通信速度制限がかかったスマホ環境や電波の弱い被災地であっても、タイムアウトやフリーズのリスクを軽減し、スムーズに起動することを目指しています。<br><br>
+        <b>🔹 キャッシュ機能とマーカークラスターの導入</b><br>
+        サーバー負荷やブラウザのメモリ消費を抑えるため、データのキャッシュ処理および地図上のピンの自動グルーピング（クラスター表示）を行い、スマートフォンでの実用的な操作性を確保しています。
+    </div>
+    """, unsafe_allow_html=True)
+
+st.markdown("---")
 
 # エリアに特化したシンプルな単一選択
 st.markdown("""<div style="border-left: 5px solid #fde047; padding-left: 8px; margin-bottom: 4px;"><span style="color: #fef08a; font-weight: bold; font-size: 14px;">📍 監視エリアの選択（エリアで起きている災害・インフラ状況の確認）</span></div>""", unsafe_allow_html=True)
