@@ -131,7 +131,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# 携帯でも最初に見えるメイン画面上部に「システム設計・通信検証方針」を配置（横向きの背景を濃い青に変更）
+# 携帯でも最初に見えるメイン画面上部に「システム設計・通信検証方針」を配置（横向きの背景を濃い青に変更、スペース調整反映）
 with st.expander("🛠️ 【重要】システムの設計・通信検証方針について（⚠️スマホの方はコチラをタップ）", expanded=False):
     st.markdown("""
     <div style="font-size: 13px; color: #cbd5e1; line-height: 1.6;">
@@ -205,10 +205,11 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# 気象庁APIからのリアルタイム予報テロップ表示
+# 気象庁APIからのリアルタイム予報テロップ表示（※再読み込みの案内を追加）
 st.markdown("""
 <div style="background-color: #0f172a; border: 1px solid #334155; padding: 10px 14px; border-radius: 6px; margin-bottom: 1rem; font-size: 13px; color: #38bdf8;">
     <b>📡 気象庁APIリアルタイム天候・予報フィード:</b>
+    <span style="float: right; font-size: 11px; color: #94a3b8;">（※最新情報に更新されない場合は再読み込みしてください）</span>
 </div>
 """, unsafe_allow_html=True)
 for f_text in jma_data['forecasts']:
@@ -261,7 +262,7 @@ for idx, loc in enumerate(filtered_locations):
 
 map_left, map_center, map_right = st.columns([0.08, 0.84, 0.08])
 with map_center:
-    st_folium(m, width="100%", height=380, key="infra_map_direct_v7")
+    st_folium(m, width="100%", height=380, key="infra_map_direct_v8")
 
 st.markdown(f"<h3 style='font-size: 20px; font-weight: bold; margin-top: 1rem;'>📋 【{selected_region}】気象庁リアルタイム警戒レベル（レベル2〜5）状況一覧</h3>", unsafe_allow_html=True)
 
