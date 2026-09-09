@@ -124,7 +124,7 @@ def fetch_robust_disaster_news():
 
 # ヘルパータイトル部分
 st.markdown("""
-<div style="margin-left: 0px; margin-bottom: 1rem;">
+<div style="margin-left: 0px; margin-bottom: 0.5rem;">
     <div style="color: #60a5fa; font-size: 22px; font-weight: bold; margin-bottom: 4px;">
         🛡️ 全国インフラ・気象防災カルテ・リアルリンク共用システム
     </div>
@@ -134,7 +134,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# 【変更】折りたたみを廃止し、閉じ忘れが起きない常時表示のコンパクト案内カードに変更
+# タイトル直下に常時表示するスマホ向け案内カード
 st.markdown("""
 <div style="background-color: #0f172a; border: 1px solid #334155; border-left: 5px solid #38bdf8; padding: 10px 14px; border-radius: 6px; margin-bottom: 1rem; font-size: 12.5px; color: #cbd5e1; line-height: 1.5;">
     <span style="color: #fef08a; font-weight: bold;">📱 スマホ・タブレットご利用の方へ：</span>
@@ -259,7 +259,7 @@ for idx, loc in enumerate(filtered_locations):
 
 map_left, map_center, map_right = st.columns([0.08, 0.84, 0.08])
 with map_center:
-    st_folium(m, width="100%", height=380, key="infra_map_direct_v11")
+    st_folium(m, width="100%", height=380, key="infra_map_direct_v12")
 
 st.markdown(f"<h3 style='font-size: 20px; font-weight: bold; margin-top: 1rem;'>📋 【{selected_region}】気象庁リアルタイム警戒レベル（レベル2〜5）状況一覧</h3>", unsafe_allow_html=True)
 
