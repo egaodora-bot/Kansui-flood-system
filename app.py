@@ -15,6 +15,230 @@ st.set_page_config(
 
 st.markdown("""
 <style>
+
+/* ==========================================
+   V4：防災UIコントラスト統一設計
+   「白文字＋白背景」を発生させない
+   ========================================== */
+
+/* ページ全体：常時ダーク背景 */
+html, body,
+[data-testid="stAppViewContainer"],
+[data-testid="stApp"],
+.main,
+section[data-testid="stMain"] {
+    background-color: #080d16 !important;
+    color: #ffffff !important;
+}
+
+/* メインコンテンツ */
+[data-testid="stAppViewContainer"] .main .block-container {
+    background-color: #080d16 !important;
+    color: #ffffff !important;
+}
+
+/* 通常の文章 */
+[data-testid="stAppViewContainer"] p,
+[data-testid="stAppViewContainer"] li,
+[data-testid="stAppViewContainer"] span {
+    color: #ffffff;
+}
+
+/* Markdown内の見出し */
+[data-testid="stAppViewContainer"] h1,
+[data-testid="stAppViewContainer"] h2,
+[data-testid="stAppViewContainer"] h3,
+[data-testid="stAppViewContainer"] h4 {
+    color: #ffffff !important;
+    font-weight: 900 !important;
+}
+
+/* ==========================================
+   カード：背景と文字をセットで管理
+   ========================================== */
+
+/* スマホ案内 */
+.mobile-guide {
+    background-color: #111827 !important;
+    color: #ffffff !important;
+    border: 1px solid #475569 !important;
+    border-left: 7px solid #38bdf8 !important;
+}
+
+/* 警戒状況カード */
+div[style*="border-left: 6px solid #ef4444"],
+div[style*="border-left: 6px solid #ef4444"] * {
+    color: #ffffff !important;
+}
+
+/* 重要情報カード */
+div[style*="border: 1px solid #334155"],
+div[style*="border: 1px solid #334155"] * {
+    color: #ffffff !important;
+}
+
+/* 公式リンクカード */
+div[style*="border: 2px solid #ffffff"] {
+    background-color: #111827 !important;
+    color: #ffffff !important;
+}
+
+/* ==========================================
+   Streamlit Expander
+   ========================================== */
+
+div[data-testid="stExpander"] {
+    background-color: #111827 !important;
+    border: 1px solid #64748b !important;
+    border-radius: 8px !important;
+}
+
+div[data-testid="stExpander"] > details {
+    background-color: #111827 !important;
+}
+
+div[data-testid="stExpander"] > details > summary {
+    background-color: #111827 !important;
+    color: #ffffff !important;
+    opacity: 1 !important;
+}
+
+div[data-testid="stExpander"] > details > summary *,
+div[data-testid="stExpander"] > details > summary p,
+div[data-testid="stExpander"] > details > summary span {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    opacity: 1 !important;
+    font-weight: 900 !important;
+}
+
+div[data-testid="stExpander"] > details > div {
+    background-color: #111827 !important;
+    color: #ffffff !important;
+}
+
+div[data-testid="stExpander"] > details > div * {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    opacity: 1 !important;
+}
+
+/* ==========================================
+   Level別：背景色＋白文字
+   ========================================== */
+
+/* Level 5 / 4 */
+.level-danger {
+    background-color: #7f1d1d !important;
+    border: 2px solid #ef4444 !important;
+    color: #ffffff !important;
+}
+
+/* Level 3 */
+.level-warning {
+    background-color: #9a3412 !important;
+    border: 2px solid #fb923c !important;
+    color: #ffffff !important;
+}
+
+/* Level 2 */
+.level-info {
+    background-color: #1e3a8a !important;
+    border: 2px solid #60a5fa !important;
+    color: #ffffff !important;
+}
+
+/* ==========================================
+   セレクトボックス
+   ========================================== */
+
+div[data-testid="stSelectbox"] {
+    background-color: #080d16 !important;
+}
+
+div[data-testid="stSelectbox"] div[role="combobox"] {
+    background-color: #1f2937 !important;
+    border: 2px solid #ffe600 !important;
+    color: #ffffff !important;
+}
+
+div[data-testid="stSelectbox"] div[role="combobox"] *,
+div[data-testid="stSelectbox"] input {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    font-weight: 900 !important;
+}
+
+/* ドロップダウン */
+div[role="listbox"],
+div[data-baseweb="popover"],
+div[data-baseweb="menu"] {
+    background-color: #111827 !important;
+    color: #ffffff !important;
+}
+
+div[role="option"] {
+    background-color: #111827 !important;
+    color: #ffffff !important;
+    font-weight: 700 !important;
+}
+
+div[role="option"]:hover {
+    background-color: #1e3a8a !important;
+    color: #ffffff !important;
+}
+
+/* ==========================================
+   リンク
+   ========================================== */
+
+a {
+    color: #60a5fa !important;
+    font-weight: 800 !important;
+}
+
+a:hover {
+    color: #93c5fd !important;
+}
+
+/* ==========================================
+   灰色文字：暗すぎる灰色を排除
+   ========================================== */
+
+[style*="color: gray"],
+[style*="color:grey"],
+[style*="color: #64748b"],
+[style*="color: #94a3b8"],
+[style*="color: #9ca3af"] {
+    color: #e5e7eb !important;
+}
+
+/* ==========================================
+   スマホ：文字とカードをさらに明瞭に
+   ========================================== */
+
+@media (max-width: 768px) {
+    [data-testid="stAppViewContainer"] .main .block-container {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+    }
+
+    p, li {
+        font-size: 14px !important;
+        line-height: 1.65 !important;
+    }
+
+    div[data-testid="stExpander"] > details > summary,
+    div[data-testid="stExpander"] > details > summary * {
+        font-size: 15px !important;
+        line-height: 1.5 !important;
+        font-weight: 900 !important;
+    }
+
+    div[data-testid="stExpander"] {
+        margin-bottom: 10px !important;
+    }
+}
 /* ==========================================
    基本UI：スマホでも見やすい文字・コントラスト
    ========================================== */
@@ -456,6 +680,13 @@ else:
         else:
             badge = "🔵【レベル2/気象注意報】"
             
+        if loc["level"] in ("Level5", "Level4"):
+            level_class = "level-danger"
+        elif loc["level"] == "Level3":
+            level_class = "level-warning"
+        else:
+            level_class = "level-info"
+
         title_text = f"{badge} ｜ [{loc['infrastructure_type']}] {loc['pref']} ｜ **{loc['name']}**"
         
         with st.expander(title_text):
