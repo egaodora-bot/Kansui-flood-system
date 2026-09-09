@@ -172,7 +172,7 @@ locations = [
 ]
 
 if st.session_state["first_visit"]:
-    st.markdown("<h3 style='font-size: 18px; font-weight: bold; background-color: #fef08a; color: #1e293b; padding: 8px 12px; border-radius: 6px; border-left: 6px solid #ca8a04; margin-bottom: 0.8rem;'>🛡️ 全国総合防災・気象庁データ統合システム</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='font-size: 20px; font-weight: bold; background-color: #fef08a; color: #1e293b; padding: 10px 14px; border-radius: 6px; border-left: 6px solid #ca8a04; margin-bottom: 0.8rem;'>🛡️ 全国総合防災・気象庁データ統合システム</h3>", unsafe_allow_html=True)
     
     st.markdown("""
     <div style="background-color: #1e40af; padding: 18px 22px; border-radius: 8px; border-left: 6px solid #60a5fa; color: #ffffff; font-weight: bold; font-size: 15px; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.1); line-height: 1.7;">
@@ -180,7 +180,7 @@ if st.session_state["first_visit"]:
         <div style="background-color: rgba(255, 255, 255, 0.15); padding: 10px 14px; border-radius: 6px; font-size: 14px; color: #ffffff; line-height: 1.8;">
             📍 <b>【システムの特徴】</b><br>
             ・気象庁データを基軸に、スマホでもエラーなく安全に稼働。<br>
-            ・全国すべての市区町村の網羅的詳細情報は、下記の**「気象庁公式・国土交通省・民間気象会社の信頼リンク集」**から直接アクセス可能。
+            ・全国すべての市区町村の網羅的詳細情報は、システム開始後の画面下部にある<b>「気象庁公式・国土交通省・民間気象会社の信頼リンク集」</b>から直接アクセスできます。
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -188,10 +188,13 @@ if st.session_state["first_visit"]:
     with st.expander("📖 :red[【ご利用ガイド・命を守る共有方法】]", expanded=True):
         st.markdown("""
         ##### ［ご家族やご友人への共有］
-        災害時はこのシステムのURLを共有することで、全員が同じ最新情報にアクセスできます。
+        災害時はこのシステムのURLを共有することで、全員が命を守る為に必要な、今いる場所が掲載している最新公開情報へアクセスできます。
 
-        ##### ［📱 スマホのホーム画面への追加］
-        ブラウザメニューから「ホーム画面に追加」を行うと、専用アプリのようにワンタップで起動できます。
+        ##### ［📱 クイックにアクセスする為、スマホのホーム画面への追加］
+        ブラウザメニューから「ホーム画面に追加」を行うと、専用アプリのようにワンタップで起動できます。(推奨)
+        
+        ---
+        👇 **内容をご確認の上、以下のボタンを押してシステムを開始してください。**
         """, unsafe_allow_html=True)
         
         if st.button("確認しました（システムを開始する）", type="primary"):
@@ -200,12 +203,13 @@ if st.session_state["first_visit"]:
     
     st.stop()
 
+# --- メイン画面のヘッダー文字サイズを大きく調整 ---
 st.markdown("""
 <div style="margin-left: 0px; margin-bottom: 1.4rem;">
-    <div style="color: #60a5fa; font-size: 20px; font-weight: bold; margin-bottom: 4px;">
+    <div style="color: #60a5fa; font-size: 24px; font-weight: bold; margin-bottom: 6px;">
         🛡️ 全国総合防災・気象庁データ統合システム
     </div>
-    <div style="color: #93c5fd; font-size: 13.5px; font-weight: bold;">
+    <div style="color: #93c5fd; font-size: 15px; font-weight: bold;">
         （※気象庁の公式災害情報をベースに、重要拠点の状況をリアルタイムで把握します）
     </div>
 </div>
