@@ -209,14 +209,14 @@ st.markdown(f"""
 </div>
 """, unsafe_allow_html=True)
 
-# 気象庁APIからのリアルタイム予報テロップ表示（※再読み込み案内を左寄せ・分かりやすい位置に改善）
+# 気象庁キキクル・天気予報リアルタイムフィード（キキクルを最優先・左寄せ再読み込み案内）
 st.markdown("""
 <div style="background-color: #0f172a; border: 1px solid #334155; padding: 12px 16px; border-radius: 6px; margin-bottom: 1rem;">
-    <div style="font-size: 13.5px; color: #38bdf8; font-weight: bold; margin-bottom: 4px;">
-        📡 気象庁APIリアルタイム天候・予報フィード:
+    <div style="font-size: 14px; color: #f87171; font-weight: bold; margin-bottom: 6px;">
+        ⚠️ 【最重要・キキクル危険度分布 & 気象庁APIリアルタイム天候】
     </div>
-    <div style="font-size: 11.5px; color: #fbbf24;">
-        🔄 ※最新情報に更新されない場合は、ブラウザの再読み込みを行ってください。
+    <div style="font-size: 11.5px; color: #fbbf24; margin-bottom: 8px;">
+        🔄 ※最新の危険度・気象情報に更新されない場合は、ブラウザの再読み込みを行ってください。
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -231,11 +231,11 @@ st.markdown("""
         ⚡ <b>【公式データリンク集】河川・国道・県道・市町道・鉄道・気象庁のリアルタイム状況</b>
     </div>
     <div style="font-size: 13.5px; color: #f1f5f9; line-height: 1.8;">
+        ・ ⚠️ （キキクル） <a href="https://www.jma.go.jp/bosai/risk/" target="_blank" rel="noopener noreferrer" style="color: #f87171; font-weight: bold;">気象庁 キキクル（土砂・浸水・洪水危険度分布・最優先確認）</a><br>
         ・ 🌊 （河川） <a href="https://www.river.go.jp/" target="_blank" rel="noopener noreferrer" style="color: #38bdf8; font-weight: bold;">国土交通省 川の防災情報（全国の河川水位・ライブカメラ）</a><br>
         ・ 🚗 （道路） <a href="https://www.jartic.or.jp/" target="_blank" rel="noopener noreferrer" style="color: #7dd3fc; font-weight: bold;">JARTIC 日本道路交通情報センター（高速・国道・県道の規制情報）</a><br>
         ・ 🚆 （鉄道） <a href="https://www.train-info.com/" target="_blank" rel="noopener noreferrer" style="color: #34d399; font-weight: bold;">主要鉄道 運行情報・各社遅延リアルタイム案内</a><br>
-        ・ 🔴 （気象） <a href="https://www.jma.go.jp/bosai/warning/" target="_blank" rel="noopener noreferrer" style="color: #fca5a5; font-weight: bold;">気象庁 警報・注意報（すべての市区町村別の最新発令状況）</a><br>
-        ・ ⚠️ （気象） <a href="https://www.jma.go.jp/bosai/risk/" target="_blank" rel="noopener noreferrer" style="color: #60a5fa; font-weight: bold;">気象庁 キキクル（土砂・浸水・洪水危険度分布）</a>
+        ・ 🔴 （気象） <a href="https://www.jma.go.jp/bosai/warning/" target="_blank" rel="noopener noreferrer" style="color: #fca5a5; font-weight: bold;">気象庁 警報・注意報（すべての市区町村別の最新発令状況）</a>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -271,7 +271,7 @@ for idx, loc in enumerate(filtered_locations):
 
 map_left, map_center, map_right = st.columns([0.08, 0.84, 0.08])
 with map_center:
-    st_folium(m, width="100%", height=380, key="infra_map_direct_v9")
+    st_folium(m, width="100%", height=380, key="infra_map_direct_v10")
 
 st.markdown(f"<h3 style='font-size: 20px; font-weight: bold; margin-top: 1rem;'>📋 【{selected_region}】気象庁リアルタイム警戒レベル（レベル2〜5）状況一覧</h3>", unsafe_allow_html=True)
 
