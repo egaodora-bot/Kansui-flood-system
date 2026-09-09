@@ -188,6 +188,96 @@ div[role="option"]:hover {
     color: #ffffff !important;
 }
 
+
+/* ==========================================
+   監視エリア選択：白背景＋白文字を完全防止
+   ========================================== */
+
+/* 選択ウィジェット全体 */
+div[data-testid="stSelectbox"] {
+    background-color: #080d16 !important;
+    color: #ffffff !important;
+}
+
+/* BaseWeb Select本体 */
+div[data-testid="stSelectbox"] [data-baseweb="select"] {
+    background-color: #1f2937 !important;
+    color: #ffffff !important;
+}
+
+/* Selectの外枠 */
+div[data-testid="stSelectbox"] [data-baseweb="select"] > div {
+    background-color: #1f2937 !important;
+    border: 2px solid #64748b !important;
+    border-radius: 8px !important;
+    color: #ffffff !important;
+    min-height: 48px !important;
+}
+
+/* 「関東」などの選択済み文字 */
+div[data-testid="stSelectbox"] [data-baseweb="select"] [data-testid="stWidgetLabel"],
+div[data-testid="stSelectbox"] [data-baseweb="select"] span,
+div[data-testid="stSelectbox"] [data-baseweb="select"] div {
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    opacity: 1 !important;
+}
+
+/* SVGの矢印 */
+div[data-testid="stSelectbox"] [data-baseweb="select"] svg {
+    fill: #ffffff !important;
+    color: #ffffff !important;
+}
+
+/* フォーカス時：黄色で明確化 */
+div[data-testid="stSelectbox"] [data-baseweb="select"]:focus-within > div,
+div[data-testid="stSelectbox"] [aria-expanded="true"] {
+    border-color: #ffe600 !important;
+    box-shadow: 0 0 0 2px rgba(255, 230, 0, 0.25) !important;
+}
+
+/* 開いた候補リスト：白背景を禁止 */
+div[data-baseweb="popover"],
+div[data-baseweb="popover"] > div,
+div[data-baseweb="menu"],
+div[role="listbox"] {
+    background-color: #111827 !important;
+    color: #ffffff !important;
+    border: 1px solid #64748b !important;
+}
+
+/* 候補項目 */
+div[data-baseweb="menu"] li,
+div[role="option"] {
+    background-color: #111827 !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    font-weight: 800 !important;
+    min-height: 44px !important;
+}
+
+/* 選択候補に触れたとき */
+div[data-baseweb="menu"] li:hover,
+div[role="option"]:hover,
+div[role="option"][aria-selected="true"] {
+    background-color: #1e3a8a !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+/* スマホ */
+@media (max-width: 768px) {
+    div[data-testid="stSelectbox"] [data-baseweb="select"] > div {
+        min-height: 50px !important;
+        border-width: 2px !important;
+    }
+
+    div[data-testid="stSelectbox"] [data-baseweb="select"] span {
+        font-size: 16px !important;
+        font-weight: 900 !important;
+    }
+}
+
 /* ==========================================
    リンク
    ========================================== */
