@@ -1,7 +1,6 @@
 import streamlit as st
 import folium
 from streamlit_folium import st_folium
-from folium.plugins import MarkerCluster
 import urllib.request
 import json
 import xml.etree.ElementTree as ET
@@ -136,12 +135,12 @@ st.markdown("""
 with st.expander("🛠️ 【重要】システムの設計・通信検証方針について（タップして展開）", expanded=False):
     st.markdown("""
     <div style="font-size: 13px; color: #cbd5e1; line-height: 1.6;">
-        本システムは、災害現場での「一瞬の判断遅れ」を防ぐため、地図上のピンの色を見るだけで直感的に警戒レベルを把握できるように設計されています。<br><br>
+        災害時の「一瞬の判断遅れ」を防ぐため、クラスターまとめを廃止し、すべての警戒ピンを地図上に常時個別展開しています。<br><br>
         <b>🔹 視認性を最優先したカラーピン設計</b><br>
         ・ 🔴 <b>赤ピン（レベル4・5）</b>：緊急安全確保・避難指示（直ちに行動）<br>
         ・ 🟠 <b>橙ピン（レベル3）</b>：高齢者等避難（避難準備）<br>
         ・ 🔵 <b>青ピン（レベル2以下）</b>：気象注意報・平常監視<br>
-        クリックしなくても地図上で危険エリアの分布がひと目でわかるため、タイムロスを最小限に抑えます。
+        ズームアウト状態でも各ピンの色と分布がひと目で分かります。
     </div>
     """, unsafe_allow_html=True)
 
@@ -232,14 +231,12 @@ with st.expander("📡 【ライブ取得】リアルタイム災害・速報フ
         st.markdown(f"- <a href='{news['link']}' target='_blank' rel='noopener noreferrer' style='color: #f97316; font-weight: bold;'>{news['title']}</a> <small style='color:gray;'>({news['date']})</small>", unsafe_allow_html=True)
 st.markdown('</div>', unsafe_allow_html=True)
 
-# 地図表示（色で直感的に一目でわかるよう構成）
+# 地図表示（クラスターを廃止し、すべてのピンを直接地図上に個別展開）
 m = folium.Map(location=[base_lat, base_lon], zoom_start=9, control_scale=True)
-marker_cluster = MarkerCluster().add_to(m)
 
 for idx, loc in enumerate(filtered_locations):
     lat, lon = loc.get("lat"), loc.get("lon")
     if lat and lon:
-        # ピンの色に連動したアイコン種別の設定（直感的な識別）
         icon_name = "warning-sign" if loc['color'] == 'red' else ("info-sign" if loc['color'] == 'orange' else "ok-sign")
         
         popup_html = (
@@ -253,11 +250,11 @@ for idx, loc in enumerate(filtered_locations):
             [lat, lon],
             popup=folium.Popup(popup_html, max_width=320),
             icon=folium.Icon(color=loc['color'], icon=icon_name)
-        ).add_to(marker_cluster)
+        ).add_to(m)
 
 map_left, map_center, map_right = st.columns([0.08, 0.84, 0.08])
 with map_center:
-    st_folium(m, width="100%", height=380, key="infra_map_clustered")
+    st_folium(m, width="100%", height=380, key="infra_map_direct")
 
 st.markdown(f"<h3 style='font-size: 20px; font-weight: bold; margin-top: 1rem;'>📋 【{selected_region}】気象庁リアルタイム警戒レベル（レベル2〜5）状況一覧</h3>", unsafe_allow_html=True)
 
