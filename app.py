@@ -870,6 +870,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # タイトル直下：スマホ・タブレット向け案内（折りたたみ式）
+# ※元コードにあった案内内容は削らず、視認性だけ改善しています。
 with st.expander("📱 スマホ・タブレットご利用の方へ", expanded=False):
     st.markdown("""
     <div class="mobile-guide" style="
@@ -883,9 +884,10 @@ with st.expander("📱 スマホ・タブレットご利用の方へ", expanded=
         color: #ffffff;
         line-height: 1.6;
     ">
-        <div style="color: #ffe600; font-weight: 900; margin-bottom: 6px;">
+        <div style="color: #ffe600; font-weight: 900; margin-bottom: 7px;">
             📱 スマホ・タブレットご利用の方へ
         </div>
+
         <div style="color: #ffffff; font-weight: 800;">
             画面を
             <span style="
@@ -897,14 +899,18 @@ with st.expander("📱 スマホ・タブレットご利用の方へ", expanded=
             ">「横向き」</span>
             にすると地図や情報がより見やすくなります。
         </div>
+
         <div style="
             color: #e5e7eb;
             font-size: 12px;
             font-weight: 700;
-            margin-top: 7px;
+            margin-top: 8px;
         ">
-            ※設計方針：赤=Lv4-5 / 橙=Lv3 / 青=Lv2以下を、
-            カラーピンと文字で即座に判別できるようにしています。
+            （※設計方針：直感的なカラーピン設計により、
+            <span style="color: #ff4d4d; font-weight: 900;">赤=Lv4-5</span> /
+            <span style="color: #ffb000; font-weight: 900;">橙=Lv3</span> /
+            <span style="color: #60a5fa; font-weight: 900;">青=Lv2以下</span>
+            を即座に判別可能です）
         </div>
     </div>
     """, unsafe_allow_html=True)
