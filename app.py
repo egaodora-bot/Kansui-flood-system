@@ -278,6 +278,142 @@ div[role="option"][aria-selected="true"] {
     }
 }
 
+
+/* ==========================================
+   V6：iPad / iPhone / Android
+   監視エリア選択欄の背景・文字を完全固定
+   ========================================== */
+
+/* Selectboxの外側 */
+div[data-testid="stSelectbox"] {
+    background: #080d16 !important;
+    background-color: #080d16 !important;
+    color: #ffffff !important;
+}
+
+/* BaseWeb本体 */
+div[data-testid="stSelectbox"] [data-baseweb="select"],
+div[data-testid="stSelectbox"] [data-baseweb="select"] > div {
+    background: #1b2230 !important;
+    background-color: #1b2230 !important;
+    color: #ffffff !important;
+    border-color: #64748b !important;
+    opacity: 1 !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
+/* 内部の各要素を明示的に上書き */
+div[data-testid="stSelectbox"] [data-baseweb="select"] div,
+div[data-testid="stSelectbox"] [data-baseweb="select"] span,
+div[data-testid="stSelectbox"] [data-baseweb="select"] p,
+div[data-testid="stSelectbox"] [data-baseweb="select"] input {
+    background: transparent !important;
+    background-color: transparent !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    opacity: 1 !important;
+    font-weight: 900 !important;
+}
+
+/* 「関東」の表示部分を含むValueコンテナ */
+div[data-testid="stSelectbox"] [data-baseweb="select"] [data-baseweb="value-container"] {
+    background: transparent !important;
+    color: #ffffff !important;
+}
+
+/* 矢印 */
+div[data-testid="stSelectbox"] [data-baseweb="select"] svg {
+    fill: #ffffff !important;
+    stroke: #ffffff !important;
+    color: #ffffff !important;
+    opacity: 1 !important;
+}
+
+/* タップ/フォーカス時 */
+div[data-testid="stSelectbox"] [data-baseweb="select"]:focus-within,
+div[data-testid="stSelectbox"] [aria-expanded="true"] {
+    background-color: #1b2230 !important;
+    color: #ffffff !important;
+    border-color: #ffe600 !important;
+}
+
+/* iPad Safari / iOS WebKit対策 */
+@supports (-webkit-touch-callout: none) {
+    div[data-testid="stSelectbox"] [data-baseweb="select"],
+    div[data-testid="stSelectbox"] [data-baseweb="select"] > div,
+    div[data-testid="stSelectbox"] [data-baseweb="select"] * {
+        background-color: #1b2230 !important;
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
+        opacity: 1 !important;
+    }
+
+    div[data-testid="stSelectbox"] [data-baseweb="select"] [data-baseweb="value-container"] {
+        background-color: transparent !important;
+    }
+}
+
+/* iPadの横幅を含むタブレット */
+@media (min-width: 769px) and (max-width: 1366px) {
+    div[data-testid="stSelectbox"] [data-baseweb="select"] > div {
+        background-color: #1b2230 !important;
+        min-height: 50px !important;
+        border: 2px solid #64748b !important;
+        border-radius: 8px !important;
+    }
+
+    div[data-testid="stSelectbox"] [data-baseweb="select"] span {
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
+        font-size: 16px !important;
+        font-weight: 900 !important;
+    }
+}
+
+/* スマホ */
+@media (max-width: 768px) {
+    div[data-testid="stSelectbox"] [data-baseweb="select"] > div {
+        background-color: #1b2230 !important;
+        min-height: 50px !important;
+        border: 2px solid #64748b !important;
+        border-radius: 8px !important;
+    }
+
+    div[data-testid="stSelectbox"] [data-baseweb="select"] span {
+        color: #ffffff !important;
+        -webkit-text-fill-color: #ffffff !important;
+        font-size: 16px !important;
+        font-weight: 900 !important;
+    }
+}
+
+/* ==========================================
+   開いた候補一覧も白背景にしない
+   ========================================== */
+
+div[data-baseweb="popover"],
+div[data-baseweb="popover"] > div,
+div[data-baseweb="popover"] [data-baseweb="menu"],
+ul[role="listbox"] {
+    background-color: #111827 !important;
+    color: #ffffff !important;
+}
+
+div[data-baseweb="popover"] [role="option"],
+div[data-baseweb="menu"] [role="option"] {
+    background-color: #111827 !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+    font-weight: 800 !important;
+}
+
+div[data-baseweb="popover"] [role="option"]:hover,
+div[data-baseweb="popover"] [role="option"][aria-selected="true"] {
+    background-color: #1e3a8a !important;
+    color: #ffffff !important;
+    -webkit-text-fill-color: #ffffff !important;
+}
+
 /* ==========================================
    リンク
    ========================================== */
