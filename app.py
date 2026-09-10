@@ -799,16 +799,37 @@ REGION_CODES = {
     "九州": {"code": "400000", "lat": 33.6064, "lon": 130.4181}
 }
 
-# 関東選択時に表示する都県別の気象庁エリアコード
-# 「関東」は東京だけではなく、7都県を個別に取得します。
-KANTO_PREFECTURES = {
-    "茨城県": {"code": "080000"},
-    "栃木県": {"code": "090000"},
-    "群馬県": {"code": "100000"},
-    "埼玉県": {"code": "110000"},
-    "千葉県": {"code": "120000"},
-    "東京都": {"code": "130000"},
-    "神奈川県": {"code": "140000"},
+# 選択地域ごとの都道府県別気象庁エリアコード
+# 全国7地域で「都道府県｜天気｜コメント」を同じ方式で表示します。
+REGION_PREFECTURES = {
+    "北海道": {"北海道": "016000"},
+    "東北": {
+        "青森県": "020000", "岩手県": "030000", "宮城県": "040000",
+        "秋田県": "050000", "山形県": "060000", "福島県": "070000",
+    },
+    "関東": {
+        "茨城県": "080000", "栃木県": "090000", "群馬県": "100000",
+        "埼玉県": "110000", "千葉県": "120000", "東京都": "130000",
+        "神奈川県": "140000",
+    },
+    "中部": {
+        "新潟県": "150000", "富山県": "160000", "石川県": "170000",
+        "福井県": "180000", "山梨県": "190000", "長野県": "200000",
+        "岐阜県": "210000", "静岡県": "220000", "愛知県": "230000",
+        "三重県": "240000",
+    },
+    "関西": {
+        "滋賀県": "250000", "京都府": "260000", "大阪府": "270000",
+        "兵庫県": "280000", "奈良県": "290000", "和歌山県": "300000",
+    },
+    "四国": {
+        "徳島県": "360000", "香川県": "370000", "愛媛県": "380000", "高知県": "390000",
+    },
+    "九州": {
+        "福岡県": "400000", "佐賀県": "410000", "長崎県": "420000",
+        "熊本県": "430000", "大分県": "440000", "宮崎県": "450000",
+        "鹿児島県": "460100", "沖縄県": "471000",
+    },
 }
 
 @st.cache_data(ttl=300)
@@ -851,14 +872,13 @@ def fetch_jma_realtime_data(region_name):
         }
 
 @st.cache_data(ttl=300)
-def fetch_kanto_prefecture_weather():
-    """関東7都県の気象庁公式JSON APIから都県別の天気情報を取得"""
+def fetch_region_prefecture_weather(region_name):
+    """選択地域に含まれる都道府県の気象庁公式JSONから天気とコメントを取得。"""
     results = []
+    prefectures = REGION_PREFECTURES.get(region_name, {})
 
-    for prefecture, info in KANTO_PREFECTURES.items():
-        code = info["code"]
+    for prefecture, code in prefectures.items():
         url = f"https://www.jma.go.jp/bosai/forecast/data/forecast/{code}.json"
-
         try:
             req = urllib.request.Request(
                 url,
@@ -867,15 +887,15 @@ def fetch_kanto_prefecture_weather():
             with urllib.request.urlopen(req, timeout=3) as response:
                 data = json.loads(response.read().decode('utf-8'))
 
-            office = data[0].get("publishingOffice", "気象庁")
             weather = ""
             time_label = ""
-
+            # 最初に取得できた天気文を「コメント」として保持します。
+            # 「雨の可能性」等を勝手に削らないことを優先します。
             for series in data[0].get("timeSeries", []):
                 for area in series.get("areas", []):
                     weathers = area.get("weathers", [])
                     if weathers:
-                        weather = weathers[0]
+                        weather = str(weathers[0]).strip()
                         time_defines = series.get("timeDefines", [])
                         if time_defines:
                             time_label = time_defines[0]
@@ -883,26 +903,27 @@ def fetch_kanto_prefecture_weather():
                 if weather:
                     break
 
+            # 天気欄は先頭の天候表現を抽出し、コメント欄には原文全体を残します。
+            weather_match = re.match(r"(晴|曇|雨|雪|雷|晴れ|曇り|雨時々曇|曇時々雨|雨一時曇|曇一時雨)", weather)
+            weather_label = weather_match.group(1) if weather_match else "気象情報あり"
+
             results.append({
                 "prefecture": prefecture,
                 "success": True,
-                "office": office,
-                "weather": weather or "天気情報を取得しました。",
-                "time": time_label
+                "weather": weather_label,
+                "comment": weather or "天気情報を取得しました。",
+                "time": time_label,
             })
-
         except Exception:
             results.append({
                 "prefecture": prefecture,
                 "success": False,
-                "office": "気象庁（オフライン/フォールバック）",
-                "weather": "リアルタイム気象情報を取得できませんでした。通信環境またはAPIの状態をご確認ください。",
-                "time": ""
+                "weather": "取得できず",
+                "comment": "リアルタイム気象情報を取得できませんでした。通信環境またはAPIの状態をご確認ください。",
+                "time": "",
             })
 
     return results
-
-
 
 
 # 気象庁の警報・注意報コード（2026年5月29日以降の新しい防災気象情報を含む）
@@ -1231,7 +1252,7 @@ locations = [
     {
         "category": "【気象庁キキクル・リアルタイム】", "region": selected_region, "pref": f"{selected_region}管内", "name": f"{selected_region} 警戒土砂災害・浸水想定地区", 
         "infrastructure_type": "気象庁データ", "lat": base_lat + 0.02, "lon": base_lon - 0.04, "source": f"気象庁 ({jma_data['office']})", 
-        "level": "Level5", "level_desc": "【Level5】緊急安全確保（命の危険）",
+        "level": "Level5", "level_desc": "【レベル5】緊急安全確保（命の危険）",
         "metric": "キキクル危険度：極めて高い", "status": "緊急安全確保", "color": "red", "priority": 1,
         "desc": f"気象庁のリアルタイム予報およびキキクル情報に基づき、{selected_region}の一部地域で厳重警戒が必要です。",
         "link_url": "https://www.jma.go.jp/bosai/risk/"
@@ -1246,54 +1267,45 @@ warning_count = sum(1 for loc in filtered_locations if loc["color"] == "orange")
 st.markdown(f"""
 <div style="background-color: #1e293b; padding: 12px 16px; border-radius: 8px; border-left: 6px solid #ef4444; margin-top: 12px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
     <span style="color: #f8fafc; font-size: 14px; font-weight: bold;">
-        🚨 <span style="color: #fca5a5;">【{selected_region}エリア リアルタイム警戒状況】</span> 発表元：{jma_data['office']} ｜ 危険（赤：レベル4-5） <span style="color: #f87171; font-size: 16px;"><b>{danger_count}件</b></span>、注意（橙：レベル3） <span style="color: #ffe600; font-size: 16px; font-weight: 900;"><b>{warning_count}件</b></span>
+        🚨 <span style="color: #fca5a5;">【{selected_region}エリア リアルタイム警戒状況】</span> 発表元：{jma_data['office']} ｜ 危険（赤：レベル4～5） <span style="color: #f87171; font-size: 16px;"><b>{danger_count}件</b></span>、注意（橙：レベル3） <span style="color: #ffe600; font-size: 16px; font-weight: 900;"><b>{warning_count}件</b></span>
     </span>
 </div>
 """, unsafe_allow_html=True)
 
-# 関東を選択した場合：7都県の気象情報を個別表示
-if selected_region == "関東":
-    st.markdown("### 🗾 関東7都県の気象状況")
-    st.markdown(
-        "**都県｜天気｜コメント**の順で、状況確認に必要な情報をコンパクトに表示します。"
+# 選択地域の都道府県別気象情報
+# 全国7地域で同じ表示ルール：「都道府県｜天気｜コメント」
+st.markdown(f"### 🗾 {selected_region} 都道府県別の気象状況")
+st.markdown(
+    "**都道府県｜天気｜コメント**の順で、雨の可能性などのコメントを残しながら、"
+    "コンパクトに状況確認できるように表示します。"
+)
+
+region_weather = fetch_region_prefecture_weather(selected_region)
+weather_rows = []
+for item in region_weather:
+    status = "取得済み" if item["success"] else "フォールバック"
+    weather_rows.append(
+        f"<tr>"
+        f"<td style='padding:7px 8px;border-bottom:1px solid #475569;white-space:nowrap;'><b>{item['prefecture']}</b></td>"
+        f"<td style='padding:7px 8px;border-bottom:1px solid #475569;white-space:nowrap;'>{item['weather']}</td>"
+        f"<td style='padding:7px 8px;border-bottom:1px solid #475569;'>{item['comment']}<br>"
+        f"<span style='font-size:11px;color:#cbd5e1;'>[{status}]</span></td>"
+        f"</tr>"
     )
 
-    kanto_weather = fetch_kanto_prefecture_weather()
-
-    weather_rows = []
-    for item in kanto_weather:
-        raw = re.sub(r"\s+", " ", item["weather"]).strip()
-        if item["success"]:
-            # 最初の天候表現を「天気」、全体を「コメント」として残すことで、
-            # 「雨の可能性」などの詳細を省略しません。
-            parts = re.split(r"[　 ]{2,}|、", raw, maxsplit=1)
-            weather = parts[0].strip() if parts and parts[0].strip() else raw
-            comment = raw
-            status = "取得済み"
-        else:
-            weather = "取得できず"
-            comment = raw
-            status = "フォールバック"
-
-        weather_rows.append(
-            f"<tr><td><b>{item['prefecture']}</b></td>"
-            f"<td>{weather}</td>"
-            f"<td>{comment}<br><span style='font-size:11px;color:#cbd5e1;'>[{status}]</span></td></tr>"
-        )
-
-    st.markdown(
-        "<div style='overflow-x:auto;'>"
-        "<table style='width:100%; border-collapse:collapse; font-size:13px;'>"
-        "<thead><tr style='background:#1e293b;'>"
-        "<th style='text-align:left;padding:8px;border-bottom:1px solid #64748b;white-space:nowrap;'>都県</th>"
-        "<th style='text-align:left;padding:8px;border-bottom:1px solid #64748b;white-space:nowrap;'>天気</th>"
-        "<th style='text-align:left;padding:8px;border-bottom:1px solid #64748b;'>コメント</th>"
-        "</tr></thead><tbody>"
-        + "".join(weather_rows)
-        + "</tbody></table></div>",
-        unsafe_allow_html=True,
-    )
-    st.markdown("---")
+st.markdown(
+    "<div style='overflow-x:auto;'>"
+    "<table style='width:100%;border-collapse:collapse;font-size:13px;'>"
+    "<thead><tr style='background:#1e293b;'>"
+    "<th style='text-align:left;padding:7px 8px;border-bottom:1px solid #64748b;white-space:nowrap;'>都道府県</th>"
+    "<th style='text-align:left;padding:7px 8px;border-bottom:1px solid #64748b;white-space:nowrap;'>天気</th>"
+    "<th style='text-align:left;padding:7px 8px;border-bottom:1px solid #64748b;'>コメント</th>"
+    "</tr></thead><tbody>"
+    + "".join(weather_rows)
+    + "</tbody></table></div>",
+    unsafe_allow_html=True,
+)
+st.markdown("---")
 
 
 # 災害キキクル：通常の天気とは役割を分離
@@ -1319,8 +1331,8 @@ st.markdown(
 
 st.markdown("---")
 
-# 選択地域の通常の気象庁予報（キキクルとは別枠）
-st.markdown("### 🌤 気象庁リアルタイム天候")
+# 選択地域全体の気象庁予報（都道府県別表示を補足する地域概況）
+st.markdown("### 🌤 気象庁リアルタイム地域概況")
 for f_text in jma_data['forecasts']:
     st.markdown(f"<div style='font-size: 13px; color: #ffffff; font-weight: 700; margin-left: 10px; margin-bottom: 6px;'>・ {f_text}</div>", unsafe_allow_html=True)
 
@@ -1371,7 +1383,7 @@ for idx, loc in enumerate(filtered_locations):
 
 map_left, map_center, map_right = st.columns([0.08, 0.84, 0.08])
 with map_center:
-    st_folium(m, width="100%", height=380, key="infra_map_direct_v14")
+    st_folium(m, width="100%", height=380, key="infra_map_direct_v15")
 
 st.markdown(f"<h3 style='font-size: 20px; font-weight: bold; margin-top: 1rem;'>🚨 【{selected_region}】警戒レベル情報</h3>", unsafe_allow_html=True)
 st.markdown("**レベル｜都府県・市区町村｜内容** の順で、気象庁の公式警報・注意報対象区域を表示します。")
