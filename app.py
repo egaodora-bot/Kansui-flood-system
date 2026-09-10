@@ -1276,8 +1276,9 @@ st.markdown(f"""
 # 全国7地域で同じ表示ルール：「都道府県｜天気｜コメント」
 st.markdown(f"### 🗾 {selected_region} 都道府県別の気象状況")
 st.markdown(
-    "**都道府県｜天気｜コメント**の順で、雨の可能性などのコメントを残しながら、"
-    "コンパクトに状況確認できるように表示します。"
+    "**都道府県｜天気｜コメント**の順で、気象庁公式予報を都道府県ごとに整理し、"
+    "雨の可能性などのコメントを残しながら、コンパクトに状況確認できるように表示します。"
+    "この欄が通常の気象状況・地域概況を兼ねます。"
 )
 
 region_weather = fetch_region_prefecture_weather(selected_region)
@@ -1308,7 +1309,7 @@ st.markdown(
 st.markdown("---")
 
 
-# 災害キキクル：通常の天気とは役割を分離
+# 災害キキクル：通常の気象状況とは役割を分離
 st.markdown("""
 <div style="background-color: #0f172a; border: 1px solid #334155; padding: 12px 16px; border-radius: 6px; margin-bottom: 1rem;">
     <div style="font-size: 14px; color: #f87171; font-weight: bold; margin-bottom: 6px;">
@@ -1318,7 +1319,7 @@ st.markdown("""
         土砂災害・浸水害・洪水害など、災害の危険度を確認するための情報です。
     </div>
     <div style="font-size: 12px; color: #ffffff; font-weight: 700;">
-        通常の天気予報とは分けて表示しています。最新の危険度は気象庁公式キキクルで確認してください。
+        通常の気象状況とは分けて表示しています。最新の危険度は気象庁公式キキクルで確認してください。
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -1330,11 +1331,6 @@ st.markdown(
 )
 
 st.markdown("---")
-
-# 選択地域全体の気象庁予報（都道府県別表示を補足する地域概況）
-st.markdown("### 🌤 気象庁リアルタイム地域概況")
-for f_text in jma_data['forecasts']:
-    st.markdown(f"<div style='font-size: 13px; color: #ffffff; font-weight: 700; margin-left: 10px; margin-bottom: 6px;'>・ {f_text}</div>", unsafe_allow_html=True)
 
 # 公式データリンク集
 st.markdown("""
