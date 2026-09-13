@@ -226,24 +226,8 @@ def fetch_jma_realtime_data(region_name):
             data = json.loads(response.read().decode('utf-8'))
             office = data[0].get("publishingOffice", "気象庁")
             weather_forecasts = []
-            
-            max_temp_val = "--"
-            min_temp_val = "--"
-            current_temp_val = "--"
 
             for series in data[0].get("timeSeries", []):
-                for temp_area in series.get("areas", []):
-                    temps = temp_area.get("temps", [])
-                    if temps:
-                        if len(temps) > 0 and temps[0] != "":
-                            current_temp_val = temps[0]
-                        if len(temps) > 1 and temps[1] != "":
-                            max_temp_val = temps[1]
-                        elif len(temps) > 0 and temps[0] != "":
-                            max_temp_val = temps[0]
-                        if len(temps) > 2 and temps[2] != "":
-                            min_temp_val = temps[2]
-
                 areas = series.get("areas", [])
                 for area in areas:
                     area_name = area.get("area", {}).get("name", region_name)
@@ -256,23 +240,18 @@ def fetch_jma_realtime_data(region_name):
             return {
                 "success": True,
                 "office": office,
-                "forecasts": weather_forecasts[:4] if weather_forecasts else [f"【{region_name}】 &nbsp; &nbsp; エリアの気象データを正常に取得しました。"],
-                "current_temp": current_temp_val,
-                "max_temp": max_temp_val,
-                "min_temp": min_temp_val
+                "forecasts": weather_forecasts[:4] if weather_forecasts else [f"【{region_name}】 &nbsp; &nbsp; エリアの気象データを正常に取得しました。"]
             }
     except Exception as e:
         return {
             "success": False,
             "office": "気象庁（オフライン/フォールバック）",
-            "forecasts": [f"【{region_name}】 &nbsp; &nbsp; リアルタイムAPI接続確認中（通信環境または制限によりキャッシュ表示中）"],
-            "current_temp": "28.5",
-            "max_temp": "32.0",
-            "min_temp": "24.1"
+            "forecasts": [f"【{region_name}】 &nbsp; &nbsp; リアルタイムAPI接続確認中（通信環境または制限によりキャッシュ表示中）"]
         }
 
 @st.cache_data(ttl=300)
 def fetch_region_prefecture_weather(region_name):
+    """選択地域の各都道府県の天気および最高・最低気温情報を取得"""
     results = []
     prefectures = REGION_PREFECTURES.get(region_name, {})
 
@@ -287,18 +266,27 @@ def fetch_region_prefecture_weather(region_name):
                 data = json.loads(response.read().decode('utf-8'))
 
             weather = ""
-            time_label = ""
+            max_temp = "--"
+            min_temp = "--"
+            
+            # タイムシリーズから天気と気温データを探索
             for series in data[0].get("timeSeries", []):
+                # 天気の取得
                 for area in series.get("areas", []):
                     weathers = area.get("weathers", [])
-                    if weathers:
+                    if weathers and not weather:
                         weather = str(weathers[0]).strip()
-                        time_defines = series.get("timeDefines", [])
-                        if time_defines:
-                            time_label = time_defines[0]
-                        break
-                if weather:
-                    break
+                
+                # 気温データの取得（tempsリストがあれば抽出）
+                for temp_area in series.get("areas", []):
+                    temps = temp_area.get("temps", [])
+                    if temps:
+                        if len(temps) > 1 and temps[1] != "":
+                            max_temp = temps[1]
+                        elif len(temps) > 0 and temps[0] != "":
+                            max_temp = temps[0]
+                        if len(temps) > 2 and temps[2] != "":
+                            min_temp = temps[2]
 
             weather_match = re.match(r"(晴|曇|雨|雪|雷|晴れ|曇り|雨時々曇|曇時々雨|雨一時曇|曇一時雨)", weather)
             weather_label = weather_match.group(1) if weather_match else "気象情報あり"
@@ -308,7 +296,8 @@ def fetch_region_prefecture_weather(region_name):
                 "success": True,
                 "weather": weather_label,
                 "comment": weather or "天気情報を取得しました。",
-                "time": time_label,
+                "max_temp": max_temp,
+                "min_temp": min_temp
             })
         except Exception:
             results.append({
@@ -316,75 +305,11 @@ def fetch_region_prefecture_weather(region_name):
                 "success": False,
                 "weather": "取得できず",
                 "comment": "リアルタイム気象情報を取得できませんでした。",
-                "time": "",
+                "max_temp": "--",
+                "min_temp": "--"
             })
 
     return results
-
-# 気象庁の警報・注意報コード関連
-JMA_LEVEL_CODES = {
-    "Level5": {"33", "39", "38", "35", "36", "37", "32", "51", "53"},
-    "Level4": {"43", "49", "48", "40", "41"},
-    "Level3": {"03", "09", "08", "30", "31"},
-    "Level2": {"10", "29", "19", "20", "21", "22"},
-}
-
-REGION_WARNING_OFFICES = {
-    "北海道": ["016000"],
-    "東北": ["020000", "030000", "040000", "050000", "060000", "070000"],
-    "関東": ["080000", "090000", "100000", "110000", "120000", "130000", "140000"],
-    "中部": ["150000", "160000", "170000", "180000", "190000", "200000", "210000", "220000", "230000", "240000"],
-    "関西": ["250000", "260000", "270000", "280000", "290000", "300000"],
-    "四国": ["360000", "370000", "380000", "390000"],
-    "九州": ["400000", "410000", "420000", "430000", "440000", "450000", "460000", "470000"],
-}
-
-JMA_WARNING_NAMES = {
-    "10": "レベル2大雨注意報", "03": "レベル3大雨警報", "43": "レベル4大雨危険警報", "33": "レベル5大雨特別警報",
-    "29": "レベル2土砂災害注意報", "09": "レベル3土砂災害警報", "49": "レベル4土砂災害危険警報", "39": "レベル5土砂災害特別警報",
-    "19": "レベル2高潮注意報", "08": "レベル3高潮警報", "48": "レベル4高潮危険警報", "38": "レベル5高潮特別警報",
-    "15": "強風注意報", "05": "暴風警報", "35": "暴風特別警報", "13": "風雪注意報", "02": "暴風雪警報", "32": "暴風雪特別警報",
-    "16": "波浪注意報", "07": "波浪警報", "37": "波浪特別警報", "12": "大雪注意報", "06": "大雪警報", "36": "大雪特別警報",
-    "17": "融雪注意報", "14": "雷注意報", "20": "濃霧注意報", "21": "乾燥注意報", "22": "なだれ注意報", "23": "低温注意報",
-    "24": "霜注意報", "25": "着氷注意報", "26": "着雪注意報", "27": "その他の注意報",
-    "30": "レベル3氾濫警報", "31": "レベル3氾濫警報", "40": "レベル4氾濫危険警報", "41": "レベル4氾濫危険警報",
-    "51": "レベル5氾濫特別警報", "53": "レベル5氾濫特別警報",
-}
-
-def jma_level_from_code(code):
-    code = str(code).zfill(2)
-    for level, codes in JMA_LEVEL_CODES.items():
-        if code in codes:
-            return level
-    return None
-
-@st.cache_data(ttl=600)
-def fetch_jma_area_names():
-    url = "https://www.jma.go.jp/bosai/common/const/area.json"
-    try:
-        req = urllib.request.Request(
-            url,
-            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
-        )
-        with urllib.request.urlopen(req, timeout=5) as response:
-            data = json.loads(response.read().decode('utf-8'))
-
-        mapping = {}
-        def walk(obj):
-            if isinstance(obj, dict):
-                code = obj.get("code")
-                name = obj.get("name")
-                if code is not None and name:
-                    mapping[str(code)] = str(name)
-                for value in obj.values():
-                    walk(value)
-            elif isinstance(obj, list):
-                for value in obj:
-                    walk(value)
-        walk(data)
-        return mapping
-    except Exception:
-        return {}
 
 # ==========================================
 # メイン画面
@@ -407,28 +332,21 @@ selected_region = st.selectbox("🌍 監視エリアを選択してください"
 # 3. 気象データ取得
 weather_data = fetch_jma_realtime_data(selected_region)
 
-# 4. 気象・温度状況の常時表示レイアウト（折りたたみなし）
-st.markdown("### 🌡️ 気象・温度状況（現在地 / 予報）")
-
-col1, col2, col3 = st.columns(3)
-with col1:
-    st.metric(label="現在気温", value=f"{weather_data['current_temp']}°C")
-with col2:
-    st.metric(label="最高気温", value=f"{weather_data['max_temp']}°C")
-with col3:
-    st.metric(label="最低気温", value=f"{weather_data['min_temp']}°C")
-
-st.markdown("---")
-
-# 5. リアルタイム天気予報の表示
+# 4. リアルタイム天気予報の表示
 st.markdown(f"### 📡 {selected_region}地方の気象情報 ({weather_data['office']})")
 for forecast in weather_data["forecasts"]:
     st.markdown(f"- {forecast}")
 
 st.markdown("---")
 
-# 6. 都道府県別の詳細リンク・気象状況
-st.markdown(f"### 📋 {selected_region}管内 都道府県別ステータス")
+# 5. 都道府県別の詳細ステータス（最高・最低気温の常時表示対応）
+st.markdown(f"### 📋 {selected_region}管内 都道府県別ステータス・気温")
 pref_weather_list = fetch_region_prefecture_weather(selected_region)
 for pw in pref_weather_list:
-    st.markdown(f"**{pw['prefecture']}**: {pw['weather']} — {pw['comment']}")
+    # 都道府県ごとに気温情報と天気をわかりやすく並べて表示
+    st.markdown(
+        f"**📍 {pw['prefecture']}**: {pw['weather']} "
+        f"(最高: **{pw['max_temp']}°C** / 最低: **{pw['min_temp']}°C**)\n\n"
+        f"> 📝 {pw['comment']}"
+    )
+    st.markdown("")
