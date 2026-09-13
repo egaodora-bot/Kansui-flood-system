@@ -18,7 +18,7 @@ st.markdown("""
 <style>
 
 /* ==========================================
-   V7：スマホ横向き案内完全復活・ダークデザイン最適化
+   V8：起動時注意書きの視認性改善・ダークデザイン最適化
    ========================================== */
 
 html, body,
@@ -471,13 +471,13 @@ def fetch_region_prefecture_weather(region_name):
 # メイン画面の描画処理
 # ==========================================
 
-# 1. 起動時の注意書き
+# 1. 起動時の注意書き（背景色と文字色を見やすく大幅改善）
 st.markdown(
     """
-    <div style="background-color: #382512; border: 1px solid #d97706; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; color: #ffffff;">
-        <span style="color: #ff4d4d; font-weight: 900; font-size: 16px;">【起動時のご注意】</span><br><br>
-        一定時間アクセスがないと「Zzzz」というスリープ画面が表示されます。<br>
-        その場合は、<span style="color: #38bdf8; font-weight: 900;">画面にある青いボタン（Yes, get this app back up!）を1回押して</span><span style="color: #ff4d4d; font-weight: 900;">サーバーを復帰させてください。</span>
+    <div style="background-color: #1e293b; border: 1px solid #64748b; padding: 14px 18px; border-radius: 8px; margin-bottom: 20px; color: #ffffff; border-left: 7px solid #38bdf8;">
+        <span style="color: #38bdf8; font-weight: 900; font-size: 16px;">【起動時のご注意】</span><br><br>
+        一定時間アクセスがないと <span style="color: #ffe600; font-weight: 900;">「Zzzz」</span> というスリープ画面が表示されます。<br>
+        その場合は、<span style="color: #38bdf8; font-weight: 900;">画面にある青いボタン（Yes, get this app back up!）を1回押して</span> サーバーを復帰させてください。
     </div>
     """,
     unsafe_allow_html=True
@@ -486,7 +486,7 @@ st.markdown(
 st.title("🛡️ 全国インフラ・気象防災カルテ・リアルリンク共用システム")
 st.markdown("災害時のリアルタイム気象状況・インフラ・地震情報をモバイル最適化で提供します。")
 
-# スマホ横向き案内カルテカード（復活）
+# スマホ横向き案内カルテカード
 st.markdown(
     """
     <div class="mobile-guide">
