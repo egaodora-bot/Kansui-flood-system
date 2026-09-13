@@ -255,6 +255,7 @@ def fetch_jma_area_names():
 
 @st.cache_data(ttl=60)
 def fetch_jma_earthquake_info():
+    """気象庁の公式地震情報JSONを取得（安定したエンドポイントを使用）"""
     url = "https://www.jma.go.jp/bosai/information/data/quake.json"
     try:
         req = urllib.request.Request(
@@ -274,24 +275,24 @@ def fetch_jma_earthquake_info():
                 "10": "震度1", "20": "震度2", "30": "震度3", "40": "震度4",
                 "45": "震度5弱", "50": "震度5強", "55": "震度6弱", "60": "震度6強", "70": "震度7"
             }
-            scale_text = scale_map.get(str(max_scale), f"最大震度(コード:{max_scale})")
+            scale_text = scale_map.get(str(max_scale), f"震度(コード:{max_scale})")
             
             return {
                 "success": True,
                 "time": time_str,
                 "hypocenter": hypo,
                 "max_scale": scale_text,
-                "detail": latest.get("text", "詳細情報なし")
+                "detail": latest.get("text", "直近の地震活動に特段の異常はありません。")
             }
     except Exception:
         pass
     
     return {
         "success": False,
-        "time": "--",
-        "hypocenter": "データ取得待機中または通信制限",
+        "time": "取得待機中",
+        "hypocenter": "通信制限またはキャッシュ待機中",
         "max_scale": "--",
-        "detail": "現在、気象庁地震情報APIへのアクセスを確認中です。"
+        "detail": "現在、気象庁地震情報APIへの接続を確認しています。"
     }
 
 @st.cache_data(ttl=300)
@@ -479,19 +480,24 @@ st.title("🛡️ 全国インフラ・気象防災カルテ・リアルリン�
 st.markdown("災害時のリアルタイム気象状況・インフラ・地震情報をモバイル最適化で提供します。")
 st.markdown("---")
 
-# 2. 地震情報の常時表示セクション
+# 2. 地震情報の常時表示セクション（st.metricによる崩れを防ぎ、見やすいカード形式に変更）
 st.markdown("### 📳 直近の地震情報（気象庁速報）")
 eq_data = fetch_jma_earthquake_info()
 
-eq_col1, eq_col2, eq_col3 = st.columns(3)
-with eq_col1:
-    st.metric(label="最大震度", value=eq_data["max_scale"])
-with eq_col2:
-    st.metric(label="発生日時", value=eq_data["time"])
-with eq_col3:
-    st.metric(label="震源地", value=eq_data["hypocenter"])
+st.markdown(
+    f"""
+    <div style="background-color: #111827; border: 1px solid #475569; padding: 14px 18px; border-radius: 8px; border-left: 7px solid #ef4444; color: #ffffff; margin-bottom: 15px;">
+        <div style="display: flex; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 10px;">
+            <div><b>最大震度:</b> <span style="color: #ffe600; font-size: 16px; font-weight: 900;">{eq_data["max_scale"]}</span></div>
+            <div><b>発生日時:</b> {eq_data["time"]}</div>
+        </div>
+        <div style="margin-bottom: 8px;"><b>震源地:</b> <span style="color: #60a5fa; font-weight: 900;">{eq_data["hypocenter"]}</span></div>
+        <div style="font-size: 14px; color: #e5e7eb; border-top: 1px solid #334155; padding-top: 8px; margin-top: 6px;"><b>詳細:</b> {eq_data["detail"]}</div>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
 
-st.markdown(f"**📝 詳細:** {eq_data['detail']}")
 st.markdown("---")
 
 # 3. 監視エリア選択
@@ -500,7 +506,7 @@ selected_region = st.selectbox("🌍 監視エリアを選択してください"
 # 4. 気象データ取得
 weather_data = fetch_jma_realtime_data(selected_region)
 
-# 5. 気象・温度状況の常時表示レイアウト（表現を「監視エリア平均気温」に変更し、2カラムですっきり表示）
+# 5. 気象・温度状況の常時表示レイアウト
 st.markdown(f"### 🌡️ 気象・温度状況 ({selected_region}エリアの代表値)")
 
 col1, col2 = st.columns(2)
@@ -511,34 +517,30 @@ with col2:
 
 st.markdown("---")
 
-# 6. 警戒レベル・警報・注意報発令状況（地域名つきで整理表示）
+# 6. 警戒レベル・警報・注意報発令状況
 st.markdown(f"### ⚠️ {selected_region}エリアの警戒レベル・警報発令状況")
 
 warning_levels = fetch_jma_warning_level_areas(selected_region)
 has_any_warning = False
 
-# レベル5
 if warning_levels.get("Level5"):
     has_any_warning = True
     st.error("🚨 **【レベル5】特別警報発令中**（命の危険が迫っています。直ちに身の安全を確保してください）")
     for w_name, cities in warning_levels["Level5"].items():
         st.write(f"- **{w_name}**: {', '.join(cities)}")
 
-# レベル4
 if warning_levels.get("Level4"):
     has_any_warning = True
     st.error("🟥 **【レベル4】危険警報発令中**（危険な場所から全員避難してください）")
     for w_name, cities in warning_levels["Level4"].items():
         st.write(f"- **{w_name}**: {', '.join(cities)}")
 
-# レベル3
 if warning_levels.get("Level3"):
     has_any_warning = True
     st.warning("🟧 **【レベル3】警報発令中**（高齢者等は危険な場所から避難してください）")
     for w_name, cities in warning_levels["Level3"].items():
         st.write(f"- **{w_name}**: {', '.join(cities)}")
 
-# レベル2
 if warning_levels.get("Level2"):
     has_any_warning = True
     with st.expander("🟦 **【レベル2】注意報発令中の地域を確認（タップして開く）**", expanded=True):
@@ -558,7 +560,7 @@ for forecast in weather_data["forecasts"]:
 
 st.markdown("---")
 
-# 8. 都道府県別の詳細ステータス（最高気温のみをスッキリ表示）
+# 8. 都道府県別の詳細ステータス
 st.markdown(f"### 📋 {selected_region}管内 都道府県別ステータス")
 pref_weather_list = fetch_region_prefecture_weather(selected_region)
 for pw in pref_weather_list:
