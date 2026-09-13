@@ -18,7 +18,7 @@ st.markdown("""
 <style>
 
 /* ==========================================
-   V6：システム説明追加・ダークデザイン最適化
+   V7：スマホ横向き案内完全復活・ダークデザイン最適化
    ========================================== */
 
 html, body,
@@ -55,12 +55,15 @@ section[data-testid="stMain"] {
     font-weight: 900 !important;
 }
 
-/* カードデザイン */
+/* スマホ横向き案内カルテカード */
 .mobile-guide {
     background-color: #111827 !important;
     color: #ffffff !important;
     border: 1px solid #475569 !important;
     border-left: 7px solid #38bdf8 !important;
+    padding: 14px 16px;
+    border-radius: 8px;
+    margin-bottom: 15px;
 }
 
 div[data-testid="stExpander"] {
@@ -483,12 +486,13 @@ st.markdown(
 st.title("🛡️ 全国インフラ・気象防災カルテ・リアルリンク共用システム")
 st.markdown("災害時のリアルタイム気象状況・インフラ・地震情報をモバイル最適化で提供します。")
 
-# システム概要説明カード（常時表示）
+# スマホ横向き案内カルテカード（復活）
 st.markdown(
     """
-    <div style="background-color: #111827; border: 1px solid #334155; padding: 15px; border-radius: 8px; margin-top: 10px; margin-bottom: 15px; color: #e2e8f0;">
-        <b>💡 本システムについて</b><br>
-        気象庁の公式リアルタイムAPI（気象警報・地震速報・天気予報）や全国の都道府県別ステータスを統合し、災害時に素早く状況を把握できるように構築された防災インフラカルテです。エリアを選択するだけで、現地の危険度や温度状況を一目で確認できます。
+    <div class="mobile-guide">
+        <b>📱 スマホ最適化と操作のご案内</b><br>
+        ・<b>スマートフォンを横に向ける</b>ことで、デスクトップ表示（ワイド画面）に切り替わり、地図やエリア情報をより広く快適に見渡せるようになります。<br>
+        ・エリアを切り替えるだけで、現地の気象・地震・警戒レベル情報を即座に一元管理できます。
     </div>
     """,
     unsafe_allow_html=True
