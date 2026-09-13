@@ -354,38 +354,38 @@ def fetch_region_prefecture_weather(region_name):
 st.title("🛡️ 全国インフラ・気象防災カルテ・リアルリンク共用システム")
 st.markdown("災害時のリアルタイム気象状況・インフラ・地震情報をモバイル最適化で一元管理します。")
 
-# ガイド
+# ガイド（文字をはっきりと白く見やすくし、余白や枠線を調整）
 with st.expander("📱 【タップして展開】 スマホ操作解説・ご利用案内・開発目的"):
     st.markdown("""
-<div style="background-color: #1e293b; border-left: 5px solid #3b82f6; padding: 10px 14px; border-radius: 6px; margin-bottom: 12px;">
+<div style="background-color: #1e293b; border-left: 5px solid #3b82f6; padding: 12px 16px; border-radius: 6px; margin-bottom: 14px;">
     <span style="background-color: #1d4ed8; color: #ffffff; padding: 4px 10px; border-radius: 4px; font-weight: 900; font-size: 13px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); display: inline-block;">📲 画面表示の復帰</span>
-    <p style="margin-top: 8px; margin-bottom: 0px; color: #f8fafc; line-height: 1.5;">一定時間アクセスがないと「Zzzz」のスリープ画面になります。その際は、画面に表示される青い復帰ボタン（<strong>「Yes, reload this page」</strong>または<strong>「Reconnect」</strong>）を１回押して再開してください。</p>
+    <p style="margin-top: 10px; margin-bottom: 0px; color: #ffffff; font-size: 14px; line-height: 1.6; font-weight: 500;">一定時間アクセスがないと「Zzzz」のスリープ画面になります。その際は、画面に表示される青い復帰ボタン（<strong>「Yes, reload this page」</strong>または<strong>「Reconnect」</strong>）を１回押して再開してください。</p>
 </div>
 
-<div style="background-color: #1e293b; border-left: 5px solid #3b82f6; padding: 10px 14px; border-radius: 6px; margin-bottom: 12px;">
+<div style="background-color: #1e293b; border-left: 5px solid #3b82f6; padding: 12px 16px; border-radius: 6px; margin-bottom: 14px;">
     <span style="background-color: #1d4ed8; color: #ffffff; padding: 4px 10px; border-radius: 4px; font-weight: 900; font-size: 13px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); display: inline-block;">📱 ➡️ 💻 ワイド表示への切り替え</span>
-    <p style="margin-top: 8px; margin-bottom: 0px; color: #f8fafc; line-height: 1.5;">スマホを「横向き」にするとデスクトップ表示（ワイド画面）に切り替わり、地図やエリア情報を見渡しやすくなります。</p>
+    <p style="margin-top: 10px; margin-bottom: 0px; color: #ffffff; font-size: 14px; line-height: 1.6; font-weight: 500;">スマホを「横向き」にするとデスクトップ表示（ワイド画面）に切り替わり、地図やエリア情報を見渡しやすくなります。</p>
 </div>
 
-<div style="background-color: #1e293b; border-left: 5px solid #3b82f6; padding: 10px 14px; border-radius: 6px; margin-bottom: 12px;">
+<div style="background-color: #1e293b; border-left: 5px solid #3b82f6; padding: 12px 16px; border-radius: 6px; margin-bottom: 14px;">
     <span style="background-color: #1d4ed8; color: #ffffff; padding: 4px 10px; border-radius: 4px; font-weight: 900; font-size: 13px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); display: inline-block;">📌 ショートカットの活用</span>
-    <p style="margin-top: 8px; margin-bottom: 6px; color: #f8fafc; line-height: 1.5;">ホーム画面にショートカットを追加しておくと、いざという時にワンタップで瞬時に起動できます。</p>
-    <div style="background-color: #0f172a; border: 1px solid #334155; padding: 8px 12px; border-radius: 4px; font-size: 13px; color: #cbd5e1;">
-        <b>【追加のカンタン手順】</b><br>
+    <p style="margin-top: 10px; margin-bottom: 8px; color: #ffffff; font-size: 14px; line-height: 1.6; font-weight: 500;">ホーム画面にショートカットを追加しておくと、いざという時にワンタップで瞬時に起動できます。</p>
+    <div style="background-color: #0f172a; border: 1px solid #334155; padding: 10px 14px; border-radius: 6px; font-size: 13px; color: #ffffff; line-height: 1.6;">
+        <strong style="color: #60a5fa;">【追加のカンタン手順】</strong><br>
         1. 今開いているこのアプリの状態で、スマホブラウザ（Safari / Chrome）のメニューボタン（共有・︙アイコン）をタップ<br>
-        2. <b>「ホーム画面に追加」</b>を選択する<br>
-        3. デフォルトで「Streamlit」と表示された場合は、お好みで**「防災カルテ」**などに書き換えて保存してください。
+        2. <strong style="color: #38bdf8;">「ホーム画面に追加」</strong>を選択する<br>
+        3. デフォルトで「Streamlit」と表示された場合は、お好みで<strong style="color: #38bdf8;">「防災カルテ」</strong>などに書き換えて保存してください。
     </div>
 </div>
 
-<div style="background-color: #1e293b; border-left: 5px solid #10b981; padding: 10px 14px; border-radius: 6px; margin-bottom: 12px;">
+<div style="background-color: #1e293b; border-left: 5px solid #10b981; padding: 12px 16px; border-radius: 6px; margin-bottom: 14px;">
     <span style="background-color: #047857; color: #ffffff; padding: 4px 10px; border-radius: 4px; font-weight: 900; font-size: 13px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); display: inline-block;">🎯 開発の目的</span>
-    <p style="margin-top: 8px; margin-bottom: 0px; color: #f8fafc; line-height: 1.5;">気象庁の公式一次情報（地震速報・特別警報・キキクル）と、生活・交通インフラのリアルタイム状況を1つの画面で素早く確認できるように開発しています。</p>
+    <p style="margin-top: 10px; margin-bottom: 0px; color: #ffffff; font-size: 14px; line-height: 1.6; font-weight: 500;">気象庁の公式一次情報（地震速報・特別警報・キキクル）と、生活・交通インフラのリアルタイム状況を1つの画面で素早く確認できるように開発しています。</p>
 </div>
 
-<div style="background-color: #1e293b; border-left: 5px solid #10b981; padding: 10px 14px; border-radius: 6px; margin-bottom: 0px;">
+<div style="background-color: #1e293b; border-left: 5px solid #10b981; padding: 12px 16px; border-radius: 6px; margin-bottom: 0px;">
     <span style="background-color: #047857; color: #ffffff; padding: 4px 10px; border-radius: 4px; font-weight: 900; font-size: 13px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); display: inline-block;">💡 設計思想</span>
-    <p style="margin-top: 8px; margin-bottom: 0px; color: #f8fafc; line-height: 1.5;">広告や不要な装飾を削ぎ落とし、災害時や電波が不安定な状況下でもスマホから、軽量かつ直感的に命を守る判断ができるよう最適化しています。</p>
+    <p style="margin-top: 10px; margin-bottom: 0px; color: #ffffff; font-size: 14px; line-height: 1.6; font-weight: 500;">広告や不要な装飾を削ぎ落とし、災害時や電波が不安定な状況下でもスマホから、軽量かつ直感的に命を守る判断ができるよう最適化しています。</p>
 </div>
     """, unsafe_allow_html=True)
 
