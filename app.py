@@ -354,7 +354,7 @@ def fetch_region_prefecture_weather(region_name):
 st.title("🛡️ 全国インフラ・気象防災カルテ・リアルリンク共用システム")
 st.markdown("災害時のリアルタイム気象状況・インフラ・地震情報をモバイル最適化で一元管理します。")
 
-# 更新された折り畳み式ガイド（バッジの文字をくっきり太字＆影付きに変更）
+# アドレス入力不要であることが一目でわかるように修正した折り畳み式ガイド
 with st.expander("📱 【タップして展開】 スマホ操作解説・ご利用案内・開発目的"):
     st.markdown("""
 <div style="background-color: #1e293b; border-left: 5px solid #3b82f6; padding: 10px 14px; border-radius: 6px; margin-bottom: 12px;">
@@ -371,9 +371,9 @@ with st.expander("📱 【タップして展開】 スマホ操作解説・ご�
     <span style="background-color: #1d4ed8; color: #ffffff; padding: 4px 10px; border-radius: 4px; font-weight: 900; font-size: 13px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); display: inline-block;">📌 ショートカットの活用</span>
     <p style="margin-top: 8px; margin-bottom: 6px; color: #f8fafc; line-height: 1.5;">ホーム画面にショートカットを追加しておくと、いざという時にワンタップで瞬時に起動できます。</p>
     <div style="background-color: #0f172a; border: 1px solid #334155; padding: 8px 12px; border-radius: 4px; font-size: 13px; color: #cbd5e1;">
-        <b>【追加のカンタン手順】</b><br>
-        1. スマホのブラウザ（Safari / Chrome）のメニューボタン（共有・︙アイコン）をタップ<br>
-        2. <b>「ホーム画面に追加」</b>を選択して保存するだけで完了です。
+        <b>【追加のカンタン手順（アドレス入力は不要です）】</b><br>
+        1. 今開いているこのアプリの状態で、スマホブラウザ（Safari / Chrome）のメニューボタン（共有・︙アイコン）をタップ<br>
+        2. <b>「ホーム画面に追加」</b>を選択して保存するだけで、自動でこのページのショートカットが作成されます。
     </div>
 </div>
 
