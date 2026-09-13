@@ -85,7 +85,7 @@ section[data-testid="stMain"] {
 div[data-testid="stExpander"] {
     background-color: #111827 !important;
     border: 1px solid #475569 !important;
-    border-left: 7px solid #3b82f6 !important;
+    border-left: 7px solid #10b981 !important;
     border-radius: 8px !important;
 }
 
