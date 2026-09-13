@@ -18,7 +18,7 @@ st.markdown("""
 <style>
 
 /* ==========================================
-   V5：タイトルサイズ最適化・防災UIデザイン
+   V6：システム説明追加・ダークデザイン最適化
    ========================================== */
 
 html, body,
@@ -41,7 +41,7 @@ section[data-testid="stMain"] {
     color: #ffffff;
 }
 
-/* タイトルの大きさを常識的なサイズに調整 (h1) */
+/* タイトルの大きさを最適化 (h1) */
 [data-testid="stAppViewContainer"] h1 {
     color: #ffffff !important;
     font-size: 1.8rem !important;
@@ -55,7 +55,7 @@ section[data-testid="stMain"] {
     font-weight: 900 !important;
 }
 
-/* カード：背景と文字をセットで管理 */
+/* カードデザイン */
 .mobile-guide {
     background-color: #111827 !important;
     color: #ffffff !important;
@@ -480,8 +480,20 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-st.title("🛡️ 全国インフラ・気象防災カルテ・リアルリンク共有システム")
+st.title("🛡️ 全国インフラ・気象防災カルテ・リアルリンク共用システム")
 st.markdown("災害時のリアルタイム気象状況・インフラ・地震情報をモバイル最適化で提供します。")
+
+# システム概要説明カード（常時表示）
+st.markdown(
+    """
+    <div style="background-color: #111827; border: 1px solid #334155; padding: 15px; border-radius: 8px; margin-top: 10px; margin-bottom: 15px; color: #e2e8f0;">
+        <b>💡 本システムについて</b><br>
+        気象庁の公式リアルタイムAPI（気象警報・地震速報・天気予報）や全国の都道府県別ステータスを統合し、災害時に素早く状況を把握できるように構築された防災インフラカルテです。エリアを選択するだけで、現地の危険度や温度状況を一目で確認できます。
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
 st.markdown("---")
 
 # 2. 地震情報の常時表示セクション
