@@ -48,20 +48,6 @@ section[data-testid="stMain"] {
     font-weight: 900 !important;
 }
 
-@keyframes title-blink {
-    0% { opacity: 1.0; }
-    50% { opacity: 0.3; }
-    100% { opacity: 1.0; }
-}
-
-.blinking-title {
-    color: #ef4444 !important;
-    font-weight: 900;
-    font-size: 16px;
-    animation: title-blink 2.0s infinite ease-in-out;
-    display: inline-block;
-}
-
 .notice-card {
     background-color: #111827 !important;
     border: 1px solid #334155 !important;
@@ -247,9 +233,10 @@ def fetch_jma_area_names():
 
 @st.cache_data(ttl=60)
 def fetch_jma_earthquake_info():
-    url = "https://www.jma.go.jp/bosai/information/data/quake.json"
+    # 【1次挑戦】気象庁公式地震情報API
+    jma_url = "https://www.jma.go.jp/bosai/information/data/quake.json"
     try:
-        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        req = urllib.request.Request(jma_url, headers={'User-Agent': 'Mozilla/5.0'})
         with urllib.request.urlopen(req, timeout=5) as response:
             quakes = json.loads(response.read().decode('utf-8'))
         if quakes and isinstance(quakes, list):
@@ -268,7 +255,34 @@ def fetch_jma_earthquake_info():
             }
     except Exception:
         pass
-    return {"success": False, "time": "取得待機中", "hypocenter": "通信制限中", "max_scale": "--", "detail": "接続確認中"}
+
+    # 【2次挑戦（自動切替）】P2P地震情報APIから取得
+    p2p_url = "https://api.p2pquake.net/v2/history?codes=551&limit=1"
+    try:
+        req = urllib.request.Request(p2p_url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=5) as response:
+            p2p_data = json.loads(response.read().decode('utf-8'))
+        if p2p_data and isinstance(p2p_data, list):
+            item = p2p_data[0]
+            eq = item.get("earthquake", {})
+            hypo = eq.get("hypocenter", {})
+            scale = eq.get("maxScale", -1)
+            
+            p2p_scale_map = {
+                10: "震度1", 20: "震度2", 30: "震度3", 40: "震度4",
+                45: "震度5弱", 50: "震度5強", 55: "震度6弱", 60: "震度6強", 70: "震度7"
+            }
+            return {
+                "success": True,
+                "time": eq.get("time", "日時不明"),
+                "hypocenter": hypo.get("name", "震源地不明"),
+                "max_scale": p2p_scale_map.get(scale, "不明"),
+                "detail": f"【自動切替取得】規模(M): {eq.get('magnitude', '--')} / 深さ: {hypo.get('depth', '--')}km"
+            }
+    except Exception:
+        pass
+
+    return {"success": False, "time": "取得待機中", "hypocenter": "サーバー混雑中・自動再試行待機", "max_scale": "--", "detail": "現在アクセスが集中しています。数秒後に自動更新されます。"}
 
 @st.cache_data(ttl=300)
 def fetch_jma_warning_level_areas(region_name):
