@@ -18,7 +18,7 @@ st.markdown("""
 <style>
 
 /* ==========================================
-   V17：地図表記のブラッシュアップ（気象地震確認マップへの変更）
+   V18：インフラ・交通カテゴリ（道路・鉄道・天気・河川）完備版
    ========================================== */
 
 html, body,
@@ -92,7 +92,7 @@ section[data-testid="stMain"] {
     margin-bottom: 15px;
 }
 
-/* リンク集カード */
+/* インフラ・リンク集カード */
 .link-card {
     background-color: #111827 !important;
     border: 1px solid #334155 !important;
@@ -504,7 +504,7 @@ def fetch_region_prefecture_weather(region_name):
     return results
 
 # ==========================================
-# メイン画面の描画処理
+# メイン画面の描画処理（見やすさと判断の優先順位に最適化）
 # ==========================================
 
 # 1. 起動時のご注意（タイトル点滅、左ラインは黄色アクセント）
@@ -536,7 +536,7 @@ st.markdown(
 
 st.markdown("---")
 
-# 2. 地震情報の常時表示セクション
+# 2. 直近の地震情報（最優先の揺れ確認）
 st.markdown("### 📳 直近の地震情報（気象庁速報）")
 eq_data = fetch_jma_earthquake_info()
 
@@ -559,39 +559,9 @@ st.markdown("---")
 # 3. 監視エリア選択
 selected_region = st.selectbox("🌍 監視エリアを選択してください", list(REGION_CODES.keys()), index=2)
 
-# 4. 監視エリアマップ（Folium地図）の常時表示（気象地震確認マップへ表記変更）
-st.markdown(f"### 🗺️ {selected_region}エリアの地図・気象地震確認マップ")
-region_info = REGION_CODES.get(selected_region, REGION_CODES["関東"])
-m = folium.Map(
-    location=[region_info["lat"], region_info["lon"]],
-    zoom_start=7,
-    tiles="OpenStreetMap"
-)
-folium.Marker(
-    [region_info["lat"], region_info["lon"]],
-    popup=f"{selected_region}エリア中心",
-    tooltip=selected_region,
-    icon=folium.Icon(color="red", icon="info-sign")
-).add_to(m)
-
-st_folium(m, width="100%", height=300, key=f"map_{selected_region}")
 st.markdown("---")
 
-# 5. 気象データ取得
-weather_data = fetch_jma_realtime_data(selected_region)
-
-# 6. 気象・温度状況の常時表示レイアウト
-st.markdown(f"### 🌡️ 気象・温度状況 ({selected_region}エリアの代表値)")
-
-col1, col2 = st.columns(2)
-with col1:
-    st.metric(label="現在気温", value=f"{weather_data['current_temp']}°C")
-with col2:
-    st.metric(label="予想最高気温", value=f"{weather_data['max_temp']}°C")
-
-st.markdown("---")
-
-# 7. 警戒レベル・警報・注意報発令状況（レベル3〜5に絞り込み）
+# 4. 緊急警戒レベル（レベル3〜5）発令状況（エリア選択直後に緊急度を把握）
 st.markdown(f"### ⚠️ {selected_region}エリアの緊急警戒レベル（レベル3〜5）発令状況")
 
 warning_levels = fetch_jma_warning_level_areas(selected_region)
@@ -620,14 +590,44 @@ if not has_any_warning:
 
 st.markdown("---")
 
-# 8. リアルタイム天気予報の表示
+# 5. 気象・温度状況
+st.markdown(f"### 🌡️ 気象・温度状況 ({selected_region}エリアの代表値)")
+
+weather_data = fetch_jma_realtime_data(selected_region)
+col1, col2 = st.columns(2)
+with col1:
+    st.metric(label="現在気温", value=f"{weather_data['current_temp']}°C")
+with col2:
+    st.metric(label="予想最高気温", value=f"{weather_data['max_temp']}°C")
+
+st.markdown("---")
+
+# 6. 監視エリアマップ（気象地震確認マップ）
+st.markdown(f"### 🗺️ {selected_region}エリアの地図・気象地震確認マップ")
+region_info = REGION_CODES.get(selected_region, REGION_CODES["関東"])
+m = folium.Map(
+    location=[region_info["lat"], region_info["lon"]],
+    zoom_start=7,
+    tiles="OpenStreetMap"
+)
+folium.Marker(
+    [region_info["lat"], region_info["lon"]],
+    popup=f"{selected_region}エリア中心",
+    tooltip=selected_region,
+    icon=folium.Icon(color="red", icon="info-sign")
+).add_to(m)
+
+st_folium(m, width="100%", height=300, key=f"map_{selected_region}")
+st.markdown("---")
+
+# 7. リアルタイム天気予報
 st.markdown(f"### 📡 {selected_region}地方の気象情報 ({weather_data['office']})")
 for forecast in weather_data["forecasts"]:
     st.markdown(f"- {forecast}")
 
 st.markdown("---")
 
-# 9. 都道府県別の詳細ステータス
+# 8. 都道府県別の詳細ステータス
 st.markdown(f"### 📋 {selected_region}管内 都道府県別ステータス")
 pref_weather_list = fetch_region_prefecture_weather(selected_region)
 for pw in pref_weather_list:
@@ -635,17 +635,19 @@ for pw in pref_weather_list:
 
 st.markdown("---")
 
-# 10. 災害防災リンク集（Yahoo!天気など5つのリンク）
+# 9. インフラ・交通・防災関連リンク集（天気・道路・鉄道・河川カテゴリ）
 st.markdown(
     """
     <div class="link-card">
-        <b>🔗 防災関連リンク集（公式・リアルタイム情報）</b><br><br>
+        <b>🔗 インフラ・交通・防災関連リンク集（公式リアルタイム情報）</b><br><br>
         <ul>
-            <li><a href="https://weather.yahoo.co.jp/weather/" target="_blank">Yahoo!天気・災害</a>：全国の天気予報、雨雲レーダー、台風情報を詳細確認</li>
-            <li><a href="https://www.jma.go.jp/bosai/" target="_blank">気象庁 防災情報ポータル</a>：全国の気象警報・台風・地震情報をリアルタイムで確認</li>
-            <li><a href="https://www.jma.go.jp/bosai/map.html" target="_blank">気象庁 キキクル（危険度分布）</a>：土砂災害・浸水害・洪水災害の危険度を地図で確認</li>
-            <li><a href="https://www.river.go.jp/" target="_blank">川の防災情報（国土交通省）</a>：全国の河川水位・ライブカメラ映像・ダム情報</li>
-            <li><a href="https://www.hazardmap.mlit.go.jp/" target="_blank">ハザードマップポータルサイト</a>：自宅や避難所の災害リスク（洪水・土砂・津波）を確認</li>
+            <li><b>【天気】</b> <a href="https://weather.yahoo.co.jp/weather/" target="_blank">Yahoo!天気・災害</a>：全国の天気予報・雨雲レーダー・台風詳細</li>
+            <li><b>【天気】</b> <a href="https://www.jma.go.jp/bosai/" target="_blank">気象庁 防災情報ポータル</a>：警報・台風・地震情報のリアルタイム確認</li>
+            <li><b>【道路】</b> <a href="https://www.jartic.or.jp/" target="_blank">JARTIC 日本道路交通情報センター</a>：高速道路・一般道の通行止め・規制情報</li>
+            <li><b>【鉄道】</b> <a href="https://transit.yahoo.co.jp/diainfo/" target="_blank">Yahoo!路線情報（運行情報）</a>：全国の鉄道の遅延・運休状況</li>
+            <li><b>【河川】</b> <a href="https://www.river.go.jp/" target="_blank">川の防災情報（国土交通省）</a>：河川水位・ライブカメラ・ダム情報</li>
+            <li><b>【危険度】</b> <a href="https://www.jma.go.jp/bosai/map.html" target="_blank">気象庁 キキクル（危険度分布）</a>：土砂災害・浸水害・洪水災害の地図確認</li>
+            <li><b>【リスク】</b> <a href="https://www.hazardmap.mlit.go.jp/" target="_blank">ハザードマップポータルサイト</a>：避難所・災害リスクの確認</li>
         </ul>
     </div>
     """,
