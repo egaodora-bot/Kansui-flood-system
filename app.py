@@ -18,7 +18,7 @@ st.markdown("""
 <style>
 
 /* ==========================================
-   V18：インフラ・交通カテゴリ（道路・鉄道・天気・河川）完備版
+   V19：公式安全リンク最適化版
    ========================================== */
 
 html, body,
@@ -504,7 +504,7 @@ def fetch_region_prefecture_weather(region_name):
     return results
 
 # ==========================================
-# メイン画面の描画処理（見やすさと判断の優先順位に最適化）
+# メイン画面の描画処理
 # ==========================================
 
 # 1. 起動時のご注意（タイトル点滅、左ラインは黄色アクセント）
@@ -561,7 +561,7 @@ selected_region = st.selectbox("🌍 監視エリアを選択してください"
 
 st.markdown("---")
 
-# 4. 緊急警戒レベル（レベル3〜5）発令状況（エリア選択直後に緊急度を把握）
+# 4. 緊急警戒レベル（レベル3〜5）発令状況
 st.markdown(f"### ⚠️ {selected_region}エリアの緊急警戒レベル（レベル3〜5）発令状況")
 
 warning_levels = fetch_jma_warning_level_areas(selected_region)
@@ -635,7 +635,7 @@ for pw in pref_weather_list:
 
 st.markdown("---")
 
-# 9. インフラ・交通・防災関連リンク集（天気・道路・鉄道・河川カテゴリ）
+# 9. インフラ・交通・防災関連リンク集（安全な公式URLに統一）
 st.markdown(
     """
     <div class="link-card">
@@ -647,7 +647,7 @@ st.markdown(
             <li><b>【鉄道】</b> <a href="https://transit.yahoo.co.jp/diainfo/" target="_blank">Yahoo!路線情報（運行情報）</a>：全国の鉄道の遅延・運休状況</li>
             <li><b>【河川】</b> <a href="https://www.river.go.jp/" target="_blank">川の防災情報（国土交通省）</a>：河川水位・ライブカメラ・ダム情報</li>
             <li><b>【危険度】</b> <a href="https://www.jma.go.jp/bosai/map.html" target="_blank">気象庁 キキクル（危険度分布）</a>：土砂災害・浸水害・洪水災害の地図確認</li>
-            <li><b>【リスク】</b> <a href="https://www.hazardmap.mlit.go.jp/" target="_blank">ハザードマップポータルサイト</a>：避難所・災害リスクの確認</li>
+            <li><b>【リスク】</b> <a href="https://disaportal.gsi.go.jp/" target="_blank">ハザードマップポータルサイト（国土交通省）</a>：避難所・災害リスクの確認</li>
         </ul>
     </div>
     """,
