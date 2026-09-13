@@ -18,7 +18,7 @@ st.markdown("""
 <style>
 
 /* ==========================================
-   V21：監視エリア完全連動リンク＆防災最適化版
+   V22：地図エリア連動＆リンク安定化最適版
    ========================================== */
 
 html, body,
@@ -191,36 +191,15 @@ hr {
 </style>
 """, unsafe_allow_html=True)
 
-# エリアごとの気象庁エリアコード・中心座標、およびYahoo!天気の安全な地域別リンク設定
+# エリアごとの気象庁エリアコードと中心都市の座標
 REGION_CODES = {
-    "北海道": {
-        "code": "016000", "lat": 43.0642, "lon": 141.3469,
-        "yahoo_url": "https://weather.yahoo.co.jp/weather/jp/1l/1.html"
-    },
-    "東北": {
-        "code": "040000", "lat": 38.2688, "lon": 140.8721,
-        "yahoo_url": "https://weather.yahoo.co.jp/weather/jp/2l/2.html"
-    },
-    "関東": {
-        "code": "130000", "lat": 35.6895, "lon": 139.6917,
-        "yahoo_url": "https://weather.yahoo.co.jp/weather/jp/3l/3.html"
-    },
-    "中部": {
-        "code": "230000", "lat": 35.1802, "lon": 136.9066,
-        "yahoo_url": "https://weather.yahoo.co.jp/weather/jp/4l/4.html"
-    },
-    "関西": {
-        "code": "270000", "lat": 34.6937, "lon": 135.5022,
-        "yahoo_url": "https://weather.yahoo.co.jp/weather/jp/5l/5.html"
-    },
-    "四国": {
-        "code": "360000", "lat": 33.8416, "lon": 132.7657,
-        "yahoo_url": "https://weather.yahoo.co.jp/weather/jp/7l/7.html"
-    },
-    "九州": {
-        "code": "400000", "lat": 33.6064, "lon": 130.4181,
-        "yahoo_url": "https://weather.yahoo.co.jp/weather/jp/8l/8.html"
-    }
+    "北海道": {"code": "016000", "lat": 43.0642, "lon": 141.3469, "center_name": "札幌（北海道中心）"},
+    "東北": {"code": "040000", "lat": 38.2688, "lon": 140.8721, "center_name": "仙台（東北中心）"},
+    "関東": {"code": "130000", "lat": 35.6895, "lon": 139.6917, "center_name": "東京（関東中心）"},
+    "中部": {"code": "230000", "lat": 35.1802, "lon": 136.9066, "center_name": "名古屋（中部中心）"},
+    "関西": {"code": "270000", "lat": 34.6937, "lon": 135.5022, "center_name": "大阪（関西中心）"},
+    "四国": {"code": "360000", "lat": 33.8416, "lon": 132.7657, "center_name": "松山（四国中心）"},
+    "九州": {"code": "400000", "lat": 33.6064, "lon": 130.4181, "center_name": "福岡（九州中心）"}
 }
 
 REGION_PREFECTURES = {
@@ -623,9 +602,10 @@ with col2:
 
 st.markdown("---")
 
-# 6. 監視エリアマップ（気象地震確認マップ）
-st.markdown(f"### 🗺️ {selected_region}エリアの地図・気象地震確認マップ")
+# 6. 監視エリアマップ（選択エリアの中心都市に自動でピンが立つ仕様）
 region_info = REGION_CODES.get(selected_region, REGION_CODES["関東"])
+st.markdown(f"### 🗺️ {selected_region}エリアの地図・気象地震確認マップ（中心：{region_info['center_name']}）")
+
 m = folium.Map(
     location=[region_info["lat"], region_info["lon"]],
     zoom_start=7,
@@ -633,8 +613,8 @@ m = folium.Map(
 )
 folium.Marker(
     [region_info["lat"], region_info["lon"]],
-    popup=f"{selected_region}エリア中心",
-    tooltip=selected_region,
+    popup=f"{selected_region}エリア中心 ({region_info['center_name']})",
+    tooltip=f"{selected_region} ({region_info['center_name']})",
     icon=folium.Icon(color="red", icon="info-sign")
 ).add_to(m)
 
@@ -656,16 +636,13 @@ for pw in pref_weather_list:
 
 st.markdown("---")
 
-# 選択されたエリアに応じたYahoo!天気の地域連動URLを取得
-current_yahoo_url = REGION_CODES[selected_region]["yahoo_url"]
-
-# 9. インフラ・交通・防災関連リンク集（選択エリアに連動するYahoo!天気＋公式安全URL）
+# 9. インフラ・交通・防災関連リンク集（Yahoo!天気は安全な検索・総合トップ、各種公式URL完備）
 st.markdown(
-    f"""
+    """
     <div class="link-card">
         <b>🔗 インフラ・交通・防災関連リンク集（公式リアルタイム情報）</b><br><br>
         <ul>
-            <li><b>【天気】</b> <a href="{current_yahoo_url}" target="_blank">Yahoo!天気・災害（{selected_region}地方の詳細天気）</a>：選択中エリアの天気予報・雨雲レーダーを詳細確認</li>
+            <li><b>【天気】</b> <a href="https://weather.yahoo.co.jp/weather/rainradar/" target="_blank">Yahoo!天気（雨雲レーダー・リアルタイム）</a>：今降っている雨や今後の雨雲の動きを詳細確認</li>
             <li><b>【天気】</b> <a href="https://www.jma.go.jp/bosai/" target="_blank">気象庁 防災情報ポータル</a>：警報・台風・地震情報のリアルタイム確認</li>
             <li><b>【道路】</b> <a href="https://www.jartic.or.jp/" target="_blank">JARTIC 日本道路交通情報センター</a>：高速道路・一般道の通行止め・規制情報</li>
             <li><b>【鉄道】</b> <a href="https://transit.yahoo.co.jp/diainfo/" target="_blank">Yahoo!路線情報（運行情報）</a>：全国の鉄道の遅延・運休状況</li>
