@@ -18,7 +18,7 @@ st.markdown("""
 <style>
 
 /* ==========================================
-   V22：地図エリア連動＆リンク安定化最適版
+   V24：開発目的カード搭載・完全安定化版
    ========================================== */
 
 html, body,
@@ -90,6 +90,17 @@ section[data-testid="stMain"] {
     padding: 14px 16px;
     border-radius: 8px;
     margin-bottom: 15px;
+}
+
+/* 開発目的カード */
+.purpose-card {
+    background-color: #111827 !important;
+    border: 1px solid #334155 !important;
+    border-left: 7px solid #3b82f6 !important;
+    padding: 14px 18px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    color: #ffffff !important;
 }
 
 /* インフラ・リンク集カード */
@@ -522,6 +533,18 @@ st.markdown(
 st.title("🛡️ 全国インフラ・気象防災カルテ・リアルリンク共用システム")
 st.markdown("災害時のリアルタイム気象状況・インフラ・地震情報をモバイル最適化で提供します。")
 
+# 開発目的・背景カルテカード
+st.markdown(
+    """
+    <div class="purpose-card">
+        <b>🎯 本システム（全国インフラ・気象防災カルテ）の開発目的と背景</b><br><br>
+        ・<b>開発目的</b>：災害大国日本において、気象庁の一次情報（地震速報・特別警報・キキクルなど）と、生活・交通インフラのリアルタイム状況を<b>「1つの画面で素早く、確実に把握すること」</b>を目的として開発しています。<br>
+        ・<b>設計思想</b>：広告や不要な装飾を削ぎ落とし、通信環境が不安定な災害時や緊急時でも、スマホやPCから軽量かつ直感的に命を守るための判断材料にアクセスできるように最適化しています。
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
 # スマホ横向き案内カルテカード
 st.markdown(
     """
@@ -575,7 +598,7 @@ if warning_levels.get("Level5"):
 
 if warning_levels.get("Level4"):
     has_any_warning = True
-    st.error("🟥 **【レベル4】危険警報発令中**（危険な場所から全員避難してください）")
+    st.error("🟥 **【Level4】危険警報発令中**（危険な場所から全員避難してください）")
     for w_name, cities in warning_levels["Level4"].items():
         st.write(f"- **{w_name}**: {', '.join(cities)}")
 
@@ -636,7 +659,7 @@ for pw in pref_weather_list:
 
 st.markdown("---")
 
-# 9. インフラ・交通・防災関連リンク集（Yahoo!天気は安全な検索・総合トップ、各種公式URL完備）
+# 9. インフラ・交通・防災関連リンク集（Yahoo雨雲レーダーの安定URL＋各種公式URL完備）
 st.markdown(
     """
     <div class="link-card">
