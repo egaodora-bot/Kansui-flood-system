@@ -206,15 +206,15 @@ JMA_LEVEL_CODES = {
 }
 
 JMA_WARNING_NAMES = {
-    "10": "レベル2大雨注意報", "03": "レベル3大雨警報", "43": "レベル4大雨危険警報", "33": "レベル5大雨特別警報",
-    "29": "レベル2土砂災害注意報", "09": "レベル3土砂災害警報", "49": "レベル4土砂災害危険警報", "39": "レベル5土砂災害特別警報",
-    "19": "レベル2高潮注意報", "08": "レベル3高潮警報", "48": "レベル4高潮危険警報", "38": "レベル5高潮特別警報",
+    "10": "レベル2大雨注意報", "03": "レベル3大雨警報", "43": "Level4大雨危険警報", "33": "Level5大雨特別警報",
+    "29": "Level2土砂災害注意報", "09": "Level3土砂災害警報", "49": "Level4土砂災害危険警報", "39": "Level5土砂災害特別警報",
+    "19": "Level2高潮注意報", "08": "Level3高潮警報", "48": "Level4高潮危険警報", "38": "Level5高潮特別警報",
     "15": "強風注意報", "05": "暴風警報", "35": "暴風特別警報", "13": "風雪注意報", "02": "暴風雪警報", "32": "暴風雪特別警報",
     "16": "波浪注意報", "07": "波浪警報", "37": "波浪特別警報", "12": "大雪注意報", "06": "大雪警報", "36": "大雪特別警報",
     "17": "融雪注意報", "14": "雷注意報", "20": "濃霧注意報", "21": "乾燥注意報", "22": "なだれ注意報",
     "23": "低温注意報", "24": "霜注意報", "25": "着氷注意報", "26": "着雪注意報", "27": "その他の注意報",
-    "30": "レベル3氾濫警報", "31": "レベル3氾濫警報", "40": "レベル4氾濫危険警報", "41": "レベル4氾濫危険警報",
-    "51": "レベル5氾濫特別警報", "53": "レベル5氾濫特別警報",
+    "30": "Level3氾濫警報", "31": "Level3氾濫警報", "40": "Level4氾濫危険警報", "41": "Level4氾濫危険警報",
+    "51": "Level5氾濫特別警報", "53": "Level5氾濫特別警報",
 }
 
 def jma_level_from_code(code):
@@ -226,7 +226,6 @@ def jma_level_from_code(code):
 
 @st.cache_data(ttl=600)
 def fetch_jma_area_names():
-    """気象庁公式のエリア辞書からコード→市区町村名マップを作成"""
     url = "https://www.jma.go.jp/bosai/common/const/area.json"
     try:
         req = urllib.request.Request(
@@ -256,10 +255,6 @@ def fetch_jma_area_names():
 
 @st.cache_data(ttl=300)
 def fetch_jma_warning_level_areas(region_name):
-    """
-    警報・注意報JSONを取得し、レベル5〜2ごとに発表中の情報と該当地域をまとめます。
-    「地域不明」や「解除済み」のデータは完全に自動除外します。
-    """
     office_codes = REGION_WARNING_OFFICES.get(
         region_name,
         [REGION_CODES.get(region_name, REGION_CODES["関東"])["code"]]
@@ -429,11 +424,16 @@ def fetch_region_prefecture_weather(region_name):
 # メイン画面の描画処理
 # ==========================================
 
-# 1. 起動時の注意書き（ダブルチェック用・Zzzz画面対策常時表示）
-st.warning(
-    "**【起動時のご注意】**\n\n"
-    "一定時間アクセスがないと「Zzzz」というスリープ画面が表示されます。"
-    "その場合は、画面にある青いボタン（**Yes, get this app back up!**）を1回押してサーバーを復帰させてください。"
+# 1. 起動時の注意書き（HTMLで色を指定：赤と青のダブルチェック案内）
+st.markdown(
+    """
+    <div style="background-color: #382512; border: 1px solid #d97706; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; color: #ffffff;">
+        <span style="color: #ff4d4d; font-weight: 900; font-size: 16px;">【起動時のご注意】</span><br><br>
+        一定時間アクセスがないと「Zzzz」というスリープ画面が表示されます。<br>
+        その場合は、<span style="color: #38bdf8; font-weight: 900;">画面にある青いボタン（Yes, get this app back up!）を1回押して</span><span style="color: #ff4d4d; font-weight: 900;">サーバーを復帰させてください。</span>
+    </div>
+    """,
+    unsafe_allow_html=True
 )
 
 st.title("🛡️ 全国インフラ・気象防災カルテ・リアルリンク共用システム")
