@@ -354,22 +354,27 @@ def fetch_region_prefecture_weather(region_name):
 st.title("🛡️ 全国インフラ・気象防災カルテ・リアルリンク共用システム")
 st.markdown("災害時のリアルタイム気象状況・インフラ・地震情報をモバイル最適化で一元管理します。")
 
-# 折り畳み式ガイド（操作案内を上に、開発目的を下に整理し、HTMLを使ってカテゴリを強力に強調表示）
+# 更新された折り畳み式ガイド
 with st.expander("📱 【タップして展開】 スマホ操作解説・ご利用案内・開発目的"):
     st.markdown("""
 <div style="background-color: #1e293b; border-left: 5px solid #3b82f6; padding: 10px 14px; border-radius: 6px; margin-bottom: 12px;">
     <span style="background-color: #2563eb; color: #ffffff; padding: 3px 8px; border-radius: 4px; font-weight: 900; font-size: 13px;">📲 画面表示の復帰</span>
-    <p style="margin-top: 8px; margin-bottom: 0px; color: #f8fafc; line-height: 1.5;">一定時間アクセスがないと「Zzzz」のスリープ画面になります。その際は、青い復帰ボタンを1回押して再開してください。</p>
+    <p style="margin-top: 8px; margin-bottom: 0px; color: #f8fafc; line-height: 1.5;">一定時間アクセスがないと「Zzzz」のスリープ画面になります。その際は、画面に表示される青い復帰ボタン（<strong>「Yes, reload this page」</strong>または<strong>「Reconnect」</strong>）を1回押して再開してください。</p>
 </div>
 
 <div style="background-color: #1e293b; border-left: 5px solid #3b82f6; padding: 10px 14px; border-radius: 6px; margin-bottom: 12px;">
-    <span style="background-color: #2563eb; color: #ffffff; padding: 3px 8px; border-radius: 4px; font-weight: 900; font-size: 13px;">↔️ ワイド表示への切り替え</span>
+    <span style="background-color: #2563eb; color: #ffffff; padding: 3px 8px; border-radius: 4px; font-weight: 900; font-size: 13px;">📱➡️💻 ワイド表示への切り替え</span>
     <p style="margin-top: 8px; margin-bottom: 0px; color: #f8fafc; line-height: 1.5;">スマホを「横向き」にするとデスクトップ表示（ワイド画面）に切り替わり、地図やエリア情報を見渡しやすくなります。</p>
 </div>
 
 <div style="background-color: #1e293b; border-left: 5px solid #3b82f6; padding: 10px 14px; border-radius: 6px; margin-bottom: 12px;">
     <span style="background-color: #2563eb; color: #ffffff; padding: 3px 8px; border-radius: 4px; font-weight: 900; font-size: 13px;">📌 ショートカットの活用</span>
-    <p style="margin-top: 8px; margin-bottom: 0px; color: #f8fafc; line-height: 1.5;">ホーム画面にショートカットを追加しておくと、いざという時にワンタップで瞬時に起動できます。</p>
+    <p style="margin-top: 8px; margin-bottom: 6px; color: #f8fafc; line-height: 1.5;">ホーム画面にショートカットを追加しておくと、いざという時にワンタップで瞬時に起動できます。</p>
+    <div style="background-color: #0f172a; border: 1px solid #334155; padding: 8px 12px; border-radius: 4px; font-size: 13px; color: #cbd5e1;">
+        <b>【追加のカンタン手順】</b><br>
+        1. スマホのブラウザ（Safari / Chrome）のメニューボタン（共有・︙アイコン）をタップ<br>
+        2. <b>「ホーム画面に追加」</b>を選択して保存するだけで完了です。
+    </div>
 </div>
 
 <div style="background-color: #1e293b; border-left: 5px solid #10b981; padding: 10px 14px; border-radius: 6px; margin-bottom: 12px;">
@@ -379,7 +384,7 @@ with st.expander("📱 【タップして展開】 スマホ操作解説・ご�
 
 <div style="background-color: #1e293b; border-left: 5px solid #10b981; padding: 10px 14px; border-radius: 6px; margin-bottom: 0px;">
     <span style="background-color: #059669; color: #ffffff; padding: 3px 8px; border-radius: 4px; font-weight: 900; font-size: 13px;">💡 設計思想</span>
-    <p style="margin-top: 8px; margin-bottom: 0px; color: #f8fafc; line-height: 1.5;">広告や不要な装飾を削ぎ落とし、災害時や電波が不安定な状況下でもスマホから軽量かつ直感的に命を守る判断ができるよう最適化しています。</p>
+    <p style="margin-top: 8px; margin-bottom: 0px; color: #f8fafc; line-height: 1.5;">広告や不要な装飾を削ぎ落とし、災害時や電波が不安定な状況下でもスマホから、軽量かつ直感的に命を守る判断ができるよう最適化しています。</p>
 </div>
     """, unsafe_allow_html=True)
 
@@ -449,7 +454,7 @@ st.markdown(
             <li><b>【鉄道運行】</b> <a href="https://transit.yahoo.co.jp/diainfo/" target="_blank">Yahoo!路線情報（運行情報）</a>：全国の鉄道遅延・運休状況</li>
             <li><b>【河川水位】</b> <a href="https://www.river.go.jp/" target="_blank">川の防災情報（国土交通省）</a>：河川水位・ライブカメラ・ダム情報</li>
             <li><b>【危険度分布】</b> <a href="https://www.jma.go.jp/bosai/map.html" target="_blank">気象庁 キキクル</a>：土砂災害・浸水害・洪水の危険度マップ</li>
-            <li><b>【ハザード】</b> <a href="https://disaportal.gsi.go.jp/" target="_blank">ハザードマップポータルサイト</a>：避難所や災害リスクの全国家屋情報</li>
+            <li><b>【ハザード】</b> <a href="https://disaportal.gsi.go.jp/" target="_blank">ハザードマップポータルサイト</a>：避難所や災害リスクの全國家屋情報</li>
         </ul>
     </div>
     """,
