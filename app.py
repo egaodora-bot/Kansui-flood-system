@@ -18,7 +18,7 @@ st.markdown("""
 <style>
 
 /* ==========================================
-   V11：起動時注意書きの左枠線を赤系統に変更して注意喚起力を向上
+   V12：点滅アニメーション・リンク完全復活・防災UI最適化
    ========================================== */
 
 html, body,
@@ -55,6 +55,24 @@ section[data-testid="stMain"] {
     font-weight: 900 !important;
 }
 
+/* 起動時ご注意の点滅アニメーション */
+@keyframes blink-warning {
+    0% { opacity: 1.0; border-color: #ef4444; }
+    50% { opacity: 0.5; border-color: #b91c1c; }
+    100% { opacity: 1.0; border-color: #ef4444; }
+}
+
+.blinking-notice {
+    background-color: #111827 !important;
+    border: 2px solid #ef4444 !important;
+    border-left: 10px solid #ef4444 !important;
+    padding: 14px 18px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    color: #ffffff !important;
+    animation: blink-warning 2.5s infinite ease-in-out;
+}
+
 /* スマホ横向き案内カルテカード */
 .mobile-guide {
     background-color: #111827 !important;
@@ -64,6 +82,17 @@ section[data-testid="stMain"] {
     padding: 14px 16px;
     border-radius: 8px;
     margin-bottom: 15px;
+}
+
+/* リンク集カード */
+.link-card {
+    background-color: #111827 !important;
+    border: 1px solid #334155 !important;
+    border-left: 7px solid #10b981 !important;
+    padding: 16px;
+    border-radius: 8px;
+    margin-top: 20px;
+    margin-bottom: 20px;
 }
 
 div[data-testid="stExpander"] {
@@ -313,8 +342,7 @@ def fetch_jma_warning_level_areas(region_name):
     level_data = {
         "Level5": {},
         "Level4": {},
-        "Level3": {},
-        "Level2": {}
+        "Level3": {}
     }
 
     for office_code in office_codes:
@@ -344,7 +372,8 @@ def fetch_jma_warning_level_areas(region_name):
                         lvl = jma_level_from_code(w_code)
                         w_name = JMA_WARNING_NAMES.get(w_code)
                         
-                        if lvl and w_name and lvl in level_data:
+                        # 負荷軽減のためレベル3〜5に限定して抽出
+                        if lvl in ["Level3", "Level4", "Level5"] and w_name:
                             if w_name not in level_data[lvl]:
                                 level_data[lvl][w_name] = set()
                             level_data[lvl][w_name].add(name)
@@ -471,10 +500,10 @@ def fetch_region_prefecture_weather(region_name):
 # メイン画面の描画処理
 # ==========================================
 
-# 1. 起動時のご注意（左側の枠線を赤系統に変更して注意喚起を強化）
+# 1. 起動時のご注意（ゆっくり点滅する注意喚起カード）
 st.markdown(
     """
-    <div style="background-color: #111827; border: 1px solid #334155; padding: 14px 18px; border-radius: 8px; border-left: 7px solid #ef4444; margin-bottom: 20px; color: #ffffff;">
+    <div class="blinking-notice">
         <span style="color: #ef4444; font-weight: 900; font-size: 16px;">【起動時のご注意】</span><br><br>
         <span style="color: #ff6b6b; font-weight: 900;">一定時間アクセスがないと</span>「Zzzz」というスリープ画面が表示されます。<br>
         その場合は、<span style="color: #38bdf8; font-weight: 900;">画面にある青いボタン（Yes, get this app back up!）を1回押して</span>サーバーを復帰し正常表示します。
@@ -555,8 +584,8 @@ with col2:
 
 st.markdown("---")
 
-# 7. 警戒レベル・警報・注意報発令状況
-st.markdown(f"### ⚠️ {selected_region}エリアの警戒レベル・警報発令状況")
+# 7. 警戒レベル・警報・注意報発令状況（レベル3〜5の重要情報に絞り込み）
+st.markdown(f"### ⚠️ {selected_region}エリアの緊急警戒レベル（レベル3〜5）発令状況")
 
 warning_levels = fetch_jma_warning_level_areas(selected_region)
 has_any_warning = False
@@ -575,19 +604,12 @@ if warning_levels.get("Level4"):
 
 if warning_levels.get("Level3"):
     has_any_warning = True
-    st.warning("🟧 **【レベル3】警報発令中**（高齢者等は危険な場所から避難してください）")
+    st.warning("🟧 **【level3】警報発令中**（高齢者等は危険な場所から避難してください）")
     for w_name, cities in warning_levels["Level3"].items():
         st.write(f"- **{w_name}**: {', '.join(cities)}")
 
-if warning_levels.get("Level2"):
-    has_any_warning = True
-    with st.expander("🟦 **【レベル2】注意報発令中の地域を確認（タップして開く）**", expanded=True):
-        for w_name, cities in warning_levels["Level2"].items():
-            cities_str = "、".join(cities)
-            st.markdown(f"・**{w_name}**: {cities_str}")
-
 if not has_any_warning:
-    st.success("🟢 現在、対象エリアに発表されている警戒レベル2以上の警報・注意報はありません。")
+    st.success("🟢 現在、対象エリアに発表されている緊急警戒レベル（レベル3〜5）の警報はありません。")
 
 st.markdown("---")
 
@@ -603,3 +625,22 @@ st.markdown(f"### 📋 {selected_region}管内 都道府県別ステータス")
 pref_weather_list = fetch_region_prefecture_weather(selected_region)
 for pw in pref_weather_list:
     st.markdown(f"**{pw['prefecture']}** (最高: {pw['max_temp']}°C) └ 予報: {pw['comment']}")
+
+st.markdown("---")
+
+# 10. 災害防災リンク集（5つのリンクを完全復活）
+st.markdown(
+    """
+    <div class="link-card">
+        <b>🔗 防災関連リンク集（公式・リアルタイム情報）</b><br><br>
+        <ul>
+            <li><a href="https://www.jma.go.jp/bosai/" target="_blank">気象庁 防災情報ポータル</a>：全国の気象警報・台風・地震情報をリアルタイムで確認</li>
+            <li><a href="https://www.jma.go.jp/bosai/map.html" target="_blank">気象庁 キキクル（危険度分布）</a>：土砂災害・浸水害・洪水災害の危険度を地図で確認</li>
+            <li><a href="https://www.river.go.jp/" target="_blank">川の防災情報（国土交通省）</a>：全国の河川水位・ライブカメラ映像・ダム情報</li>
+            <li><a href="https://www.hazardmap.mlit.go.jp/" target="_blank">ハザードマップポータルサイト</a>：自宅や避難所の災害リスク（洪水・土砂・津波）を確認</li>
+            <li><a href="https://www.bousai.go.jp/" target="_blank">内閣府 防災情報ページ</a>：政府・自治体の避難指針や災害対策基本情報</li>
+        </ul>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
