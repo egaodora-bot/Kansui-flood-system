@@ -18,7 +18,7 @@ st.markdown("""
 <style>
 
 /* ==========================================
-   V10：注意書きの赤文字の視認性・コントラストを大幅強化
+   V11：起動時注意書きの左枠線を赤系統に変更して注意喚起力を向上
    ========================================== */
 
 html, body,
@@ -214,7 +214,7 @@ JMA_LEVEL_CODES = {
 }
 
 JMA_WARNING_NAMES = {
-    "10": "レベル2大雨注意報", "03": "Level3大雨警報", "43": "Level4大雨危険警報", "33": "Level5大雨特別警報",
+    "10": "Level2大雨注意報", "03": "Level3大雨警報", "43": "Level4大雨危険警報", "33": "Level5大雨特別警報",
     "29": "Level2土砂災害注意報", "09": "Level3土砂災害警報", "49": "Level4土砂災害危険警報", "39": "Level5土砂災害特別警報",
     "19": "Level2高潮注意報", "08": "Level3高潮警報", "48": "Level4高潮危険警報", "38": "Level5高潮特別警報",
     "15": "強風注意報", "05": "暴風警報", "35": "暴風特別警報", "13": "風雪注意報", "02": "暴風雪警報", "32": "暴風雪特別警報",
@@ -471,11 +471,11 @@ def fetch_region_prefecture_weather(region_name):
 # メイン画面の描画処理
 # ==========================================
 
-# 1. 起動時の注意書き（黒背景に、コントラスト抜群の明るい赤文字で強調）
+# 1. 起動時のご注意（左側の枠線を赤系統に変更して注意喚起を強化）
 st.markdown(
     """
-    <div style="background-color: #111827; border: 1px solid #334155; padding: 14px 18px; border-radius: 8px; border-left: 7px solid #38bdf8; margin-bottom: 20px; color: #ffffff;">
-        <span style="color: #38bdf8; font-weight: 900; font-size: 16px;">【起動時のご注意】</span><br><br>
+    <div style="background-color: #111827; border: 1px solid #334155; padding: 14px 18px; border-radius: 8px; border-left: 7px solid #ef4444; margin-bottom: 20px; color: #ffffff;">
+        <span style="color: #ef4444; font-weight: 900; font-size: 16px;">【起動時のご注意】</span><br><br>
         <span style="color: #ff6b6b; font-weight: 900;">一定時間アクセスがないと</span>「Zzzz」というスリープ画面が表示されます。<br>
         その場合は、<span style="color: #38bdf8; font-weight: 900;">画面にある青いボタン（Yes, get this app back up!）を1回押して</span>サーバーを復帰し正常表示します。
     </div>
