@@ -72,26 +72,6 @@ section[data-testid="stMain"] {
     color: #ffffff !important;
 }
 
-.mobile-guide {
-    background-color: #111827 !important;
-    color: #ffffff !important;
-    border: 1px solid #475569 !important;
-    border-left: 7px solid #38bdf8 !important;
-    padding: 14px 16px;
-    border-radius: 8px;
-    margin-bottom: 15px;
-}
-
-.purpose-card {
-    background-color: #111827 !important;
-    border: 1px solid #334155 !important;
-    border-left: 7px solid #3b82f6 !important;
-    padding: 14px 18px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    color: #ffffff !important;
-}
-
 .link-card {
     background-color: #111827 !important;
     border: 1px solid #334155 !important;
@@ -364,14 +344,38 @@ def fetch_region_prefecture_weather(region_name):
     return results
 
 # 画面描画
-st.markdown('<div class="notice-card"><span class="blinking-title">【起動時のご注意】</span><br><br>一定時間アクセスがないと「Zzzz」のスリープ画面になります。その際は<span style="color: #38bdf8; font-weight: 900;">青い復帰ボタン</span>を1回押して再開してください。</div>', unsafe_allow_html=True)
-
 st.title("🛡️ 全国インフラ・気象防災カルテ・リアルリンク共用システム")
 st.markdown("災害時のリアルタイム気象状況・インフラ・地震情報をモバイル最適化で一元管理します。")
 
-st.markdown('<div class="purpose-card"><b>🎯 本システムの開発目的と解説</b><br><br>・<b>目的</b>：気象庁の公式一次情報（地震速報・特別警報・キキクル）と、生活・交通インフラのリアルタイム状況を1画面で素早く確認。<br>・<b>解説</b>：広告や不要な装飾を削ぎ落とし、災害時や電波が不安定な状況下でもスマホから軽量かつ直感的に命を守る判断ができるよう設計されています。</div>', unsafe_allow_html=True)
+# 折り畳み式の統合ガイド＆開発目的カルテ（全項目をカテゴリ＋段落で整理）
+st.markdown(
+    """
+    <details style="background-color: #111827; border: 1px solid #475569; border-left: 7px solid #3b82f6; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; color: #ffffff;">
+        <summary style="font-weight: 900; cursor: pointer; color: #ffffff; font-size: 15px;">
+            📱 <span style="color: #60a5fa;">【タップして展開】</span> 本システムのご利用案内・開発目的・スマホ操作解説
+        </summary>
+        <div style="margin-top: 12px; padding-top: 10px; border-top: 1px solid #334155; line-height: 1.6;">
+            
+            <b>「開発の目的」</b>：<br>
+             気象庁の公式一次情報（地震速報・特別警報・キキクル）と、生活・交通インフラのリアルタイム状況を1つの画面で素早く確認できるように開発しています。<br><br>
+            
+            <b>「設計思想」</b>：<br>
+             広告や不要な装飾を削ぎ落とし、災害時や電波が不安定な状況下でもスマホから軽量かつ直感的に命を守る判断ができるよう最適化しています。<br><br>
+            
+            <b>「画面表示の復帰」</b>：<br>
+             一定時間アクセスがないと「Zzzz」のスリープ画面になります。その際は、青い復帰ボタンを1回押して再開してください。<br><br>
+            
+            <b>「ワイド表示への切り替え」</b>：<br>
+             スマホを「横向き」にするとデスクトップ表示（ワイド画面）に切り替わり、地図やエリア情報を見渡しやすくなります。<br><br>
+            
+            <b>「ショートカットの活用」</b>：<br>
+             ホーム画面にショートカットを追加しておくと、いざという時にワンタップで瞬時に起動できます。
 
-st.markdown('<div class="mobile-guide"><b>📱 スマホ操作の解説</b><br>・スマホを「横向き」にするとデスクトップ表示（ワイド画面）に切り替わり、地図やエリア情報を見渡しやすくなります。</div>', unsafe_allow_html=True)
+        </div>
+    </details>
+    """,
+    unsafe_allow_html=True
+)
 
 st.markdown("---")
 
@@ -390,7 +394,7 @@ st.markdown(f"### ⚠️ {selected_region}エリアの緊急警戒レベル（�
 st.markdown("<p style='font-size:13px; color:#94a3b8;'>気象庁が発表している土砂災害や大雨等の厳戒警報・特別警報をレベル別に集約表示します。</p>", unsafe_allow_html=True)
 warnings = fetch_jma_warning_level_areas(selected_region)
 has_warn = False
-for lvl, color, title in [("Level5", "error", "🚨 【レベル5】特別警報発令中（直ちに命を守る行動を）"), ("Level4", "error", "🟥 【Level4】危険警報発令中（危険な場所から全員避難）"), ("Level3", "warning", "🟧 【Level3】警報発令中（高齢者等は避難準備）")]:
+for lvl, color, title in [("Level5", "error", "🚨 【Level5】特別警報発令中（直ちに命を守る行動を）"), ("Level4", "error", "🟥 【Level4】危険警報発令中（危険な場所から全員避難）"), ("Level3", "warning", "🟧 【Level3】警報発令中（高齢者等は避難準備）")]:
     if warnings.get(lvl):
         has_warn = True
         getattr(st, color)(title)
