@@ -255,7 +255,6 @@ def fetch_jma_area_names():
 
 @st.cache_data(ttl=60)
 def fetch_jma_earthquake_info():
-    """気象庁の公式地震情報JSONから直近の地震情報を取得"""
     url = "https://www.jma.go.jp/bosai/information/data/quake.json"
     try:
         req = urllib.request.Request(
@@ -267,15 +266,10 @@ def fetch_jma_earthquake_info():
             
         if quakes and isinstance(quakes, list):
             latest = quakes[0]
-            # 各種パラメータの抽出
-            # 日時
             time_str = latest.get("at", "日時不明")
-            # 震源地
             hypo = latest.get("hypocenter", {}).get("name", "震源地不明")
-            # 最大震度
             max_scale = latest.get("maxScale", "不明")
             
-            # 震度コードを一般的な表現に変換するマッピング（例: 30=震度3, 40=震度4, 45=震度5弱 等）
             scale_map = {
                 "10": "震度1", "20": "震度2", "30": "震度3", "40": "震度4",
                 "45": "震度5弱", "50": "震度5強", "55": "震度6弱", "60": "震度6強", "70": "震度7"
@@ -374,7 +368,6 @@ def fetch_jma_realtime_data(region_name):
             weather_forecasts = []
             
             max_temp_val = "--"
-            min_temp_val = "--"
             current_temp_val = "--"
 
             for series in data[0].get("timeSeries", []):
@@ -387,8 +380,6 @@ def fetch_jma_realtime_data(region_name):
                             max_temp_val = temps[1]
                         elif len(temps) > 0 and temps[0] != "":
                             max_temp_val = temps[0]
-                        if len(temps) > 2 and temps[2] != "":
-                            min_temp_val = temps[2]
 
                 areas = series.get("areas", [])
                 for area in areas:
@@ -404,8 +395,7 @@ def fetch_jma_realtime_data(region_name):
                 "office": office,
                 "forecasts": weather_forecasts[:4] if weather_forecasts else [f"【{region_name}】 &nbsp; &nbsp; エリアの気象データを正常に取得しました。"],
                 "current_temp": current_temp_val,
-                "max_temp": max_temp_val,
-                "min_temp": min_temp_val
+                "max_temp": max_temp_val
             }
     except Exception as e:
         return {
@@ -413,8 +403,7 @@ def fetch_jma_realtime_data(region_name):
             "office": "気象庁（オフライン/フォールバック）",
             "forecasts": [f"【{region_name}】 &nbsp; &nbsp; リアルタイムAPI接続確認中（通信環境または制限によりキャッシュ表示中）"],
             "current_temp": "28.5",
-            "max_temp": "32.0",
-            "min_temp": "24.1"
+            "max_temp": "32.0"
         }
 
 @st.cache_data(ttl=300)
@@ -434,7 +423,6 @@ def fetch_region_prefecture_weather(region_name):
 
             weather = ""
             max_t = "--"
-            min_t = "--"
 
             for series in data[0].get("timeSeries", []):
                 for area in series.get("areas", []):
@@ -442,10 +430,8 @@ def fetch_region_prefecture_weather(region_name):
                     if temps:
                         if len(temps) > 0 and temps[0] != "":
                             max_t = temps[0]
-                        if len(temps) > 1 and temps[1] != "":
-                            min_t = temps[1]
-                        elif len(temps) > 1 and temps[1] == "" and len(temps) > 0:
-                            min_t = temps[0]
+                        elif len(temps) > 1 and temps[1] != "":
+                            max_t = temps[1]
 
                 for area in series.get("areas", []):
                     weathers = area.get("weathers", [])
@@ -461,7 +447,6 @@ def fetch_region_prefecture_weather(region_name):
                 "weather": weather_label,
                 "comment": weather or "天気情報を取得しました。",
                 "max_temp": max_t,
-                "min_temp": min_t,
             })
         except Exception:
             results.append({
@@ -470,7 +455,6 @@ def fetch_region_prefecture_weather(region_name):
                 "weather": "取得できず",
                 "comment": "リアルタイム気象情報を取得できませんでした。",
                 "max_temp": "--",
-                "min_temp": "--",
             })
 
     return results
@@ -495,7 +479,7 @@ st.title("🛡️ 全国インフラ・気象防災カルテ・リアルリン�
 st.markdown("災害時のリアルタイム気象状況・インフラ・地震情報をモバイル最適化で提供します。")
 st.markdown("---")
 
-# 2. 地震情報の常時表示セクション（新規追加・折りたたみなし）
+# 2. 地震情報の常時表示セクション
 st.markdown("### 📳 直近の地震情報（気象庁速報）")
 eq_data = fetch_jma_earthquake_info()
 
@@ -516,16 +500,14 @@ selected_region = st.selectbox("🌍 監視エリアを選択してください"
 # 4. 気象データ取得
 weather_data = fetch_jma_realtime_data(selected_region)
 
-# 5. 気象・温度状況の常時表示レイアウト（最高・最低気温含む）
-st.markdown("### 🌡️ 気象・温度状況（現在地 / 予報）")
+# 5. 気象・温度状況の常時表示レイアウト（表現を「監視エリア平均気温」に変更し、2カラムですっきり表示）
+st.markdown(f"### 🌡️ 気象・温度状況 ({selected_region}エリアの代表値)")
 
-col1, col2, col3 = st.columns(3)
+col1, col2 = st.columns(2)
 with col1:
     st.metric(label="現在気温", value=f"{weather_data['current_temp']}°C")
 with col2:
-    st.metric(label="最高気温", value=f"{weather_data['max_temp']}°C")
-with col3:
-    st.metric(label="最低気温", value=f"{weather_data['min_temp']}°C")
+    st.metric(label="予想最高気温", value=f"{weather_data['max_temp']}°C")
 
 st.markdown("---")
 
@@ -576,8 +558,8 @@ for forecast in weather_data["forecasts"]:
 
 st.markdown("---")
 
-# 8. 都道府県別の詳細ステータス（最高・最低気温を反映）
+# 8. 都道府県別の詳細ステータス（最高気温のみをスッキリ表示）
 st.markdown(f"### 📋 {selected_region}管内 都道府県別ステータス")
 pref_weather_list = fetch_region_prefecture_weather(selected_region)
 for pw in pref_weather_list:
-    st.markdown(f"**{pw['prefecture']}** (最高: {pw['max_temp']}°C / 最低: {pw['min_temp']}°C) └ 予報: {pw['comment']}")
+    st.markdown(f"**{pw['prefecture']}** (最高: {pw['max_temp']}°C) └ 予報: {pw['comment']}")
