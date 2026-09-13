@@ -18,8 +18,7 @@ st.markdown("""
 <style>
 
 /* ==========================================
-   V4：防災UIコントラスト統一設計
-   「白文字＋白背景」を発生させない
+   V5：タイトルサイズ最適化・防災UIデザイン
    ========================================== */
 
 html, body,
@@ -42,7 +41,13 @@ section[data-testid="stMain"] {
     color: #ffffff;
 }
 
-[data-testid="stAppViewContainer"] h1,
+/* タイトルの大きさを常識的なサイズに調整 (h1) */
+[data-testid="stAppViewContainer"] h1 {
+    color: #ffffff !important;
+    font-size: 1.8rem !important;
+    font-weight: 800 !important;
+}
+
 [data-testid="stAppViewContainer"] h2,
 [data-testid="stAppViewContainer"] h3,
 [data-testid="stAppViewContainer"] h4 {
@@ -463,7 +468,7 @@ def fetch_region_prefecture_weather(region_name):
 # メイン画面の描画処理
 # ==========================================
 
-# 1. 起動時の注意書き（HTMLで色を指定：赤と青のダブルチェック案内）
+# 1. 起動時の注意書き
 st.markdown(
     """
     <div style="background-color: #382512; border: 1px solid #d97706; padding: 12px 16px; border-radius: 8px; margin-bottom: 20px; color: #ffffff;">
