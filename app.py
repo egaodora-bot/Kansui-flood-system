@@ -18,7 +18,7 @@ st.markdown("""
 <style>
 
 /* ==========================================
-   V12：点滅アニメーション・リンク完全復活・防災UI最適化
+   V14：タイトル点滅最適化・5大防災リンク完全復活版
    ========================================== */
 
 html, body,
@@ -55,22 +55,30 @@ section[data-testid="stMain"] {
     font-weight: 900 !important;
 }
 
-/* 起動時ご注意の点滅アニメーション */
-@keyframes blink-warning {
-    0% { opacity: 1.0; border-color: #ef4444; }
-    50% { opacity: 0.5; border-color: #b91c1c; }
-    100% { opacity: 1.0; border-color: #ef4444; }
+/* 「起動時のご注意」のタイトル文字だけを優しく点滅させるアニメーション */
+@keyframes title-blink {
+    0% { opacity: 1.0; }
+    50% { opacity: 0.3; }
+    100% { opacity: 1.0; }
 }
 
-.blinking-notice {
+.blinking-title {
+    color: #ef4444 !important;
+    font-weight: 900;
+    font-size: 16px;
+    animation: title-blink 2.0s infinite ease-in-out;
+    display: inline-block;
+}
+
+/* 起動時ご注意カード（背景・枠は固定で落ち着いたデザイン） */
+.notice-card {
     background-color: #111827 !important;
-    border: 2px solid #ef4444 !important;
-    border-left: 10px solid #ef4444 !important;
+    border: 1px solid #334155 !important;
+    border-left: 7px solid #ef4444 !important;
     padding: 14px 18px;
     border-radius: 8px;
     margin-bottom: 20px;
     color: #ffffff !important;
-    animation: blink-warning 2.5s infinite ease-in-out;
 }
 
 /* スマホ横向き案内カルテカード */
@@ -372,7 +380,6 @@ def fetch_jma_warning_level_areas(region_name):
                         lvl = jma_level_from_code(w_code)
                         w_name = JMA_WARNING_NAMES.get(w_code)
                         
-                        # 負荷軽減のためレベル3〜5に限定して抽出
                         if lvl in ["Level3", "Level4", "Level5"] and w_name:
                             if w_name not in level_data[lvl]:
                                 level_data[lvl][w_name] = set()
@@ -500,11 +507,11 @@ def fetch_region_prefecture_weather(region_name):
 # メイン画面の描画処理
 # ==========================================
 
-# 1. 起動時のご注意（ゆっくり点滅する注意喚起カード）
+# 1. 起動時のご注意（タイトルのみ点滅、カード背景は安定表示）
 st.markdown(
     """
-    <div class="blinking-notice">
-        <span style="color: #ef4444; font-weight: 900; font-size: 16px;">【起動時のご注意】</span><br><br>
+    <div class="notice-card">
+        <span class="blinking-title">【起動時のご注意】</span><br><br>
         <span style="color: #ff6b6b; font-weight: 900;">一定時間アクセスがないと</span>「Zzzz」というスリープ画面が表示されます。<br>
         その場合は、<span style="color: #38bdf8; font-weight: 900;">画面にある青いボタン（Yes, get this app back up!）を1回押して</span>サーバーを復帰し正常表示します。
     </div>
@@ -584,7 +591,7 @@ with col2:
 
 st.markdown("---")
 
-# 7. 警戒レベル・警報・注意報発令状況（レベル3〜5の重要情報に絞り込み）
+# 7. 警戒レベル・警報・注意報発令状況（レベル3〜5に絞り込み）
 st.markdown(f"### ⚠️ {selected_region}エリアの緊急警戒レベル（レベル3〜5）発令状況")
 
 warning_levels = fetch_jma_warning_level_areas(selected_region)
@@ -604,7 +611,7 @@ if warning_levels.get("Level4"):
 
 if warning_levels.get("Level3"):
     has_any_warning = True
-    st.warning("🟧 **【level3】警報発令中**（高齢者等は危険な場所から避難してください）")
+    st.warning("🟧 **【Level3】警報発令中**（高齢者等は危険な場所から避難してください）")
     for w_name, cities in warning_levels["Level3"].items():
         st.write(f"- **{w_name}**: {', '.join(cities)}")
 
@@ -628,17 +635,17 @@ for pw in pref_weather_list:
 
 st.markdown("---")
 
-# 10. 災害防災リンク集（5つのリンクを完全復活）
+# 10. 災害防災リンク集（Yahoo!天気など5つのリンクを完全復活）
 st.markdown(
     """
     <div class="link-card">
         <b>🔗 防災関連リンク集（公式・リアルタイム情報）</b><br><br>
         <ul>
+            <li><a href="https://weather.yahoo.co.jp/weather/" target="_blank">Yahoo!天気・災害</a>：全国の天気予報、雨雲レーダー、台風情報を詳細確認</li>
             <li><a href="https://www.jma.go.jp/bosai/" target="_blank">気象庁 防災情報ポータル</a>：全国の気象警報・台風・地震情報をリアルタイムで確認</li>
             <li><a href="https://www.jma.go.jp/bosai/map.html" target="_blank">気象庁 キキクル（危険度分布）</a>：土砂災害・浸水害・洪水災害の危険度を地図で確認</li>
             <li><a href="https://www.river.go.jp/" target="_blank">川の防災情報（国土交通省）</a>：全国の河川水位・ライブカメラ映像・ダム情報</li>
             <li><a href="https://www.hazardmap.mlit.go.jp/" target="_blank">ハザードマップポータルサイト</a>：自宅や避難所の災害リスク（洪水・土砂・津波）を確認</li>
-            <li><a href="https://www.bousai.go.jp/" target="_blank">内閣府 防災情報ページ</a>：政府・自治体の避難指針や災害対策基本情報</li>
         </ul>
     </div>
     """,
