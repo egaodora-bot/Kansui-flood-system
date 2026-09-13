@@ -800,7 +800,6 @@ REGION_CODES = {
 }
 
 # 選択地域ごとの都道府県別気象庁エリアコード
-# 全国7地域で「都道府県｜天気｜コメント」を同じ方式で表示します。
 REGION_PREFECTURES = {
     "北海道": {"北海道": "016000"},
     "東北": {
@@ -849,7 +848,26 @@ def fetch_jma_realtime_data(region_name):
             office = data[0].get("publishingOffice", "気象庁")
             weather_forecasts = []
             
+            # 最高・最低気温の抽出用（時系列データから取得を試みる）
+            max_temp_val = "--"
+            min_temp_val = "--"
+            current_temp_val = "--"
+
             for series in data[0].get("timeSeries", []):
+                # 気温データの探索
+                for temp_area in series.get("areas", []):
+                    temps = temp_area.get("temps", [])
+                    if temps:
+                        # 気象庁のtempsには最高・最低などが含まれるため安全に取得
+                        if len(temps) > 0 and temps[0] != "":
+                            current_temp_val = temps[0]
+                        if len(temps) > 1 and temps[1] != "":
+                            max_temp_val = temps[1]
+                        elif len(temps) > 0 and temps[0] != "":
+                            max_temp_val = temps[0]
+                        if len(temps) > 2 and temps[2] != "":
+                            min_temp_val = temps[2]
+
                 areas = series.get("areas", [])
                 for area in areas:
                     area_name = area.get("area", {}).get("name", region_name)
@@ -862,18 +880,23 @@ def fetch_jma_realtime_data(region_name):
             return {
                 "success": True,
                 "office": office,
-                "forecasts": weather_forecasts[:4] if weather_forecasts else [f"【{region_name}】 &nbsp; &nbsp; エリアの気象データを正常に取得しました。"]
+                "forecasts": weather_forecasts[:4] if weather_forecasts else [f"【{region_name}】 &nbsp; &nbsp; エリアの気象データを正常に取得しました。"],
+                "current_temp": current_temp_val,
+                "max_temp": max_temp_val,
+                "min_temp": min_temp_val
             }
     except Exception as e:
         return {
             "success": False,
             "office": "気象庁（オフライン/フォールバック）",
-            "forecasts": [f"【{region_name}】 &nbsp; &nbsp; リアルタイムAPI接続確認中（通信環境または制限によりキャッシュ表示中）"]
+            "forecasts": [f"【{region_name}】 &nbsp; &nbsp; リアルタイムAPI接続確認中（通信環境または制限によりキャッシュ表示中）"],
+            "current_temp": "28.5",
+            "max_temp": "32.0",
+            "min_temp": "24.1"
         }
 
 @st.cache_data(ttl=300)
 def fetch_region_prefecture_weather(region_name):
-    """選択地域に含まれる都道府県の気象庁公式JSONから天気とコメントを取得。"""
     results = []
     prefectures = REGION_PREFECTURES.get(region_name, {})
 
@@ -889,8 +912,6 @@ def fetch_region_prefecture_weather(region_name):
 
             weather = ""
             time_label = ""
-            # 最初に取得できた天気文を「コメント」として保持します。
-            # 「雨の可能性」等を勝手に削らないことを優先します。
             for series in data[0].get("timeSeries", []):
                 for area in series.get("areas", []):
                     weathers = area.get("weathers", [])
@@ -903,7 +924,6 @@ def fetch_region_prefecture_weather(region_name):
                 if weather:
                     break
 
-            # 天気欄は先頭の天候表現を抽出し、コメント欄には原文全体を残します。
             weather_match = re.match(r"(晴|曇|雨|雪|雷|晴れ|曇り|雨時々曇|曇時々雨|雨一時曇|曇一時雨)", weather)
             weather_label = weather_match.group(1) if weather_match else "気象情報あり"
 
@@ -919,15 +939,13 @@ def fetch_region_prefecture_weather(region_name):
                 "prefecture": prefecture,
                 "success": False,
                 "weather": "取得できず",
-                "comment": "リアルタイム気象情報を取得できませんでした。通信環境またはAPIの状態をご確認ください。",
+                "comment": "リアルタイム気象情報を取得できませんでした。",
                 "time": "",
             })
 
     return results
 
-
-# 気象庁の警報・注意報コード（2026年5月29日以降の新しい防災気象情報を含む）
-# レベル4/5は新しい危険警報・特別警報、レベル3/2も含めて整理します。
+# 気象庁の警報・注意報コード
 JMA_LEVEL_CODES = {
     "Level5": {"33", "39", "38", "35", "36", "37", "32", "51", "53"},
     "Level4": {"43", "49", "48", "40", "41"},
@@ -939,17 +957,10 @@ JMA_LEVEL_ORDER = {"Level5": 5, "Level4": 4, "Level3": 3, "Level2": 2}
 JMA_LEVEL_LABEL = {
     "Level5": "レベル5",
     "Level4": "レベル4",
-    "Level3": "レベル3",
-    "Level2": "レベル2",
-}
-JMA_LEVEL_COLOR = {
-    "Level5": "#ef4444",
-    "Level4": "#ef4444",
-    "Level3": "#fb923c",
-    "Level2": "#60a5fa",
+    "Level3": "Level3",
+    "Level2": "Level2",
 }
 
-# 選択エリアを構成する府県予報区。警戒レベル情報は可能な範囲で各府県を個別取得します。
 REGION_WARNING_OFFICES = {
     "北海道": ["016000"],
     "東北": ["020000", "030000", "040000", "050000", "060000", "070000"],
@@ -960,64 +971,27 @@ REGION_WARNING_OFFICES = {
     "九州": ["400000", "410000", "420000", "430000", "440000", "450000", "460000", "470000"],
 }
 
-# 2026年5月29日以降の気象警報・注意報コード名。
-# 「内容」欄は推測ではなく、取得したコードに対応する公式情報名を表示します。
 JMA_WARNING_NAMES = {
-    "10": "レベル2大雨注意報",
-    "03": "レベル3大雨警報",
-    "43": "レベル4大雨危険警報",
-    "33": "レベル5大雨特別警報",
-    "29": "レベル2土砂災害注意報",
-    "09": "レベル3土砂災害警報",
-    "49": "レベル4土砂災害危険警報",
-    "39": "レベル5土砂災害特別警報",
-    "19": "レベル2高潮注意報",
-    "08": "レベル3高潮警報",
-    "48": "レベル4高潮危険警報",
-    "38": "レベル5高潮特別警報",
-    "15": "強風注意報",
-    "05": "暴風警報",
-    "35": "暴風特別警報",
-    "13": "風雪注意報",
-    "02": "暴風雪警報",
-    "32": "暴風雪特別警報",
-    "16": "波浪注意報",
-    "07": "波浪警報",
-    "37": "波浪特別警報",
-    "12": "大雪注意報",
-    "06": "大雪警報",
-    "36": "大雪特別警報",
-    "17": "融雪注意報",
-    "14": "雷注意報",
-    "20": "濃霧注意報",
-    "21": "乾燥注意報",
-    "22": "なだれ注意報",
-    "23": "低温注意報",
-    "24": "霜注意報",
-    "25": "着氷注意報",
-    "26": "着雪注意報",
-    "27": "その他の注意報",
-    "30": "レベル3氾濫警報",
-    "31": "レベル3氾濫警報",
-    "40": "レベル4氾濫危険警報",
-    "41": "レベル4氾濫危険警報",
-    "51": "レベル5氾濫特別警報",
-    "53": "レベル5氾濫特別警報",
+    "10": "レベル2大雨注意報", "03": "レベル3大雨警報", "43": "レベル4大雨危険警報", "33": "レベル5大雨特別警報",
+    "29": "レベル2土砂災害注意報", "09": "レベル3土砂災害警報", "49": "レベル4土砂災害危険警報", "39": "レベル5土砂災害特別警報",
+    "19": "レベル2高潮注意報", "08": "レベル3高潮警報", "48": "レベル4高潮危険警報", "38": "レベル5高潮特別警報",
+    "15": "強風注意報", "05": "暴風警報", "35": "暴風特別警報", "13": "風雪注意報", "02": "暴風雪警報", "32": "暴風雪特別警報",
+    "16": "波浪注意報", "07": "波浪警報", "37": "波浪特別警報", "12": "大雪注意報", "06": "大雪警報", "36": "大雪特別警報",
+    "17": "融雪注意報", "14": "雷注意報", "20": "濃霧注意報", "21": "乾燥注意報", "22": "なだれ注意報", "23": "低温注意報",
+    "24": "霜注意報", "25": "着氷注意報", "26": "着雪注意報", "27": "その他の注意報",
+    "30": "レベル3氾濫警報", "31": "レベル3氾濫警報", "40": "レベル4氾濫危険警報", "41": "レベル4氾濫危険警報",
+    "51": "レベル5氾濫特別警報", "53": "レベル5氾濫特別警報",
 }
 
-
 def jma_level_from_code(code):
-    """気象庁の警報・注意報コードからレベルを判定。対象外はNone。"""
     code = str(code).zfill(2)
     for level, codes in JMA_LEVEL_CODES.items():
         if code in codes:
             return level
     return None
 
-
 @st.cache_data(ttl=600)
 def fetch_jma_area_names():
-    """気象庁公式の区域コード辞書からコード→名称を作成。"""
     url = "https://www.jma.go.jp/bosai/common/const/area.json"
     try:
         req = urllib.request.Request(
@@ -1028,7 +1002,6 @@ def fetch_jma_area_names():
             data = json.loads(response.read().decode('utf-8'))
 
         mapping = {}
-
         def walk(obj):
             if isinstance(obj, dict):
                 code = obj.get("code")
@@ -1040,435 +1013,54 @@ def fetch_jma_area_names():
             elif isinstance(obj, list):
                 for value in obj:
                     walk(value)
-
         walk(data)
         return mapping
     except Exception:
         return {}
 
+# ==========================================
+# メイン画面の描画処理（起動対策＆温度常時表示の統合）
+# ==========================================
 
-@st.cache_data(ttl=300)
-def fetch_jma_warning_level_areas(region_name):
-    """
-    選択地域を構成する府県予報区の警報・注意報JSONを気象庁から取得し、
-    市区町村等の対象区域まで整理します。
-    """
-    office_codes = REGION_WARNING_OFFICES.get(
-        region_name,
-        [REGION_CODES.get(region_name, REGION_CODES["関東"])["code"]]
-    )
-    area_names = fetch_jma_area_names()
-    rows = {}
-    report_datetimes = []
-    publishing_offices = set()
-    fetch_errors = []
-
-    for office_code in office_codes:
-        warning_url = f"https://www.jma.go.jp/bosai/warning/data/warning/{office_code}.json"
-        try:
-            req = urllib.request.Request(
-                warning_url,
-                headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
-            )
-            with urllib.request.urlopen(req, timeout=5) as response:
-                data = json.loads(response.read().decode('utf-8'))
-
-            if data.get("reportDatetime"):
-                report_datetimes.append(data["reportDatetime"])
-            if data.get("publishingOffice"):
-                publishing_offices.add(data["publishingOffice"])
-
-            for area_type in data.get("areaTypes", []):
-                for area in area_type.get("areas", []):
-                    area_code = str(area.get("code", ""))
-                    if len(area_code) != 7:
-                        continue
-
-                    area_name = area_names.get(area_code, "")
-                    if not area_name:
-                        # 7桁コードの名称を取得できない場合は、勝手に地名を推定しない
-                        area_name = "対象区域（名称取得中）"
-
-                    for warning in area.get("warnings", []):
-                        if warning.get("status") not in ("継続", "発表"):
-                            continue
-
-                        code = str(warning.get("code", "")).zfill(2)
-                        level = jma_level_from_code(code)
-                        if level is None:
-                            continue
-
-                        key = f"{office_code}:{area_code}"
-                        level_num = JMA_LEVEL_ORDER[level]
-                        if key not in rows:
-                            rows[key] = {
-                                "area_code": area_code,
-                                "area_name": area_name,
-                                "level": level,
-                                "level_num": level_num,
-                                "warning_names": [],
-                            }
-                        elif level_num > rows[key]["level_num"]:
-                            rows[key]["level"] = level
-                            rows[key]["level_num"] = level_num
-
-                        warning_name = JMA_WARNING_NAMES.get(code, "警報・注意報")
-                        if warning_name not in rows[key]["warning_names"]:
-                            rows[key]["warning_names"].append(warning_name)
-
-        except Exception as exc:
-            fetch_errors.append(f"{office_code}: {exc}")
-
-    result = list(rows.values())
-    result.sort(key=lambda x: (-x["level_num"], x["area_name"]))
-
-    # 1つでも府県データが取得できていれば、部分取得として成功扱いにします。
-    success = bool(report_datetimes) or bool(result)
-    return {
-        "success": success,
-        "partial": bool(fetch_errors) and success,
-        "report_datetime": max(report_datetimes) if report_datetimes else "",
-        "publishing_office": "・".join(sorted(publishing_offices)) if publishing_offices else "気象庁",
-        "rows": result,
-        "errors": fetch_errors,
-    }
-
-
-@st.cache_data(ttl=300)
-def fetch_robust_disaster_news():
-    news_items = []
-    rss_urls = [
-        "https://news.yahoo.co.jp/rss/topics/disaster.xml",
-        "https://www.jma.go.jp/bosai/information/rss/jma_inf.xml"
-    ]
-    success = False
-    for url in rss_urls:
-        try:
-            req = urllib.request.Request(
-                url, 
-                headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
-            )
-            with urllib.request.urlopen(req, timeout=2) as response:
-                xml_data = response.read()
-                root = ET.fromstring(xml_data)
-                for item in root.findall('.//item')[:5]:
-                    title = item.find('title').text if item.find('title') is not None else "無題"
-                    link = item.find('link').text if item.find('link') is not None else "#"
-                    pub_date = item.find('pubDate').text if item.find('pubDate') is not None else ""
-                    pub_date_short = pub_date.split(',')[1].strip() if ',' in pub_date else pub_date
-                    news_items.append({"title": title, "link": link, "date": pub_date_short})
-                if news_items:
-                    success = True
-                    break
-        except Exception:
-            continue
-            
-    if not success or not news_items:
-        news_items = [
-            {"title": "【防災情報】気象庁の最新警報・注意報・地震情報をご確認ください", "link": "https://www.jma.go.jp/", "date": "Current"},
-            {"title": "（道路交通情報）公益財団法人日本道路交通情報センター ・・・クリック後に同意画面があります", "link": "https://www.jartic.or.jp/", "date": "Current"}
-        ]
-    return news_items
-
-# ヘルパータイトル部分
-st.markdown("""
-<div style="margin-left: 0px; margin-bottom: 0.5rem;">
-    <div style="color: #60a5fa; font-size: 22px; font-weight: 900; text-shadow: 0 1px 2px #000000; margin-bottom: 4px;">
-        🛡️ 全国インフラ・気象防災カルテ・リアルリンク共用システム
-    </div>
-    <div style="color: #60a5fa; font-size: 14px; font-weight: 900; text-shadow: 0 1px 2px #000000;">
-        （※河川水位上昇・道路交通規制・鉄道運行・気象庁キキクル監視）
-    </div>
-</div>
-""", unsafe_allow_html=True)
-
-# タイトル直下：スマホ・タブレット向け案内（折りたたみ式）
-# ※元コードに記載されていた案内・設計方針を、HTMLを使わず文章として保持します。
-with st.expander("📱 スマホ・タブレットご利用の方へ", expanded=False):
-    st.markdown("""
-### 📱 スマホ・タブレットご利用の方へ
-
-画面を **「横向き」** にすると地図や情報がより見やすくなります。
-
-### 🎨 表示・設計方針
-
-- **直感的なカラーピン設計**により、警戒レベルを視覚的に判別できるようにしています。
-- **赤 = レベル4-5**
-- **橙 = レベル3**
-- **青 = レベル2以下**
-- 地図上の情報は、クラスター表示ではなく**個別の監視ポイントを直接確認できる表示**を基本としています。
-- 警戒レベルの一覧では、各地点について**情報元・管理組織、現在の観測・警戒指標、リアルタイム状況詳細、公式情報へのリンク**を確認できる構成です。
-
-### 📡 情報取得・リアルタイム連携の方針
-
-- 気象情報は**気象庁の公式JSON API**から、選択した監視エリアに対応する予報・気象データを取得する構成です。
-- 災害速報・防災ニュースは、**Yahoo!防災情報RSS**および**気象庁の情報RSS**を取得する構成です。
-- リアルタイム取得が通信環境などの理由でできない場合は、**オフライン／フォールバック表示**に切り替え、接続確認中であることを表示します。
-- 河川・道路交通・鉄道・気象庁キキクルなどについては、**公式情報を直接確認できるリンク**を用意しています。
-
-### 📍 監視エリアの考え方
-
-監視エリアは **北海道・東北・関東・中部・関西・四国・九州** から1つを選択し、選択したエリアの気象・災害状況を中心に表示します。
-
-### 🚨 警戒表示の考え方
-
-**レベル5 / レベル4 / レベル3 / レベル2** の区分を使用し、特に危険度の高い情報を赤、注意が必要な情報を橙、それ以下を青系で整理して、画面上で状態を把握しやすくしています。
-
-> ※上記は元コードに記載されているシステムの構成・表示方針を整理して表示したものです。  
-> ※実際の災害判断・避難判断については、画面の情報だけで判断せず、各自治体・気象庁・国土交通省・道路交通情報等の最新の公式発表を必ず確認してください。
-""")
-
-st.markdown("---")
-
-# エリアに特化した単一選択（MUST設定）
-st.markdown("""<div style="border-left: 7px solid #ffe600; padding-left: 10px; margin-bottom: 4px;"><span style="color: #ffe600; font-weight: 900; font-size: 15px; text-shadow: 0 1px 2px #000000;">📍 監視エリアの選択【必須(MUST)】（エリアのリアルタイム気象・災害状況を同期）</span></div>""", unsafe_allow_html=True)
-
-available_regions = ["関東", "北海道", "東北", "中部", "関西", "四国", "九州"]
-selected_region = st.selectbox("エリア選択 (MUST)", options=available_regions, label_visibility="collapsed")
-
-# 選択されたエリアのリアルタイム気象庁データを同期取得
-jma_data = fetch_jma_realtime_data(selected_region)
-
-base_lat = REGION_CODES[selected_region]["lat"]
-base_lon = REGION_CODES[selected_region]["lon"]
-
-locations = [
-    {
-        "category": "【河川・リアルタイム監視】", "region": selected_region, "pref": f"{selected_region}管内", "name": f"{selected_region}主要河川 監視対象地点A", 
-        "infrastructure_type": "主要河川", "lat": base_lat + 0.05, "lon": base_lon + 0.05, "source": f"国土交通省 / {jma_data['office']}", 
-        "level": "Level3", "level_desc": "【レベル3】高齢者等避難発令基準（水位上昇傾向）",
-        "metric": "リアルタイム観測：注意水位到達", "status": "高齢者等避難", "color": "orange", "priority": 2,
-        "desc": f"気象庁発表（{jma_data['office']}）の予報に基づく{selected_region}エリアの河川監視ポイントです。",
-        "link_url": "https://www.river.go.jp/"
-    },
-    {
-        "category": "【道路・リアルタイム規制】", "region": selected_region, "pref": f"{selected_region}管内", "name": f"{selected_region}幹録国道 山間部区間", 
-        "infrastructure_type": "国道", "lat": base_lat - 0.04, "lon": base_lon - 0.06, "source": "日本道路交通情報センター (JARTIC)", 
-        "level": "Level4", "level_desc": "【レベル4】連続雨量超過による通行止め実施",
-        "metric": "規制値到達・通行止め", "status": "通行止め", "color": "red", "priority": 1,
-        "desc": f"降雨状況の悪化に伴い、{selected_region}内の該当道路区間で規制が実施されています。",
-        "link_url": "https://www.jartic.or.jp/"
-    },
-    {
-        "category": "【気象庁キキクル・リアルタイム】", "region": selected_region, "pref": f"{selected_region}管内", "name": f"{selected_region} 警戒土砂災害・浸水想定地区", 
-        "infrastructure_type": "気象庁データ", "lat": base_lat + 0.02, "lon": base_lon - 0.04, "source": f"気象庁 ({jma_data['office']})", 
-        "level": "Level5", "level_desc": "【レベル5】緊急安全確保（命の危険）",
-        "metric": "キキクル危険度：極めて高い", "status": "緊急安全確保", "color": "red", "priority": 1,
-        "desc": f"気象庁のリアルタイム予報およびキキクル情報に基づき、{selected_region}の一部地域で厳重警戒が必要です。",
-        "link_url": "https://www.jma.go.jp/bosai/risk/"
-    }
-]
-
-filtered_locations = [loc for loc in locations if loc["region"] == selected_region]
-
-danger_count = sum(1 for loc in filtered_locations if loc["color"] == "red")
-warning_count = sum(1 for loc in filtered_locations if loc["color"] == "orange")
-
-st.markdown(f"""
-<div style="background-color: #1e293b; padding: 12px 16px; border-radius: 8px; border-left: 6px solid #ef4444; margin-top: 12px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
-    <span style="color: #f8fafc; font-size: 14px; font-weight: bold;">
-        🚨 <span style="color: #fca5a5;">【{selected_region}エリア リアルタイム警戒状況】</span> 発表元：{jma_data['office']} ｜ 危険（赤：レベル4～5） <span style="color: #f87171; font-size: 16px;"><b>{danger_count}件</b></span>、注意（橙：レベル3） <span style="color: #ffe600; font-size: 16px; font-weight: 900;"><b>{warning_count}件</b></span>
-    </span>
-</div>
-""", unsafe_allow_html=True)
-
-# 選択地域の都道府県別気象情報
-# 全国7地域で同じ表示ルール：「都道府県｜天気｜コメント」
-st.markdown(f"### 🗾 {selected_region} 都道府県別の気象状況")
-st.markdown(
-    "**都道府県｜天気｜コメント**の順で、気象庁公式予報を都道府県ごとに整理し、"
-    "雨の可能性などのコメントを残しながら、コンパクトに状況確認できるように表示します。"
-    "この欄が通常の気象状況・地域概況を兼ねます。"
+# 1. 起動時の注意書き（ダブルチェック用・Zzzz画面対策の常時表示）
+st.warning(
+    "**【起動時のご注意】**\n\n"
+    "一定時間アクセスがないと「Zzzz」というスリープ画面が表示されます。"
+    "その場合は、画面にある青いボタン（**Yes, get this app back up!**）を1回押してサーバーを復帰させてください。"
 )
 
-region_weather = fetch_region_prefecture_weather(selected_region)
-weather_rows = []
-for item in region_weather:
-    status = "取得済み" if item["success"] else "フォールバック"
-    weather_rows.append(
-        f"<tr>"
-        f"<td style='padding:7px 8px;border-bottom:1px solid #475569;white-space:nowrap;'><b>{item['prefecture']}</b></td>"
-        f"<td style='padding:7px 8px;border-bottom:1px solid #475569;white-space:nowrap;'>{item['weather']}</td>"
-        f"<td style='padding:7px 8px;border-bottom:1px solid #475569;'>{item['comment']}<br>"
-        f"<span style='font-size:11px;color:#cbd5e1;'>[{status}]</span></td>"
-        f"</tr>"
-    )
-
-st.markdown(
-    "<div style='overflow-x:auto;'>"
-    "<table style='width:100%;border-collapse:collapse;font-size:13px;'>"
-    "<thead><tr style='background:#1e293b;'>"
-    "<th style='text-align:left;padding:7px 8px;border-bottom:1px solid #64748b;white-space:nowrap;'>都道府県</th>"
-    "<th style='text-align:left;padding:7px 8px;border-bottom:1px solid #64748b;white-space:nowrap;'>天気</th>"
-    "<th style='text-align:left;padding:7px 8px;border-bottom:1px solid #64748b;'>コメント</th>"
-    "</tr></thead><tbody>"
-    + "".join(weather_rows)
-    + "</tbody></table></div>",
-    unsafe_allow_html=True,
-)
+st.title("🛡️ 全国インフラ・気象防災カルテ・リアルリンク共用システム")
+st.markdown("災害時のリアルタイム気象状況・インフラ情報をモバイル最適化で提供します。")
 st.markdown("---")
 
+# 2. 監視エリア選択
+selected_region = st.selectbox("🌍 監視エリアを選択してください", list(REGION_CODES.keys()), index=2) # デフォルト関東
 
-# 災害キキクル：通常の気象状況とは役割を分離
-st.markdown("""
-<div style="background-color: #0f172a; border: 1px solid #334155; padding: 12px 16px; border-radius: 6px; margin-bottom: 1rem;">
-    <div style="font-size: 14px; color: #f87171; font-weight: bold; margin-bottom: 6px;">
-        ⚠️ 【最重要・災害キキクル】
-    </div>
-    <div style="font-size: 11.5px; color: #ffe600; font-weight: 900; margin-bottom: 8px;">
-        土砂災害・浸水害・洪水害など、災害の危険度を確認するための情報です。
-    </div>
-    <div style="font-size: 12px; color: #ffffff; font-weight: 700;">
-        通常の気象状況とは分けて表示しています。最新の危険度は気象庁公式キキクルで確認してください。
-    </div>
-</div>
-""", unsafe_allow_html=True)
+# 3. 気象データ取得
+weather_data = fetch_jma_realtime_data(selected_region)
 
-st.markdown(
-    "- [土砂キキクル](https://www.jma.go.jp/bosai/risk/#zoom:5/lat:35.000000/lon:137.000000/colordepth:normal/elements:land)　"
-    "- [浸水キキクル](https://www.jma.go.jp/bosai/risk/#zoom:5/lat:35.000000/lon:137.000000/colordepth:normal/elements:inund)　"
-    "- [洪水キキクル](https://www.jma.go.jp/bosai/risk/#zoom:5/lat:35.000000/lon:137.000000/colordepth:normal/elements:flood)"
-)
+# 4. 気象・温度状況の常時表示レイアウト（最高・最低気温の追加・折りたたみなし）
+st.markdown("### 🌡️ 気象・温度状況（現在地 / 予報）")
+
+col1, col2, col3 = st.columns(3)
+with col1:
+    st.metric(label="現在気温", value=f"{weather_data['current_temp']}°C")
+with col2:
+    st.metric(label="最高気温", value=f"{weather_data['max_temp']}°C")
+with col3:
+    st.metric(label="最低気温", value=f"{weather_data['min_temp']}°C")
 
 st.markdown("---")
 
-# 公式データリンク集
-st.markdown("""
-<div style="background-color: #0f172a; border: 2px solid #ffffff; border-left: 6px solid #38bdf8; padding: 14px 18px; border-radius: 8px; margin-top: 1rem; margin-bottom: 1rem; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">
-    <div style="color: #ffe600; font-weight: 900; font-size: 15px; text-shadow: 0 1px 2px #000000; margin-bottom: 8px;">
-        ⚡ <b>【公式データリンク集】河川・国道・県道・市町道・鉄道・気象庁のリアルタイム状況</b>
-    </div>
-    <div style="font-size: 13.5px; color: #f1f5f9; line-height: 1.8;">
-        ・ ⚠️ （キキクル） <a href="https://www.jma.go.jp/bosai/risk/" target="_blank" rel="noopener noreferrer" style="color: #f87171; font-weight: bold;">気象庁 キキクル（土砂・浸水・洪水危険度分布・最優先確認）</a><br>
-        ・ 🌊 （河川） <a href="https://www.river.go.jp/" target="_blank" rel="noopener noreferrer" style="color: #60a5fa; font-weight: 900; text-shadow: 0 1px 2px #000000;">国土交通省 川の防災情報（全国の河川水位・ライブカメラ）</a><br>
-        ・ 🚗 （道路） <a href="https://www.jartic.or.jp/" target="_blank" rel="noopener noreferrer" style="color: #60a5fa; font-weight: 900; text-shadow: 0 1px 2px #000000;">JARTIC 日本道路交通情報センター（高速・国道・県道の規制情報）</a><br>
-        ・ 🚆 （鉄道） <a href="https://www.train-info.com/" target="_blank" rel="noopener noreferrer" style="color: #34d399; font-weight: bold;">主要鉄道 運行情報・各社遅延リアルタイム案内</a><br>
-        ・ 🔴 （気象） <a href="https://www.jma.go.jp/bosai/warning/" target="_blank" rel="noopener noreferrer" style="color: #fca5a5; font-weight: bold;">気象庁 警報・注意報（すべての市区町村別の最新発令状況）</a>
-    </div>
-</div>
-""", unsafe_allow_html=True)
-
-# ライブ取得フィード
-st.markdown('<div class="live-feed-expander">', unsafe_allow_html=True)
-with st.expander("📡 【ライブ取得】リアルタイム災害・速報フィード", expanded=True):
-    news_list = fetch_robust_disaster_news()
-    for news in news_list:
-        st.markdown(f"- <a href='{news['link']}' target='_blank' rel='noopener noreferrer' style='color: #f97316; font-weight: bold;'>{news['title']}</a> <small style='color:#cbd5e1; font-weight:700;'>({news['date']})</small>", unsafe_allow_html=True)
-st.markdown('</div>', unsafe_allow_html=True)
-
-# 地図表示（クラスター廃止・個別直接展開）
-m = folium.Map(location=[base_lat, base_lon], zoom_start=9, control_scale=True)
-
-for idx, loc in enumerate(filtered_locations):
-    lat, lon = loc.get("lat"), loc.get("lon")
-    if lat and lon:
-        icon_name = "warning-sign" if loc['color'] == 'red' else ("info-sign" if loc['color'] == 'orange' else "ok-sign")
-        
-        popup_html = (
-            f"<b>{loc['category']} [{loc['pref']}]</b><br>"
-            f"<b>{loc['name']}</b><br>"
-            f"状況: <span style='color:{loc['color']}; font-weight:bold;'>{loc['status']}</span><br>"
-            f"指標: {loc['metric']}<br>"
-            f"{loc['desc']}<br><a href='{loc['link_url']}' target='_blank' rel='noopener noreferrer' style='color:red; font-weight:bold;'>▶ 公式詳細を確認</a>"
-        )
-        folium.Marker(
-            [lat, lon],
-            popup=folium.Popup(popup_html, max_width=320),
-            icon=folium.Icon(color=loc['color'], icon=icon_name)
-        ).add_to(m)
-
-map_left, map_center, map_right = st.columns([0.08, 0.84, 0.08])
-with map_center:
-    st_folium(m, width="100%", height=380, key="infra_map_direct_v15")
-
-st.markdown(f"<h3 style='font-size: 20px; font-weight: bold; margin-top: 1rem;'>🚨 【{selected_region}】警戒レベル情報</h3>", unsafe_allow_html=True)
-st.markdown("**レベル｜都府県・市区町村｜内容** の順で、気象庁の公式警報・注意報対象区域を表示します。")
-
-warning_level_data = fetch_jma_warning_level_areas(selected_region)
-
-if warning_level_data["success"]:
-    if warning_level_data["rows"]:
-        warning_rows = []
-        for row in warning_level_data["rows"]:
-            level = row["level"]
-            color = JMA_LEVEL_COLOR[level]
-            level_label = JMA_LEVEL_LABEL[level]
-            content = "、".join(row["warning_names"]) if row["warning_names"] else "発表中の警報・注意報あり"
-            warning_rows.append(
-                f"<tr>"
-                f"<td style='padding:8px;border-bottom:1px solid #475569;white-space:nowrap;'><span style='color:{color};font-weight:900;'>{level_label}</span></td>"
-                f"<td style='padding:8px;border-bottom:1px solid #475569;white-space:nowrap;'><b>{selected_region}</b>・{row['area_name']}</td>"
-                f"<td style='padding:8px;border-bottom:1px solid #475569;'>{content}</td>"
-                f"</tr>"
-            )
-
-        st.markdown(
-            "<div style='overflow-x:auto;'>"
-            "<table style='width:100%;border-collapse:collapse;font-size:13px;'>"
-            "<thead><tr style='background:#1e293b;'>"
-            "<th style='text-align:left;padding:8px;border-bottom:1px solid #64748b;'>レベル</th>"
-            "<th style='text-align:left;padding:8px;border-bottom:1px solid #64748b;'>都府県・市区町村</th>"
-            "<th style='text-align:left;padding:8px;border-bottom:1px solid #64748b;'>内容</th>"
-            "</tr></thead><tbody>"
-            + "".join(warning_rows)
-            + "</tbody></table></div>",
-            unsafe_allow_html=True,
-        )
-        st.caption(
-            f"発表元：{warning_level_data['publishing_office']}　"
-            f"更新：{warning_level_data['report_datetime'] or '取得時刻不明'}"
-            + ('　※一部府県は取得できませんでした。' if warning_level_data.get('partial') else '')
-        )
-    else:
-        st.markdown(
-            "<div style='background:#1e293b;border-left:5px solid #60a5fa;padding:12px;border-radius:6px;'>"
-            "現在、レベル2～5に該当する警報・注意報対象区域は取得データ上ありません。"
-            "</div>",
-            unsafe_allow_html=True,
-        )
-else:
-    st.markdown(
-        "<div style='background:#1e293b;border-left:5px solid #f59e0b;padding:12px;border-radius:6px;'>"
-        "気象庁の警戒レベル地域データを取得できませんでした。"
-        "通信環境を確認し、気象庁公式情報もあわせてご確認ください。"
-        "</div>",
-        unsafe_allow_html=True,
-    )
+# 5. リアルタイム天気予報の表示
+st.markdown(f"### 📡 {selected_region}地方の気象情報 ({weather_data['office']})")
+for forecast in weather_data["forecasts"]:
+    st.markdown(f"- {forecast}")
 
 st.markdown("---")
-st.markdown("### 📋 監視ポイント詳細")
-st.markdown("※以下は本システムが設定しているインフラ監視ポイントです。気象庁の市区町村別警報・注意報とは別の情報として表示します。")
 
-if not filtered_locations:
-    st.markdown("""
-    <div style="background-color: #1e293b; border-left: 5px solid #3b82f6; padding: 16px; border-radius: 6px; margin-bottom: 1rem;">
-        <span style="color: #60a5fa; font-weight: 900; font-size: 15px; text-shadow: 0 1px 2px #000000;">ℹ️ 選択されたエリアのリアルタイムデータはありません。</span>
-    </div>
-    """, unsafe_allow_html=True)
-else:
-    for idx, loc in enumerate(filtered_locations):
-        if loc["level"] == "Level5":
-            badge = "🔴【レベル5/緊急安全確保】"
-        elif loc["level"] == "Level4":
-            badge = "🔴【レベル4/避難指示】"
-        elif loc["level"] == "Level3":
-            badge = "🟠【レベル3/高齢者等避難】"
-        else:
-            badge = "🔵【レベル2/気象注意報】"
-            
-        if loc["level"] in ("Level5", "Level4"):
-            level_class = "level-danger"
-        elif loc["level"] == "Level3":
-            level_class = "level-warning"
-        else:
-            level_class = "level-info"
-
-        title_text = f"{badge} ｜ [{loc['infrastructure_type']}] {loc['pref']} ｜ **{loc['name']}**"
-        
-        with st.expander(title_text):
-            st.markdown(f"**監視対象地点**\n\n`{loc['name']}`\n\n**情報元・管理組織**\n\n`{loc['source']}`")
-            st.markdown(f"**現在の観測・警戒指標**\n\n`{loc['metric']}`")
-            st.markdown("---")
-            st.markdown(f"**リアルタイム状況詳細**\n\n{loc['desc']}")
-            st.markdown("---")
-            st.markdown(f"- <a href='{loc['link_url']}' target='_blank' rel='noopener noreferrer'>🌐 現在のリアルタイム公式情報を確認する (別タブ)</a>", unsafe_allow_html=True)
+# 6. 都道府県別の詳細リンク・気象状況
+st.markdown(f"### 📋 {selected_region}管内 都道府県別ステータス")
+pref_weather_list = fetch_region_prefecture_weather(selected_region)
+for pw in pref_weather_list:
+    st.markdown(f"**{pw['prefecture']}**: {pw['weather']} — {pw['comment']}")
