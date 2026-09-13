@@ -3,9 +3,7 @@ import folium
 from streamlit_folium import st_folium
 import urllib.request
 import json
-import xml.etree.ElementTree as ET
 import re
-import textwrap
 
 st.set_page_config(
     page_title="全国インフラ・気象防災カルテ・リアルリンク共用システム", 
@@ -16,10 +14,6 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-
-/* ==========================================
-   V24：開発目的カード搭載・完全安定化版
-   ========================================== */
 
 html, body,
 [data-testid="stAppViewContainer"],
@@ -41,7 +35,6 @@ section[data-testid="stMain"] {
     color: #ffffff;
 }
 
-/* タイトルの大きさを最適化 (h1) */
 [data-testid="stAppViewContainer"] h1 {
     color: #ffffff !important;
     font-size: 1.8rem !important;
@@ -55,7 +48,6 @@ section[data-testid="stMain"] {
     font-weight: 900 !important;
 }
 
-/* 「起動時のご注意」のタイトル文字だけを優しく点滅させるアニメーション */
 @keyframes title-blink {
     0% { opacity: 1.0; }
     50% { opacity: 0.3; }
@@ -70,7 +62,6 @@ section[data-testid="stMain"] {
     display: inline-block;
 }
 
-/* 起動時ご注意カード（左側を黄色ラインに変更） */
 .notice-card {
     background-color: #111827 !important;
     border: 1px solid #334155 !important;
@@ -81,7 +72,6 @@ section[data-testid="stMain"] {
     color: #ffffff !important;
 }
 
-/* スマホ横向き案内カルテカード */
 .mobile-guide {
     background-color: #111827 !important;
     color: #ffffff !important;
@@ -92,7 +82,6 @@ section[data-testid="stMain"] {
     margin-bottom: 15px;
 }
 
-/* 開発目的カード */
 .purpose-card {
     background-color: #111827 !important;
     border: 1px solid #334155 !important;
@@ -103,7 +92,6 @@ section[data-testid="stMain"] {
     color: #ffffff !important;
 }
 
-/* インフラ・リンク集カード */
 .link-card {
     background-color: #111827 !important;
     border: 1px solid #334155 !important;
@@ -120,37 +108,6 @@ div[data-testid="stExpander"] {
     border-radius: 8px !important;
 }
 
-div[data-testid="stExpander"] > details {
-    background-color: #111827 !important;
-}
-
-div[data-testid="stExpander"] > details > summary {
-    background-color: #111827 !important;
-    color: #ffffff !important;
-    opacity: 1 !important;
-}
-
-div[data-testid="stExpander"] > details > summary *,
-div[data-testid="stExpander"] > details > summary p,
-div[data-testid="stExpander"] > details > summary span {
-    color: #ffffff !important;
-    -webkit-text-fill-color: #ffffff !important;
-    opacity: 1 !important;
-    font-weight: 900 !important;
-}
-
-div[data-testid="stExpander"] > details > div {
-    background-color: #111827 !important;
-    color: #ffffff !important;
-}
-
-div[data-testid="stExpander"] > details > div * {
-    color: #ffffff !important;
-    -webkit-text-fill-color: #ffffff !important;
-    opacity: 1 !important;
-}
-
-/* セレクトボックスのダーク化 */
 div[data-testid="stSelectbox"] {
     background-color: #080d16 !important;
     border-left: 7px solid #ffe600;
@@ -202,7 +159,6 @@ hr {
 </style>
 """, unsafe_allow_html=True)
 
-# エリアごとの気象庁エリアコードと中心都市の座標
 REGION_CODES = {
     "北海道": {"code": "016000", "lat": 43.0642, "lon": 141.3469, "center_name": "札幌（北海道中心）"},
     "東北": {"code": "040000", "lat": 38.2688, "lon": 140.8721, "center_name": "仙台（東北中心）"},
@@ -284,13 +240,9 @@ def jma_level_from_code(code):
 def fetch_jma_area_names():
     url = "https://www.jma.go.jp/bosai/common/const/area.json"
     try:
-        req = urllib.request.Request(
-            url,
-            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
-        )
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         with urllib.request.urlopen(req, timeout=5) as response:
             data = json.loads(response.read().decode('utf-8'))
-
         mapping = {}
         def walk(obj):
             if isinstance(obj, dict):
@@ -298,12 +250,9 @@ def fetch_jma_area_names():
                 name = obj.get("name")
                 if code is not None and name:
                     mapping[str(code)] = str(name)
-                for value in obj.values():
-                    walk(value)
+                for value in obj.values(): walk(value)
             elif isinstance(obj, list):
-                for value in obj:
-                    walk(value)
-
+                for value in obj: walk(value)
         walk(data)
         return mapping
     except Exception:
@@ -313,365 +262,184 @@ def fetch_jma_area_names():
 def fetch_jma_earthquake_info():
     url = "https://www.jma.go.jp/bosai/information/data/quake.json"
     try:
-        req = urllib.request.Request(
-            url,
-            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
-        )
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         with urllib.request.urlopen(req, timeout=3) as response:
             quakes = json.loads(response.read().decode('utf-8'))
-            
         if quakes and isinstance(quakes, list):
             latest = quakes[0]
-            time_str = latest.get("at", "日時不明")
-            hypo = latest.get("hypocenter", {}).get("name", "震源地不明")
             max_scale = latest.get("maxScale", "不明")
-            
             scale_map = {
                 "10": "震度1", "20": "震度2", "30": "震度3", "40": "震度4",
                 "45": "震度5弱", "50": "震度5強", "55": "震度6弱", "60": "震度6強", "70": "震度7"
             }
-            scale_text = scale_map.get(str(max_scale), f"震度(コード:{max_scale})")
-            
             return {
                 "success": True,
-                "time": time_str,
-                "hypocenter": hypo,
-                "max_scale": scale_text,
+                "time": latest.get("at", "日時不明"),
+                "hypocenter": latest.get("hypocenter", {}).get("name", "震源地不明"),
+                "max_scale": scale_map.get(str(max_scale), f"震度({max_scale})"),
                 "detail": latest.get("text", "直近の地震活動に特段の異常はありません。")
             }
     except Exception:
         pass
-    
-    return {
-        "success": False,
-        "time": "取得待機中",
-        "hypocenter": "通信制限またはキャッシュ待機中",
-        "max_scale": "--",
-        "detail": "現在、気象庁地震情報APIへの接続を確認しています。"
-    }
+    return {"success": False, "time": "取得待機中", "hypocenter": "通信制限中", "max_scale": "--", "detail": "接続確認中"}
 
 @st.cache_data(ttl=300)
 def fetch_jma_warning_level_areas(region_name):
-    office_codes = REGION_WARNING_OFFICES.get(
-        region_name,
-        [REGION_CODES.get(region_name, REGION_CODES["関東"])["code"]]
-    )
+    office_codes = REGION_WARNING_OFFICES.get(region_name, [REGION_CODES[region_name]["code"]])
     area_names = fetch_jma_area_names()
-    
-    level_data = {
-        "Level5": {},
-        "Level4": {},
-        "Level3": {}
-    }
+    level_data = {"Level5": {}, "Level4": {}, "Level3": {}}
 
     for office_code in office_codes:
         warning_url = f"https://www.jma.go.jp/bosai/warning/data/warning/{office_code}.json"
         try:
-            req = urllib.request.Request(
-                warning_url,
-                headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
-            )
+            req = urllib.request.Request(warning_url, headers={'User-Agent': 'Mozilla/5.0'})
             with urllib.request.urlopen(req, timeout=5) as response:
                 data = json.loads(response.read().decode('utf-8'))
-
             for area_type in data.get("areaTypes", []):
                 for area in area_type.get("areas", []):
                     area_code = str(area.get("code", ""))
-                    
                     name = area_names.get(area_code)
-                    if not name or name == "地域不明":
-                        continue
-                    
+                    if not name: continue
                     for w in area.get("warnings", []):
-                        status = w.get("status", "")
-                        if status in ["解除", "発表警報・注意報はなし", "", None]:
-                            continue
-                        
+                        if w.get("status") in ["解除", "発表警報・注意報はなし", "", None]: continue
                         w_code = str(w.get("code", "")).zfill(2)
                         lvl = jma_level_from_code(w_code)
                         w_name = JMA_WARNING_NAMES.get(w_code)
-                        
-                        if lvl in ["Level3", "Level4", "Level5"] and w_name:
-                            if w_name not in level_data[lvl]:
-                                level_data[lvl][w_name] = set()
-                            level_data[lvl][w_name].add(name)
+                        if lvl in level_data and w_name:
+                            level_data[lvl].setdefault(w_name, set()).add(name)
         except Exception:
             continue
 
-    formatted_data = {}
-    for lvl, warnings in level_data.items():
-        formatted_data[lvl] = {}
-        for w_name, cities in warnings.items():
-            formatted_data[lvl][w_name] = sorted(list(cities))
-
-    return formatted_data
+    return {lvl: {w: sorted(list(cities)) for w, cities in warnings.items()} for lvl, warnings in level_data.items()}
 
 @st.cache_data(ttl=300)
 def fetch_jma_realtime_data(region_name):
     info = REGION_CODES.get(region_name, REGION_CODES["関東"])
-    code = info["code"]
-    url = f"https://www.jma.go.jp/bosai/forecast/data/forecast/{code}.json"
-    
+    url = f"https://www.jma.go.jp/bosai/forecast/data/forecast/{info['code']}.json"
     try:
-        req = urllib.request.Request(
-            url, 
-            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
-        )
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         with urllib.request.urlopen(req, timeout=3) as response:
             data = json.loads(response.read().decode('utf-8'))
             office = data[0].get("publishingOffice", "気象庁")
             weather_forecasts = []
-            
-            max_temp_val = "--"
-            current_temp_val = "--"
+            current_temp, max_temp = "--", "--"
 
             for series in data[0].get("timeSeries", []):
                 for temp_area in series.get("areas", []):
                     temps = temp_area.get("temps", [])
                     if temps:
-                        if len(temps) > 0 and temps[0] != "":
-                            current_temp_val = temps[0]
-                        if len(temps) > 1 and temps[1] != "":
-                            max_temp_val = temps[1]
-                        elif len(temps) > 0 and temps[0] != "":
-                            max_temp_val = temps[0]
-
-                areas = series.get("areas", [])
-                for area in areas:
-                    area_name = area.get("area", {}).get("name", region_name)
+                        if len(temps) > 0 and temps[0] != "": current_temp = temps[0]
+                        if len(temps) > 1 and temps[1] != "": max_temp = temps[1]
+                        elif len(temps) > 0 and temps[0] != "": max_temp = temps[0]
+                for area in series.get("areas", []):
                     weathers = area.get("weathers", [])
                     if weathers:
-                        w_text = weathers[0]
-                        w_text_spaced = re.sub(r'([雨曇晴雷])', r' &nbsp; \1 &nbsp; ', w_text)
-                        weather_forecasts.append(f"【{area_name}】 &nbsp; &nbsp; {w_text_spaced}")
-            
-            return {
-                "success": True,
-                "office": office,
-                "forecasts": weather_forecasts[:4] if weather_forecasts else [f"【{region_name}】 &nbsp; &nbsp; エリアの気象データを正常に取得しました。"],
-                "current_temp": current_temp_val,
-                "max_temp": max_temp_val
-            }
-    except Exception as e:
-        return {
-            "success": False,
-            "office": "気象庁（オフライン/フォールバック）",
-            "forecasts": [f"【{region_name}】 &nbsp; &nbsp; リアルタイムAPI接続確認中（通信環境または制限によりキャッシュ表示中）"],
-            "current_temp": "28.5",
-            "max_temp": "32.0"
-        }
+                        w_text = re.sub(r'([雨曇晴雷])', r' &nbsp; \1 &nbsp; ', weathers[0])
+                        weather_forecasts.append(f"【{area.get('area', {}).get('name', region_name)}】 &nbsp; {w_text}")
+            return {"success": True, "office": office, "forecasts": weather_forecasts[:4], "current_temp": current_temp, "max_temp": max_temp}
+    except Exception:
+        return {"success": False, "office": "気象庁（オフライン）", "forecasts": [f"【{region_name}】 接続確認中"], "current_temp": "28.5", "max_temp": "32.0"}
 
 @st.cache_data(ttl=300)
 def fetch_region_prefecture_weather(region_name):
     results = []
-    prefectures = REGION_PREFECTURES.get(region_name, {})
-
-    for prefecture, code in prefectures.items():
+    for prefecture, code in REGION_PREFECTURES.get(region_name, {}).items():
         url = f"https://www.jma.go.jp/bosai/forecast/data/forecast/{code}.json"
         try:
-            req = urllib.request.Request(
-                url,
-                headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
-            )
+            req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
             with urllib.request.urlopen(req, timeout=3) as response:
                 data = json.loads(response.read().decode('utf-8'))
-
-            weather = ""
-            max_t = "--"
-
+            weather, max_t = "", "--"
             for series in data[0].get("timeSeries", []):
                 for area in series.get("areas", []):
                     temps = area.get("temps", [])
-                    if temps:
-                        if len(temps) > 0 and temps[0] != "":
-                            max_t = temps[0]
-                        elif len(temps) > 1 and temps[1] != "":
-                            max_t = temps[1]
-
+                    if temps and max_t == "--": max_t = temps[0] if temps[0] != "" else (temps[1] if len(temps)>1 else "--")
                 for area in series.get("areas", []):
                     weathers = area.get("weathers", [])
-                    if weathers and not weather:
-                        weather = str(weathers[0]).strip()
-
-            weather_match = re.match(r"(晴|曇|雨|雪|雷|晴れ|曇り|雨時々曇|曇時々雨|雨一時曇|曇一時雨)", weather)
-            weather_label = weather_match.group(1) if weather_match else "気象情報あり"
-
-            results.append({
-                "prefecture": prefecture,
-                "success": True,
-                "weather": weather_label,
-                "comment": weather or "天気情報を取得しました。",
-                "max_temp": max_t,
-            })
+                    if weathers and not weather: weather = str(weathers[0]).strip()
+            wm = re.match(r"(晴|曇|雨|雪|雷|晴れ|曇り|雨時々曇|曇時々雨|雨一時曇|曇一時雨)", weather)
+            results.append({"prefecture": prefecture, "weather": wm.group(1) if wm else "気象情報", "comment": weather or "取得完了", "max_temp": max_t})
         except Exception:
-            results.append({
-                "prefecture": prefecture,
-                "success": False,
-                "weather": "取得できず",
-                "comment": "リアルタイム気象情報を取得できませんでした。",
-                "max_temp": "--",
-            })
-
+            results.append({"prefecture": prefecture, "weather": "取得できず", "comment": "通信エラー", "max_temp": "--"})
     return results
 
-# ==========================================
-# メイン画面の描画処理
-# ==========================================
-
-# 1. 起動時のご注意（タイトル点滅、左ラインは黄色アクセント）
-st.markdown(
-    """
-    <div class="notice-card">
-        <span class="blinking-title">【起動時のご注意】</span><br><br>
-        <span style="color: #ff6b6b; font-weight: 900;">一定時間アクセスがないと</span>「Zzzz」というスリープ画面が表示されます。<br>
-        その場合は、<span style="color: #38bdf8; font-weight: 900;">画面にある青いボタン（Yes, get this app back up!）を1回押して</span>サーバーを復帰し正常表示します。
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+# 画面描画
+st.markdown('<div class="notice-card"><span class="blinking-title">【起動時のご注意】</span><br><br>一定時間アクセスがないと「Zzzz」のスリープ画面になります。その際は<span style="color: #38bdf8; font-weight: 900;">青い復帰ボタン</span>を1回押して再開してください。</div>', unsafe_allow_html=True)
 
 st.title("🛡️ 全国インフラ・気象防災カルテ・リアルリンク共用システム")
-st.markdown("災害時のリアルタイム気象状況・インフラ・地震情報をモバイル最適化で提供します。")
+st.markdown("災害時のリアルタイム気象状況・インフラ・地震情報をモバイル最適化で一元管理します。")
 
-# 開発目的・背景カルテカード
-st.markdown(
-    """
-    <div class="purpose-card">
-        <b>🎯 本システム（全国インフラ・気象防災カルテ）の開発目的と背景</b><br><br>
-        ・<b>開発目的</b>：災害大国日本において、気象庁の一次情報（地震速報・特別警報・キキクルなど）と、生活・交通インフラのリアルタイム状況を<b>「1つの画面で素早く、確実に把握すること」</b>を目的として開発しています。<br>
-        ・<b>設計思想</b>：広告や不要な装飾を削ぎ落とし、通信環境が不安定な災害時や緊急時でも、スマホやPCから軽量かつ直感的に命を守るための判断材料にアクセスできるように最適化しています。
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+st.markdown('<div class="purpose-card"><b>🎯 本システムの開発目的と解説</b><br><br>・<b>目的</b>：気象庁の公式一次情報（地震速報・特別警報・キキクル）と、生活・交通インフラのリアルタイム状況を1画面で素早く確認。<br>・<b>解説</b>：広告や不要な装飾を削ぎ落とし、災害時や電波が不安定な状況下でもスマホから軽量かつ直感的に命を守る判断ができるよう設計されています。</div>', unsafe_allow_html=True)
 
-# スマホ横向き案内カルテカード
-st.markdown(
-    """
-    <div class="mobile-guide">
-        <b>📱 スマホ最適化と操作のご案内</b><br>
-        ・<b>スマートフォンを横に向ける</b>ことで、デスクトップ表示（ワイド画面）に切り替わり、地図やエリア情報をより広く快適に見渡せるようになります。<br>
-        ・エリアを切り替えるだけで、現地の気象・地震・警戒レベル情報を即座に一元管理できます。
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+st.markdown('<div class="mobile-guide"><b>📱 スマホ操作の解説</b><br>・スマホを「横向き」にするとデスクトップ表示（ワイド画面）に切り替わり、地図やエリア情報を見渡しやすくなります。</div>', unsafe_allow_html=True)
 
 st.markdown("---")
 
-# 2. 直近の地震情報（最優先の揺れ確認）
 st.markdown("### 📳 直近の地震情報（気象庁速報）")
-eq_data = fetch_jma_earthquake_info()
-
-st.markdown(
-    f"""
-    <div style="background-color: #111827; border: 1px solid #475569; padding: 14px 18px; border-radius: 8px; border-left: 7px solid #ef4444; color: #ffffff; margin-bottom: 15px;">
-        <div style="display: flex; justify-content: space-between; margin-bottom: 8px; flex-wrap: wrap; gap: 10px;">
-            <div><b>最大震度:</b> <span style="color: #ffe600; font-size: 16px; font-weight: 900;">{eq_data["max_scale"]}</span></div>
-            <div><b>発生日時:</b> {eq_data["time"]}</div>
-        </div>
-        <div style="margin-bottom: 8px;"><b>震源地:</b> <span style="color: #60a5fa; font-weight: 900;">{eq_data["hypocenter"]}</span></div>
-        <div style="font-size: 14px; color: #e5e7eb; border-top: 1px solid #334155; padding-top: 8px; margin-top: 6px;"><b>詳細:</b> {eq_data["detail"]}</div>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+st.markdown("<p style='font-size:13px; color:#94a3b8;'>日本国内で発生した直近の地震の規模、最大震度、および震源地を速報でお伝えします。</p>", unsafe_allow_html=True)
+eq = fetch_jma_earthquake_info()
+st.markdown(f'<div style="background-color: #111827; border: 1px solid #475569; padding: 14px; border-radius: 8px; border-left: 7px solid #ef4444;"><div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;"><div><b>最大震度:</b> <span style="color: #ffe600; font-weight: 900;">{eq["max_scale"]}</span></div><div><b>発生日時:</b> {eq["time"]}</div></div><div style="margin-top:6px;"><b>震源地:</b> <span style="color: #60a5fa; font-weight: 900;">{eq["hypocenter"]}</span></div><div style="font-size: 13px; color: #e5e7eb; border-top: 1px solid #334155; margin-top: 6px; padding-top: 6px;"><b>解説:</b> {eq["detail"]}</div></div>', unsafe_allow_html=True)
 
 st.markdown("---")
 
-# 3. 監視エリア選択
-selected_region = st.selectbox("🌍 監視エリアを選択してください", list(REGION_CODES.keys()), index=2)
+selected_region = st.selectbox("🌍 監視エリアを選択してください（地域を切り替えると各データが連動します）", list(REGION_CODES.keys()), index=2)
 
 st.markdown("---")
 
-# 4. 緊急警戒レベル（レベル3〜5）発令状況
 st.markdown(f"### ⚠️ {selected_region}エリアの緊急警戒レベル（レベル3〜5）発令状況")
-
-warning_levels = fetch_jma_warning_level_areas(selected_region)
-has_any_warning = False
-
-if warning_levels.get("Level5"):
-    has_any_warning = True
-    st.error("🚨 **【レベル5】特別警報発令中**（命の危険が迫っています。直ちに身の安全を確保してください）")
-    for w_name, cities in warning_levels["Level5"].items():
-        st.write(f"- **{w_name}**: {', '.join(cities)}")
-
-if warning_levels.get("Level4"):
-    has_any_warning = True
-    st.error("🟥 **【Level4】危険警報発令中**（危険な場所から全員避難してください）")
-    for w_name, cities in warning_levels["Level4"].items():
-        st.write(f"- **{w_name}**: {', '.join(cities)}")
-
-if warning_levels.get("Level3"):
-    has_any_warning = True
-    st.warning("🟧 **【Level3】警報発令中**（高齢者等は危険な場所から避難してください）")
-    for w_name, cities in warning_levels["Level3"].items():
-        st.write(f"- **{w_name}**: {', '.join(cities)}")
-
-if not has_any_warning:
-    st.success("🟢 現在、対象エリアに発表されている緊急警戒レベル（レベル3〜5）の警報はありません。")
+st.markdown("<p style='font-size:13px; color:#94a3b8;'>気象庁が発表している土砂災害や大雨等の厳戒警報・特別警報をレベル別に集約表示します。</p>", unsafe_allow_html=True)
+warnings = fetch_jma_warning_level_areas(selected_region)
+has_warn = False
+for lvl, color, title in [("Level5", "error", "🚨 【レベル5】特別警報発令中（直ちに命を守る行動を）"), ("Level4", "error", "🟥 【Level4】危険警報発令中（危険な場所から全員避難）"), ("Level3", "warning", "🟧 【Level3】警報発令中（高齢者等は避難準備）")]:
+    if warnings.get(lvl):
+        has_warn = True
+        getattr(st, color)(title)
+        for w_name, cities in warnings[lvl].items(): st.write(f"- **{w_name}**: {', '.join(cities)}")
+if not has_warn: st.success("🟢 現在、対象エリアに緊急警戒レベル（レベル3〜5）の警報は発表されていません。")
 
 st.markdown("---")
 
-# 5. 気象・温度状況
-st.markdown(f"### 🌡️ 気象・温度状況 ({selected_region}エリアの代表値)")
-
-weather_data = fetch_jma_realtime_data(selected_region)
-col1, col2 = st.columns(2)
-with col1:
-    st.metric(label="現在気温", value=f"{weather_data['current_temp']}°C")
-with col2:
-    st.metric(label="予想最高気温", value=f"{weather_data['max_temp']}°C")
+st.markdown(f"### 🌡️ 気象・温度状況 ({selected_region}エリア)")
+w_data = fetch_jma_realtime_data(selected_region)
+c1, c2 = st.columns(2)
+with c1: st.metric(label="現在気温", value=f"{w_data['current_temp']}°C")
+with c2: st.metric(label="予想最高気温", value=f"{w_data['max_temp']}°C")
 
 st.markdown("---")
 
-# 6. 監視エリアマップ（選択エリアの中心都市に自動でピンが立つ仕様）
-region_info = REGION_CODES.get(selected_region, REGION_CODES["関東"])
-st.markdown(f"### 🗺️ {selected_region}エリアの地図・気象地震確認マップ（中心：{region_info['center_name']}）")
-
-m = folium.Map(
-    location=[region_info["lat"], region_info["lon"]],
-    zoom_start=7,
-    tiles="OpenStreetMap"
-)
-folium.Marker(
-    [region_info["lat"], region_info["lon"]],
-    popup=f"{selected_region}エリア中心 ({region_info['center_name']})",
-    tooltip=f"{selected_region} ({region_info['center_name']})",
-    icon=folium.Icon(color="red", icon="info-sign")
-).add_to(m)
-
+reg_info = REGION_CODES.get(selected_region, REGION_CODES["関東"])
+st.markdown(f"### 🗺️ {selected_region}エリアの中心地図（中心：{reg_info['center_name']}）")
+m = folium.Map(location=[reg_info["lat"], reg_info["lon"]], zoom_start=7, tiles="OpenStreetMap")
+folium.Marker([reg_info["lat"], reg_info["lon"]], popup=selected_region, icon=folium.Icon(color="red", icon="info-sign")).add_to(m)
 st_folium(m, width="100%", height=300, key=f"map_{selected_region}")
-st.markdown("---")
-
-# 7. リアルタイム天気予報
-st.markdown(f"### 📡 {selected_region}地方の気象情報 ({weather_data['office']})")
-for forecast in weather_data["forecasts"]:
-    st.markdown(f"- {forecast}")
 
 st.markdown("---")
 
-# 8. 都道府県別の詳細ステータス
+st.markdown(f"### 📡 {selected_region}地方の気象解説 ({w_data['office']})")
+for fc in w_data["forecasts"]: st.markdown(f"- {fc}")
+
+st.markdown("---")
+
 st.markdown(f"### 📋 {selected_region}管内 都道府県別ステータス")
-pref_weather_list = fetch_region_prefecture_weather(selected_region)
-for pw in pref_weather_list:
-    st.markdown(f"**{pw['prefecture']}** (最高: {pw['max_temp']}°C) └ 予報: {pw['comment']}")
+st.markdown("<p style='font-size:13px; color:#94a3b8;'>選択した管内各県の天気概況と予想最高気温を一覧で確認できます。</p>", unsafe_allow_html=True)
+for pw in fetch_region_prefecture_weather(selected_region):
+    st.markdown(f"**{pw['prefecture']}** (最高: {pw['max_temp']}°C) └ {pw['comment']}")
 
 st.markdown("---")
 
-# 9. インフラ・交通・防災関連リンク集（Yahoo雨雲レーダーの安定URL＋各種公式URL完備）
 st.markdown(
     """
     <div class="link-card">
-        <b>🔗 インフラ・交通・防災関連リンク集（公式リアルタイム情報）</b><br><br>
+        <b>🔗 インフラ・交通・防災関連リンク集（公式リアルタイム情報）</b><br>
+        <p style='font-size:13px; color:#94a3b8; margin-top:4px;'>詳細な雨雲の動きや交通・河川情報をピンポイントで確認するための外部公式リンク集です。</p>
         <ul>
-            <li><b>【天気】</b> <a href="https://weather.yahoo.co.jp/weather/rainradar/" target="_blank">Yahoo!天気（雨雲レーダー・リアルタイム）</a>：今降っている雨や今後の雨雲の動きを詳細確認</li>
-            <li><b>【天気】</b> <a href="https://www.jma.go.jp/bosai/" target="_blank">気象庁 防災情報ポータル</a>：警報・台風・地震情報のリアルタイム確認</li>
-            <li><b>【道路】</b> <a href="https://www.jartic.or.jp/" target="_blank">JARTIC 日本道路交通情報センター</a>：高速道路・一般道の通行止め・規制情報</li>
-            <li><b>【鉄道】</b> <a href="https://transit.yahoo.co.jp/diainfo/" target="_blank">Yahoo!路線情報（運行情報）</a>：全国の鉄道の遅延・運休状況</li>
-            <li><b>【河川】</b> <a href="https://www.river.go.jp/" target="_blank">川の防災情報（国土交通省）</a>：河川水位・ライブカメラ・ダム情報</li>
-            <li><b>【危険度】</b> <a href="https://www.jma.go.jp/bosai/map.html" target="_blank">気象庁 キキクル（危険度分布）</a>：土砂災害・浸水害・洪水災害の地図確認</li>
-            <li><b>【リスク】</b> <a href="https://disaportal.gsi.go.jp/" target="_blank">ハザードマップポータルサイト（国土交通省）</a>：避難所・災害リスクの確認</li>
+            <li><b>【雨雲ズーム】</b> <a href="https://weather.yahoo.co.jp/weather/zoomradar/" target="_blank">Yahoo!天気（雨雲ズームレーダー）</a>：高精度な雨雲の現在地と将来の動きを拡大表示</li>
+            <li><b>【防災情報】</b> <a href="https://www.jma.go.jp/bosai/" target="_blank">気象庁 防災情報ポータル</a>：警報・台風・地震情報の総合窓口</li>
+            <li><b>【道路規制】</b> <a href="https://www.jartic.or.jp/" target="_blank">JARTIC 日本道路交通情報センター</a>：高速道路・一般道の通行止め情報</li>
+            <li><b>【鉄道運行】</b> <a href="https://transit.yahoo.co.jp/diainfo/" target="_blank">Yahoo!路線情報（運行情報）</a>：全国の鉄道遅延・運休状況</li>
+            <li><b>【河川水位】</b> <a href="https://www.river.go.jp/" target="_blank">川の防災情報（国土交通省）</a>：河川水位・ライブカメラ・ダム情報</li>
+            <li><b>【危険度分布】</b> <a href="https://www.jma.go.jp/bosai/map.html" target="_blank">気象庁 キキクル</a>：土砂災害・浸水害・洪水の危険度マップ</li>
+            <li><b>【ハザード】</b> <a href="https://disaportal.gsi.go.jp/" target="_blank">ハザードマップポータルサイト</a>：避難所や災害リスクの全国家屋情報</li>
         </ul>
     </div>
     """,
