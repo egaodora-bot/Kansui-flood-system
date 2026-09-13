@@ -18,7 +18,7 @@ st.markdown("""
 <style>
 
 /* ==========================================
-   V9：起動時注意書きの背景・文字色最適化（視認性向上）
+   V10：注意書きの赤文字の視認性・コントラストを大幅強化
    ========================================== */
 
 html, body,
@@ -471,12 +471,12 @@ def fetch_region_prefecture_weather(region_name):
 # メイン画面の描画処理
 # ==========================================
 
-# 1. 起動時の注意書き（背景を黒ベース、文字を明るく見やすく改善）
+# 1. 起動時の注意書き（黒背景に、コントラスト抜群の明るい赤文字で強調）
 st.markdown(
     """
     <div style="background-color: #111827; border: 1px solid #334155; padding: 14px 18px; border-radius: 8px; border-left: 7px solid #38bdf8; margin-bottom: 20px; color: #ffffff;">
         <span style="color: #38bdf8; font-weight: 900; font-size: 16px;">【起動時のご注意】</span><br><br>
-        <span style="color: #ff4d4d; font-weight: 900;">一定時間アクセスがないと</span>「Zzzz」というスリープ画面が表示されます。<br>
+        <span style="color: #ff6b6b; font-weight: 900;">一定時間アクセスがないと</span>「Zzzz」というスリープ画面が表示されます。<br>
         その場合は、<span style="color: #38bdf8; font-weight: 900;">画面にある青いボタン（Yes, get this app back up!）を1回押して</span>サーバーを復帰し正常表示します。
     </div>
     """,
