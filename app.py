@@ -359,7 +359,7 @@ with st.expander("📱 【タップして展開】 スマホ操作解説・ご�
     st.markdown("""
 <div style="background-color: #1e293b; border-left: 5px solid #3b82f6; padding: 10px 14px; border-radius: 6px; margin-bottom: 12px;">
     <span style="background-color: #2563eb; color: #ffffff; padding: 3px 8px; border-radius: 4px; font-weight: 900; font-size: 13px;">📲 画面表示の復帰</span>
-    <p style="margin-top: 8px; margin-bottom: 0px; color: #f8fafc; line-height: 1.5;">一定時間アクセスがないと「Zzzz」のスリープ画面になります。その際は、画面に表示される青い復帰ボタン（<strong>「Yes, reload this page」</strong>または<strong>「Reconnect」</strong>）を1回押して再開してください。</p>
+    <p style="margin-top: 8px; margin-bottom: 0px; color: #f8fafc; line-height: 1.5;">一定時間アクセスがないと「Zzzz」のスリープ画面になります。その際は、画面に表示される青い復帰ボタン（<strong>「Yes, reload this page」</strong>または<strong>「Reconnect」</strong>）を１回押して再開してください。</p>
 </div>
 
 <div style="background-color: #1e293b; border-left: 5px solid #3b82f6; padding: 10px 14px; border-radius: 6px; margin-bottom: 12px;">
