@@ -233,56 +233,60 @@ def fetch_jma_area_names():
 
 @st.cache_data(ttl=60)
 def fetch_jma_earthquake_info():
-    # 【1次挑戦】気象庁公式地震情報API
+    # P2P地震情報APIから複数件（最大15件）取得してリスト化
+    p2p_url = "https://api.p2pquake.net/v2/history?codes=551&limit=15"
+    try:
+        req = urllib.request.Request(p2p_url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=5) as response:
+            p2p_data = json.loads(response.read().decode('utf-8'))
+        
+        if p2p_data and isinstance(p2p_data, list):
+            quake_list = []
+            p2p_scale_map = {
+                10: "震度1", 20: "震度2", 30: "震度3", 40: "震度4",
+                45: "震度5弱", 50: "震度5強", 55: "震度6弱", 60: "震度6強", 70: "震度7"
+            }
+            for item in p2p_data:
+                eq = item.get("earthquake", {})
+                hypo = eq.get("hypocenter", {})
+                scale = eq.get("maxScale", -1)
+                quake_list.append({
+                    "time": eq.get("time", "日時不明"),
+                    "hypocenter": hypo.get("name", "震源地不明"),
+                    "max_scale": p2p_scale_map.get(scale, "不明"),
+                    "magnitude": eq.get("magnitude", "--"),
+                    "depth": hypo.get("depth", "--")
+                })
+            return {"success": True, "quakes": quake_list}
+    except Exception:
+        pass
+
+    # 気象庁公式APIへのフォールバック
     jma_url = "https://www.jma.go.jp/bosai/information/data/quake.json"
     try:
         req = urllib.request.Request(jma_url, headers={'User-Agent': 'Mozilla/5.0'})
         with urllib.request.urlopen(req, timeout=5) as response:
             quakes = json.loads(response.read().decode('utf-8'))
         if quakes and isinstance(quakes, list):
-            latest = quakes[0]
-            max_scale = latest.get("maxScale", "不明")
+            quake_list = []
             scale_map = {
                 "10": "震度1", "20": "震度2", "30": "震度3", "40": "震度4",
                 "45": "震度5弱", "50": "震度5強", "55": "震度6弱", "60": "震度6強", "70": "震度7"
             }
-            return {
-                "success": True,
-                "time": latest.get("at", "日時不明"),
-                "hypocenter": latest.get("hypocenter", {}).get("name", "震源地不明"),
-                "max_scale": scale_map.get(str(max_scale), f"震度({max_scale})"),
-                "detail": latest.get("text", "直近の地震活動に特段の異常はありません。")
-            }
+            for latest in quakes[:10]:
+                max_scale = latest.get("maxScale", "不明")
+                quake_list.append({
+                    "time": latest.get("at", "日時不明"),
+                    "hypocenter": latest.get("hypocenter", {}).get("name", "震源地不明"),
+                    "max_scale": scale_map.get(str(max_scale), f"震度({max_scale})"),
+                    "magnitude": "--",
+                    "depth": "--"
+                })
+            return {"success": True, "quakes": quake_list}
     except Exception:
         pass
 
-    # 【2次挑戦（自動切替）】P2P地震情報APIから取得
-    p2p_url = "https://api.p2pquake.net/v2/history?codes=551&limit=1"
-    try:
-        req = urllib.request.Request(p2p_url, headers={'User-Agent': 'Mozilla/5.0'})
-        with urllib.request.urlopen(req, timeout=5) as response:
-            p2p_data = json.loads(response.read().decode('utf-8'))
-        if p2p_data and isinstance(p2p_data, list):
-            item = p2p_data[0]
-            eq = item.get("earthquake", {})
-            hypo = eq.get("hypocenter", {})
-            scale = eq.get("maxScale", -1)
-            
-            p2p_scale_map = {
-                10: "震度1", 20: "震度2", 30: "震度3", 40: "震度4",
-                45: "震度5弱", 50: "震度5強", 55: "震度6弱", 60: "震度6強", 70: "震度7"
-            }
-            return {
-                "success": True,
-                "time": eq.get("time", "日時不明"),
-                "hypocenter": hypo.get("name", "震源地不明"),
-                "max_scale": p2p_scale_map.get(scale, "不明"),
-                "detail": f"【自動切替取得】規模(M): {eq.get('magnitude', '--')} / 深さ: {hypo.get('depth', '--')}km"
-            }
-    except Exception:
-        pass
-
-    return {"success": False, "time": "取得待機中", "hypocenter": "サーバー混雑中・自動再試行待機", "max_scale": "--", "detail": "現在アクセスが集中しています。数秒後に自動更新されます。"}
+    return {"success": False, "quakes": []}
 
 @st.cache_data(ttl=300)
 def fetch_jma_warning_level_areas(region_name):
@@ -405,10 +409,23 @@ with st.expander("📱 【タップして展開】 スマホ操作解説・ご�
 
 st.markdown("---")
 
-st.markdown("### 📳 直近の地震情報（気象庁速報）")
-st.markdown("<p style='font-size:13px; color:#94a3b8;'>日本国内で発生した直近の地震の規模、最大震度、および震源地を速報でお伝えします。</p>", unsafe_allow_html=True)
-eq = fetch_jma_earthquake_info()
-st.markdown(f'<div style="background-color: #111827; border: 1px solid #475569; padding: 14px; border-radius: 8px; border-left: 7px solid #ef4444;"><div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;"><div><b>最大震度:</b> <span style="color: #ffe600; font-weight: 900;">{eq["max_scale"]}</span></div><div><b>発生日時:</b> {eq["time"]}</div></div><div style="margin-top:6px;"><b>震源地:</b> <span style="color: #60a5fa; font-weight: 900;">{eq["hypocenter"]}</span></div><div style="font-size: 13px; color: #e5e7eb; border-top: 1px solid #334155; margin-top: 6px; padding-top: 6px;"><b>解説:</b> {eq["detail"]}</div></div>', unsafe_allow_html=True)
+st.markdown("### 📳 本日の地震活動一覧（直近の発生履歴）")
+st.markdown("<p style='font-size:13px; color:#94a3b8;'>日本国内で本日発生した地震の履歴を時系列で一覧表示します。</p>", unsafe_allow_html=True)
+
+eq_data = fetch_jma_earthquake_info()
+if eq_data["success"] and eq_data["quakes"]:
+    for q in eq_data["quakes"]:
+        st.markdown(f"""
+        <div style="background-color: #111827; border: 1px solid #475569; padding: 10px 14px; border-radius: 8px; margin-bottom: 8px; border-left: 5px solid #3b82f6;">
+            <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                <div><b>最大震度:</b> <span style="color: #ffe600; font-weight: 900;">{q['max_scale']}</span></div>
+                <div><b>発生日時:</b> {q['time']}</div>
+            </div>
+            <div style="margin-top:4px;"><b>震源地:</b> <span style="color: #60a5fa; font-weight: 900;">{q['hypocenter']}</span> <span style="font-size:12px; color:#94a3b8;">(M{q['magnitude']} / 深さ:{q['depth']}km)</span></div>
+        </div>
+        """, unsafe_allow_html=True)
+else:
+    st.markdown('<div style="background-color: #111827; border: 1px solid #475569; padding: 14px; border-radius: 8px; border-left: 7px solid #ef4444;">サーバー混雑中・自動再試行待機中</div>', unsafe_allow_html=True)
 
 st.markdown("---")
 
