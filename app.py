@@ -475,7 +475,7 @@ st.markdown(
     unsafe_allow_html=True
 )
 
-st.title("🛡️ 全国インフラ・気象防災カルテ・リアルリンク共用システム")
+st.title("🛡️ 全国インフラ・気象防災カルテ・リアルリンク共有システム")
 st.markdown("災害時のリアルタイム気象状況・インフラ・地震情報をモバイル最適化で提供します。")
 st.markdown("---")
 
@@ -502,7 +502,7 @@ st.markdown("---")
 # 3. 監視エリア選択
 selected_region = st.selectbox("🌍 監視エリアを選択してください", list(REGION_CODES.keys()), index=2)
 
-# 4. 監視エリアマップ（Folium地図）の常時表示（APIキー不要の標準OpenStreetMapに変更）
+# 4. 監視エリアマップ（Folium地図）の常時表示
 st.markdown(f"### 🗺️ {selected_region}エリアの地理・位置確認マップ")
 region_info = REGION_CODES.get(selected_region, REGION_CODES["関東"])
 m = folium.Map(
