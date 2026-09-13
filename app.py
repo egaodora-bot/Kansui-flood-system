@@ -250,7 +250,7 @@ def fetch_jma_earthquake_info():
     url = "https://www.jma.go.jp/bosai/information/data/quake.json"
     try:
         req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-        with urllib.request.urlopen(req, timeout=3) as response:
+        with urllib.request.urlopen(req, timeout=5) as response:
             quakes = json.loads(response.read().decode('utf-8'))
         if quakes and isinstance(quakes, list):
             latest = quakes[0]
@@ -305,7 +305,7 @@ def fetch_jma_realtime_data(region_name):
     url = f"https://www.jma.go.jp/bosai/forecast/data/forecast/{info['code']}.json"
     try:
         req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-        with urllib.request.urlopen(req, timeout=3) as response:
+        with urllib.request.urlopen(req, timeout=5) as response:
             data = json.loads(response.read().decode('utf-8'))
             office = data[0].get("publishingOffice", "気象庁")
             weather_forecasts = []
@@ -334,7 +334,7 @@ def fetch_region_prefecture_weather(region_name):
         url = f"https://www.jma.go.jp/bosai/forecast/data/forecast/{code}.json"
         try:
             req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
-            with urllib.request.urlopen(req, timeout=3) as response:
+            with urllib.request.urlopen(req, timeout=5) as response:
                 data = json.loads(response.read().decode('utf-8'))
             weather, max_t = "", "--"
             for series in data[0].get("timeSeries", []):
