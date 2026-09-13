@@ -84,8 +84,15 @@ section[data-testid="stMain"] {
 
 div[data-testid="stExpander"] {
     background-color: #111827 !important;
-    border: 1px solid #64748b !important;
+    border: 1px solid #475569 !important;
+    border-left: 7px solid #3b82f6 !important;
     border-radius: 8px !important;
+}
+
+div[data-testid="stExpander"] summary p {
+    font-weight: 900 !important;
+    color: #ffffff !important;
+    font-size: 15px !important;
 }
 
 div[data-testid="stSelectbox"] {
@@ -347,35 +354,34 @@ def fetch_region_prefecture_weather(region_name):
 st.title("🛡️ 全国インフラ・気象防災カルテ・リアルリンク共用システム")
 st.markdown("災害時のリアルタイム気象状況・インフラ・地震情報をモバイル最適化で一元管理します。")
 
-# 折り畳み式の統合ガイド＆開発目的カルテ（全項目をカテゴリ＋段落で整理）
-st.markdown(
-    """
-    <details style="background-color: #111827; border: 1px solid #475569; border-left: 7px solid #3b82f6; border-radius: 8px; padding: 12px 16px; margin-bottom: 20px; color: #ffffff;">
-        <summary style="font-weight: 900; cursor: pointer; color: #ffffff; font-size: 15px;">
-            📱 <span style="color: #60a5fa;">【タップして展開】</span> 本システムのご利用案内・開発目的・スマホ操作解説
-        </summary>
-        <div style="margin-top: 12px; padding-top: 10px; border-top: 1px solid #334155; line-height: 1.6;">
-            
-            <b>「開発の目的」</b>：<br>
-             気象庁の公式一次情報（地震速報・特別警報・キキクル）と、生活・交通インフラのリアルタイム状況を1つの画面で素早く確認できるように開発しています。<br><br>
-            
-            <b>「設計思想」</b>：<br>
-             広告や不要な装飾を削ぎ落とし、災害時や電波が不安定な状況下でもスマホから軽量かつ直感的に命を守る判断ができるよう最適化しています。<br><br>
-            
-            <b>「画面表示の復帰」</b>：<br>
-             一定時間アクセスがないと「Zzzz」のスリープ画面になります。その際は、青い復帰ボタンを1回押して再開してください。<br><br>
-            
-            <b>「ワイド表示への切り替え」</b>：<br>
-             スマホを「横向き」にするとデスクトップ表示（ワイド画面）に切り替わり、地図やエリア情報を見渡しやすくなります。<br><br>
-            
-            <b>「ショートカットの活用」</b>：<br>
-             ホーム画面にショートカットを追加しておくと、いざという時にワンタップで瞬時に起動できます。
+# 折り畳み式ガイド（操作案内を上に、開発目的を下に整理し、HTMLを使ってカテゴリを強力に強調表示）
+with st.expander("📱 【タップして展開】 スマホ操作解説・ご利用案内・開発目的"):
+    st.markdown("""
+<div style="background-color: #1e293b; border-left: 5px solid #3b82f6; padding: 10px 14px; border-radius: 6px; margin-bottom: 12px;">
+    <span style="background-color: #2563eb; color: #ffffff; padding: 3px 8px; border-radius: 4px; font-weight: 900; font-size: 13px;">📲 画面表示の復帰</span>
+    <p style="margin-top: 8px; margin-bottom: 0px; color: #f8fafc; line-height: 1.5;">一定時間アクセスがないと「Zzzz」のスリープ画面になります。その際は、青い復帰ボタンを1回押して再開してください。</p>
+</div>
 
-        </div>
-    </details>
-    """,
-    unsafe_allow_html=True
-)
+<div style="background-color: #1e293b; border-left: 5px solid #3b82f6; padding: 10px 14px; border-radius: 6px; margin-bottom: 12px;">
+    <span style="background-color: #2563eb; color: #ffffff; padding: 3px 8px; border-radius: 4px; font-weight: 900; font-size: 13px;">↔️ ワイド表示への切り替え</span>
+    <p style="margin-top: 8px; margin-bottom: 0px; color: #f8fafc; line-height: 1.5;">スマホを「横向き」にするとデスクトップ表示（ワイド画面）に切り替わり、地図やエリア情報を見渡しやすくなります。</p>
+</div>
+
+<div style="background-color: #1e293b; border-left: 5px solid #3b82f6; padding: 10px 14px; border-radius: 6px; margin-bottom: 12px;">
+    <span style="background-color: #2563eb; color: #ffffff; padding: 3px 8px; border-radius: 4px; font-weight: 900; font-size: 13px;">📌 ショートカットの活用</span>
+    <p style="margin-top: 8px; margin-bottom: 0px; color: #f8fafc; line-height: 1.5;">ホーム画面にショートカットを追加しておくと、いざという時にワンタップで瞬時に起動できます。</p>
+</div>
+
+<div style="background-color: #1e293b; border-left: 5px solid #10b981; padding: 10px 14px; border-radius: 6px; margin-bottom: 12px;">
+    <span style="background-color: #059669; color: #ffffff; padding: 3px 8px; border-radius: 4px; font-weight: 900; font-size: 13px;">🎯 開発の目的</span>
+    <p style="margin-top: 8px; margin-bottom: 0px; color: #f8fafc; line-height: 1.5;">気象庁の公式一次情報（地震速報・特別警報・キキクル）と、生活・交通インフラのリアルタイム状況を1つの画面で素早く確認できるように開発しています。</p>
+</div>
+
+<div style="background-color: #1e293b; border-left: 5px solid #10b981; padding: 10px 14px; border-radius: 6px; margin-bottom: 0px;">
+    <span style="background-color: #059669; color: #ffffff; padding: 3px 8px; border-radius: 4px; font-weight: 900; font-size: 13px;">💡 設計思想</span>
+    <p style="margin-top: 8px; margin-bottom: 0px; color: #f8fafc; line-height: 1.5;">広告や不要な装飾を削ぎ落とし、災害時や電波が不安定な状況下でもスマホから軽量かつ直感的に命を守る判断ができるよう最適化しています。</p>
+</div>
+    """, unsafe_allow_html=True)
 
 st.markdown("---")
 
