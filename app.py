@@ -18,7 +18,7 @@ st.markdown("""
 <style>
 
 /* ==========================================
-   V14：タイトル点滅最適化・5大防災リンク完全復活版
+   V17：地図表記のブラッシュアップ（気象地震確認マップへの変更）
    ========================================== */
 
 html, body,
@@ -70,11 +70,11 @@ section[data-testid="stMain"] {
     display: inline-block;
 }
 
-/* 起動時ご注意カード（背景・枠は固定で落ち着いたデザイン） */
+/* 起動時ご注意カード（左側を黄色ラインに変更） */
 .notice-card {
     background-color: #111827 !important;
     border: 1px solid #334155 !important;
-    border-left: 7px solid #ef4444 !important;
+    border-left: 7px solid #ffe600 !important;
     padding: 14px 18px;
     border-radius: 8px;
     margin-bottom: 20px;
@@ -507,7 +507,7 @@ def fetch_region_prefecture_weather(region_name):
 # メイン画面の描画処理
 # ==========================================
 
-# 1. 起動時のご注意（タイトルのみ点滅、カード背景は安定表示）
+# 1. 起動時のご注意（タイトル点滅、左ラインは黄色アクセント）
 st.markdown(
     """
     <div class="notice-card">
@@ -559,8 +559,8 @@ st.markdown("---")
 # 3. 監視エリア選択
 selected_region = st.selectbox("🌍 監視エリアを選択してください", list(REGION_CODES.keys()), index=2)
 
-# 4. 監視エリアマップ（Folium地図）の常時表示
-st.markdown(f"### 🗺️ {selected_region}エリアの地理・位置確認マップ")
+# 4. 監視エリアマップ（Folium地図）の常時表示（気象地震確認マップへ表記変更）
+st.markdown(f"### 🗺️ {selected_region}エリアの地図・気象地震確認マップ")
 region_info = REGION_CODES.get(selected_region, REGION_CODES["関東"])
 m = folium.Map(
     location=[region_info["lat"], region_info["lon"]],
@@ -635,7 +635,7 @@ for pw in pref_weather_list:
 
 st.markdown("---")
 
-# 10. 災害防災リンク集（Yahoo!天気など5つのリンクを完全復活）
+# 10. 災害防災リンク集（Yahoo!天気など5つのリンク）
 st.markdown(
     """
     <div class="link-card">
