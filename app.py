@@ -354,7 +354,7 @@ def fetch_region_prefecture_weather(region_name):
 st.title("🛡️ 全国インフラ・気象防災カルテ・リアルリンク共用システム")
 st.markdown("災害時のリアルタイム気象状況・インフラ・地震情報をモバイル最適化で一元管理します。")
 
-# ガイド（文字をはっきりと白く見やすくし、余白や枠線を調整）
+# ガイド（手順内のリンク風の青文字をすべて通常の白文字・太字に変更）
 with st.expander("📱 【タップして展開】 スマホ操作解説・ご利用案内・開発目的"):
     st.markdown("""
 <div style="background-color: #1e293b; border-left: 5px solid #3b82f6; padding: 12px 16px; border-radius: 6px; margin-bottom: 14px;">
@@ -371,10 +371,10 @@ with st.expander("📱 【タップして展開】 スマホ操作解説・ご�
     <span style="background-color: #1d4ed8; color: #ffffff; padding: 4px 10px; border-radius: 4px; font-weight: 900; font-size: 13px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); display: inline-block;">📌 ショートカットの活用</span>
     <p style="margin-top: 10px; margin-bottom: 8px; color: #ffffff; font-size: 14px; line-height: 1.6; font-weight: 500;">ホーム画面にショートカットを追加しておくと、いざという時にワンタップで瞬時に起動できます。</p>
     <div style="background-color: #0f172a; border: 1px solid #334155; padding: 10px 14px; border-radius: 6px; font-size: 13px; color: #ffffff; line-height: 1.6;">
-        <strong style="color: #60a5fa;">【追加のカンタン手順】</strong><br>
+        <b style="color: #ffffff;">【追加のカンタン手順】</b><br>
         1. 今開いているこのアプリの状態で、スマホブラウザ（Safari / Chrome）のメニューボタン（共有・︙アイコン）をタップ<br>
-        2. <strong style="color: #38bdf8;">「ホーム画面に追加」</strong>を選択する<br>
-        3. デフォルトで「Streamlit」と表示された場合は、お好みで<strong style="color: #38bdf8;">「防災カルテ」</strong>などに書き換えて保存してください。
+        2. <b>「ホーム画面に追加」</b>を選択する<br>
+        3. デフォルトで「Streamlit」と表示された場合は、お好みで<b>「防災カルテ」</b>などに書き換えて保存してください。
     </div>
 </div>
 
