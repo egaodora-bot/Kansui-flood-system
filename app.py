@@ -410,19 +410,19 @@ with st.expander("📱 【タップして展開】 スマホ操作解説・ご�
 st.markdown("---")
 
 st.markdown("### 📳 直近の地震情報 ＆ 本日の履歴")
-st.markdown("<p style='font-size:13px; color:#94a3b8;'>日本国内での最新の地震速報と、本日発生した地震の履歴を確認できます。</p>", unsafe_allow_html=True)
+st.markdown("<p style='font-size:13px; color:#cbd5e1;'>日本国内での最新の地震速報と、本日発生した地震の履歴を確認できます。</p>", unsafe_allow_html=True)
 
 eq_data = fetch_jma_earthquake_info()
 if eq_data["success"] and eq_data["quakes"]:
     # 最新の1件を外に出して強調表示
     latest = eq_data["quakes"][0]
     st.markdown(f"""
-    <div style="background-color: #111827; border: 1px solid #475569; padding: 14px; border-radius: 8px; border-left: 7px solid #ef4444; margin-bottom: 12px;">
+    <div style="background-color: #1e293b; border: 1px solid #475569; padding: 14px; border-radius: 8px; border-left: 7px solid #ef4444; margin-bottom: 12px;">
         <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
-            <div><b>最大震度:</b> <span style="color: #ffe600; font-weight: 900; font-size: 1.1em;">{latest['max_scale']}</span></div>
-            <div><b>発生日時:</b> {latest['time']}</div>
+            <div><b style="color: #ffffff;">最大震度:</b> <span style="color: #fde047; font-weight: 900; font-size: 1.1em;">{latest['max_scale']}</span></div>
+            <div><b style="color: #ffffff;">発生日時:</b> <span style="color: #f8fafc;">{latest['time']}</span></div>
         </div>
-        <div style="margin-top:6px;"><b>震源地:</b> <span style="color: #60a5fa; font-weight: 900; font-size: 1.1em;">{latest['hypocenter']}</span> <span style="font-size:12px; color:#94a3b8;">(M{latest['magnitude']} / 深さ:{latest['depth']}km)</span></div>
+        <div style="margin-top:6px;"><b style="color: #ffffff;">震源地:</b> <span style="color: #93c5fd; font-weight: 900; font-size: 1.1em;">{latest['hypocenter']}</span> <span style="font-size:12px; color:#cbd5e1;">(M{latest['magnitude']} / 深さ:{latest['depth']}km)</span></div>
     </div>
     """, unsafe_allow_html=True)
     
@@ -431,16 +431,16 @@ if eq_data["success"] and eq_data["quakes"]:
         with st.expander("🔽 過去の地震履歴をさらに表示（タップして展開）"):
             for q in eq_data["quakes"][1:]:
                 st.markdown(f"""
-                <div style="background-color: #0f172a; border: 1px solid #334155; padding: 10px 14px; border-radius: 8px; margin-bottom: 8px; border-left: 5px solid #3b82f6;">
+                <div style="background-color: #1e293b; border: 1px solid #475569; padding: 10px 14px; border-radius: 8px; margin-bottom: 8px; border-left: 5px solid #3b82f6;">
                     <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
-                        <div><b>最大震度:</b> <span style="color: #ffe600; font-weight: 900;">{q['max_scale']}</span></div>
-                        <div><b>発生日時:</b> {q['time']}</div>
+                        <div><b style="color: #ffffff;">最大震度:</b> <span style="color: #fde047; font-weight: 900;">{q['max_scale']}</span></div>
+                        <div><b style="color: #ffffff;">発生日時:</b> <span style="color: #f8fafc;">{q['time']}</span></div>
                     </div>
-                    <div style="margin-top:4px;"><b>震源地:</b> <span style="color: #60a5fa; font-weight: 900;">{q['hypocenter']}</span> <span style="font-size:12px; color:#94a3b8;">(M{q['magnitude']} / 深さ:{q['depth']}km)</span></div>
+                    <div style="margin-top:4px;"><b style="color: #ffffff;">震源地:</b> <span style="color: #93c5fd; font-weight: 900;">{q['hypocenter']}</span> <span style="font-size:12px; color:#cbd5e1;">(M{q['magnitude']} / 深さ:{q['depth']}km)</span></div>
                 </div>
                 """, unsafe_allow_html=True)
 else:
-    st.markdown('<div style="background-color: #111827; border: 1px solid #475569; padding: 14px; border-radius: 8px; border-left: 7px solid #ef4444;">サーバー混雑中・自動再試行待機中</div>', unsafe_allow_html=True)
+    st.markdown('<div style="background-color: #1e293b; border: 1px solid #475569; padding: 14px; border-radius: 8px; border-left: 7px solid #ef4444; color: #ffffff;">サーバー混雑中・自動再試行待機中</div>', unsafe_allow_html=True)
 
 st.markdown("---")
 
@@ -449,7 +449,7 @@ selected_region = st.selectbox("🌍 監視エリアを選択してください�
 st.markdown("---")
 
 st.markdown(f"### ⚠️ {selected_region}エリアの緊急警戒レベル（レベル3〜5）発令状況")
-st.markdown("<p style='font-size:13px; color:#94a3b8;'>気象庁が発表している土砂災害や大雨等の厳戒警報・特別警報をレベル別に集約表示します。</p>", unsafe_allow_html=True)
+st.markdown("<p style='font-size:13px; color:#cbd5e1;'>気象庁が発表している土砂災害や大雨等の厳戒警報・特別警報をレベル別に集約表示します。</p>", unsafe_allow_html=True)
 warnings = fetch_jma_warning_level_areas(selected_region)
 has_warn = False
 for lvl, color, title in [("Level5", "error", "🚨 【Level5】特別警報発令中（直ちに命を守る行動を）"), ("Level4", "error", "🟥 【Level4】危険警報発令中（危険な場所から全員避難）"), ("Level3", "warning", "🟧 【Level3】警報発令中（高齢者等は避難準備）")]:
@@ -483,7 +483,7 @@ for fc in w_data["forecasts"]: st.markdown(f"- {fc}")
 st.markdown("---")
 
 st.markdown(f"### 📋 {selected_region}管内 都道府県別ステータス")
-st.markdown("<p style='font-size:13px; color:#94a3b8;'>選択した管内各県の天気概況と予想最高気温を一覧で確認できます。</p>", unsafe_allow_html=True)
+st.markdown("<p style='font-size:13px; color:#cbd5e1;'>選択した管内各県の天気概況と予想最高気温を一覧で確認できます。</p>", unsafe_allow_html=True)
 for pw in fetch_region_prefecture_weather(selected_region):
     st.markdown(f"**{pw['prefecture']}** (最高: {pw['max_temp']}°C) └ {pw['comment']}")
 
@@ -493,7 +493,7 @@ st.markdown(
     """
     <div class="link-card">
         <b>🔗 インフラ・交通・防災関連リンク集（公式リアルタイム情報）</b><br>
-        <p style='font-size:13px; color:#94a3b8; margin-top:4px;'>詳細な雨雲の動きや交通・河川情報をピンポイントで確認するための外部公式リンク集です。</p>
+        <p style='font-size:13px; color:#cbd5e1; margin-top:4px;'>詳細な雨雲の動きや交通・河川情報をピンポイントで確認するための外部公式リンク集です。</p>
         <ul>
             <li><b>【雨雲ズーム】</b> <a href="https://weather.yahoo.co.jp/weather/zoomradar/" target="_blank">Yahoo!天気（雨雲ズームレーダー）</a>：高精度な雨雲の現在地と将来の動きを拡大表示</li>
             <li><b>【防災情報】</b> <a href="https://www.jma.go.jp/bosai/" target="_blank">気象庁 防災情報ポータル</a>：警報・台風・地震情報の総合窓口</li>
