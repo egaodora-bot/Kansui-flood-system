@@ -253,6 +253,53 @@ def fetch_jma_area_names():
     except Exception:
         return {}
 
+@st.cache_data(ttl=60)
+def fetch_jma_earthquake_info():
+    """気象庁の公式地震情報JSONから直近の地震情報を取得"""
+    url = "https://www.jma.go.jp/bosai/information/data/quake.json"
+    try:
+        req = urllib.request.Request(
+            url,
+            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
+        )
+        with urllib.request.urlopen(req, timeout=3) as response:
+            quakes = json.loads(response.read().decode('utf-8'))
+            
+        if quakes and isinstance(quakes, list):
+            latest = quakes[0]
+            # 各種パラメータの抽出
+            # 日時
+            time_str = latest.get("at", "日時不明")
+            # 震源地
+            hypo = latest.get("hypocenter", {}).get("name", "震源地不明")
+            # 最大震度
+            max_scale = latest.get("maxScale", "不明")
+            
+            # 震度コードを一般的な表現に変換するマッピング（例: 30=震度3, 40=震度4, 45=震度5弱 等）
+            scale_map = {
+                "10": "震度1", "20": "震度2", "30": "震度3", "40": "震度4",
+                "45": "震度5弱", "50": "震度5強", "55": "震度6弱", "60": "震度6強", "70": "震度7"
+            }
+            scale_text = scale_map.get(str(max_scale), f"最大震度(コード:{max_scale})")
+            
+            return {
+                "success": True,
+                "time": time_str,
+                "hypocenter": hypo,
+                "max_scale": scale_text,
+                "detail": latest.get("text", "詳細情報なし")
+            }
+    except Exception:
+        pass
+    
+    return {
+        "success": False,
+        "time": "--",
+        "hypocenter": "データ取得待機中または通信制限",
+        "max_scale": "--",
+        "detail": "現在、気象庁地震情報APIへのアクセスを確認中です。"
+    }
+
 @st.cache_data(ttl=300)
 def fetch_jma_warning_level_areas(region_name):
     office_codes = REGION_WARNING_OFFICES.get(
@@ -372,7 +419,6 @@ def fetch_jma_realtime_data(region_name):
 
 @st.cache_data(ttl=300)
 def fetch_region_prefecture_weather(region_name):
-    """各都道府県の予報および最高・最低気温を取得して整理する"""
     results = []
     prefectures = REGION_PREFECTURES.get(region_name, {})
 
@@ -391,7 +437,6 @@ def fetch_region_prefecture_weather(region_name):
             min_t = "--"
 
             for series in data[0].get("timeSeries", []):
-                # 気温データの探索
                 for area in series.get("areas", []):
                     temps = area.get("temps", [])
                     if temps:
@@ -402,7 +447,6 @@ def fetch_region_prefecture_weather(region_name):
                         elif len(temps) > 1 and temps[1] == "" and len(temps) > 0:
                             min_t = temps[0]
 
-                # 天気データの探索
                 for area in series.get("areas", []):
                     weathers = area.get("weathers", [])
                     if weathers and not weather:
@@ -448,16 +492,31 @@ st.markdown(
 )
 
 st.title("🛡️ 全国インフラ・気象防災カルテ・リアルリンク共用システム")
-st.markdown("災害時のリアルタイム気象状況・インフラ情報をモバイル最適化で提供します。")
+st.markdown("災害時のリアルタイム気象状況・インフラ・地震情報をモバイル最適化で提供します。")
 st.markdown("---")
 
-# 2. 監視エリア選択
+# 2. 地震情報の常時表示セクション（新規追加・折りたたみなし）
+st.markdown("### 📳 直近の地震情報（気象庁速報）")
+eq_data = fetch_jma_earthquake_info()
+
+eq_col1, eq_col2, eq_col3 = st.columns(3)
+with eq_col1:
+    st.metric(label="最大震度", value=eq_data["max_scale"])
+with eq_col2:
+    st.metric(label="発生日時", value=eq_data["time"])
+with eq_col3:
+    st.metric(label="震源地", value=eq_data["hypocenter"])
+
+st.markdown(f"**📝 詳細:** {eq_data['detail']}")
+st.markdown("---")
+
+# 3. 監視エリア選択
 selected_region = st.selectbox("🌍 監視エリアを選択してください", list(REGION_CODES.keys()), index=2)
 
-# 3. 気象データ取得
+# 4. 気象データ取得
 weather_data = fetch_jma_realtime_data(selected_region)
 
-# 4. 気象・温度状況の常時表示レイアウト（最高・最低気温含む）
+# 5. 気象・温度状況の常時表示レイアウト（最高・最低気温含む）
 st.markdown("### 🌡️ 気象・温度状況（現在地 / 予報）")
 
 col1, col2, col3 = st.columns(3)
@@ -470,7 +529,7 @@ with col3:
 
 st.markdown("---")
 
-# 5. 警戒レベル・警報・注意報発令状況（地域名つきで整理表示）
+# 6. 警戒レベル・警報・注意報発令状況（地域名つきで整理表示）
 st.markdown(f"### ⚠️ {selected_region}エリアの警戒レベル・警報発令状況")
 
 warning_levels = fetch_jma_warning_level_areas(selected_region)
@@ -510,14 +569,14 @@ if not has_any_warning:
 
 st.markdown("---")
 
-# 6. リアルタイム天気予報の表示
+# 7. リアルタイム天気予報の表示
 st.markdown(f"### 📡 {selected_region}地方の気象情報 ({weather_data['office']})")
 for forecast in weather_data["forecasts"]:
     st.markdown(f"- {forecast}")
 
 st.markdown("---")
 
-# 7. 都道府県別の詳細ステータス（最高・最低気温を反映）
+# 8. 都道府県別の詳細ステータス（最高・最低気温を反映）
 st.markdown(f"### 📋 {selected_region}管内 都道府県別ステータス")
 pref_weather_list = fetch_region_prefecture_weather(selected_region)
 for pw in pref_weather_list:
