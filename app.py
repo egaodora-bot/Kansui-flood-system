@@ -18,7 +18,7 @@ st.markdown("""
 <style>
 
 /* ==========================================
-   V19：公式安全リンク最適化版
+   V20：Yahoo!雨雲レーダー直リンク対応・防災最適化版
    ========================================== */
 
 html, body,
@@ -635,13 +635,13 @@ for pw in pref_weather_list:
 
 st.markdown("---")
 
-# 9. インフラ・交通・防災関連リンク集（安全な公式URLに統一）
+# 9. インフラ・交通・防災関連リンク集（Yahoo!雨雲レーダー・公式安全URL完備）
 st.markdown(
     """
     <div class="link-card">
         <b>🔗 インフラ・交通・防災関連リンク集（公式リアルタイム情報）</b><br><br>
         <ul>
-            <li><b>【天気】</b> <a href="https://weather.yahoo.co.jp/weather/" target="_blank">Yahoo!天気・災害</a>：全国の天気予報・雨雲レーダー・台風詳細</li>
+            <li><b>【天気】</b> <a href="https://weather.yahoo.co.jp/weather/rainradar/" target="_blank">Yahoo!天気（雨雲レーダー・リアルタイム）</a>：今降っている雨や今後の雨雲の動きを詳細確認</li>
             <li><b>【天気】</b> <a href="https://www.jma.go.jp/bosai/" target="_blank">気象庁 防災情報ポータル</a>：警報・台風・地震情報のリアルタイム確認</li>
             <li><b>【道路】</b> <a href="https://www.jartic.or.jp/" target="_blank">JARTIC 日本道路交通情報センター</a>：高速道路・一般道の通行止め・規制情報</li>
             <li><b>【鉄道】</b> <a href="https://transit.yahoo.co.jp/diainfo/" target="_blank">Yahoo!路線情報（運行情報）</a>：全国の鉄道の遅延・運休状況</li>
