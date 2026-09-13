@@ -233,7 +233,7 @@ def fetch_jma_area_names():
 
 @st.cache_data(ttl=60)
 def fetch_jma_earthquake_info():
-    # P2P地震情報APIから複数件（最大15件）取得してリスト化
+    # P2P地震情報APIから複数件取得してリスト化
     p2p_url = "https://api.p2pquake.net/v2/history?codes=551&limit=15"
     try:
         req = urllib.request.Request(p2p_url, headers={'User-Agent': 'Mozilla/5.0'})
@@ -409,21 +409,36 @@ with st.expander("📱 【タップして展開】 スマホ操作解説・ご�
 
 st.markdown("---")
 
-st.markdown("### 📳 本日の地震活動一覧（直近の発生履歴）")
-st.markdown("<p style='font-size:13px; color:#94a3b8;'>日本国内で本日発生した地震の履歴を時系列で一覧表示します。</p>", unsafe_allow_html=True)
+st.markdown("### 📳 直近の地震情報 ＆ 本日の履歴")
+st.markdown("<p style='font-size:13px; color:#94a3b8;'>日本国内での最新の地震速報と、本日発生した地震の履歴を確認できます。</p>", unsafe_allow_html=True)
 
 eq_data = fetch_jma_earthquake_info()
 if eq_data["success"] and eq_data["quakes"]:
-    for q in eq_data["quakes"]:
-        st.markdown(f"""
-        <div style="background-color: #111827; border: 1px solid #475569; padding: 10px 14px; border-radius: 8px; margin-bottom: 8px; border-left: 5px solid #3b82f6;">
-            <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
-                <div><b>最大震度:</b> <span style="color: #ffe600; font-weight: 900;">{q['max_scale']}</span></div>
-                <div><b>発生日時:</b> {q['time']}</div>
-            </div>
-            <div style="margin-top:4px;"><b>震源地:</b> <span style="color: #60a5fa; font-weight: 900;">{q['hypocenter']}</span> <span style="font-size:12px; color:#94a3b8;">(M{q['magnitude']} / 深さ:{q['depth']}km)</span></div>
+    # 最新の1件を外に出して強調表示
+    latest = eq_data["quakes"][0]
+    st.markdown(f"""
+    <div style="background-color: #111827; border: 1px solid #475569; padding: 14px; border-radius: 8px; border-left: 7px solid #ef4444; margin-bottom: 12px;">
+        <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+            <div><b>最大震度:</b> <span style="color: #ffe600; font-weight: 900; font-size: 1.1em;">{latest['max_scale']}</span></div>
+            <div><b>発生日時:</b> {latest['time']}</div>
         </div>
-        """, unsafe_allow_html=True)
+        <div style="margin-top:6px;"><b>震源地:</b> <span style="color: #60a5fa; font-weight: 900; font-size: 1.1em;">{latest['hypocenter']}</span> <span style="font-size:12px; color:#94a3b8;">(M{latest['magnitude']} / 深さ:{latest['depth']}km)</span></div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    # 2件目以降を折りたたみに格納
+    if len(eq_data["quakes"]) > 1:
+        with st.expander("🔽 過去の地震履歴をさらに表示（タップして展開）"):
+            for q in eq_data["quakes"][1:]:
+                st.markdown(f"""
+                <div style="background-color: #0f172a; border: 1px solid #334155; padding: 10px 14px; border-radius: 8px; margin-bottom: 8px; border-left: 5px solid #3b82f6;">
+                    <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                        <div><b>最大震度:</b> <span style="color: #ffe600; font-weight: 900;">{q['max_scale']}</span></div>
+                        <div><b>発生日時:</b> {q['time']}</div>
+                    </div>
+                    <div style="margin-top:4px;"><b>震源地:</b> <span style="color: #60a5fa; font-weight: 900;">{q['hypocenter']}</span> <span style="font-size:12px; color:#94a3b8;">(M{q['magnitude']} / 深さ:{q['depth']}km)</span></div>
+                </div>
+                """, unsafe_allow_html=True)
 else:
     st.markdown('<div style="background-color: #111827; border: 1px solid #475569; padding: 14px; border-radius: 8px; border-left: 7px solid #ef4444;">サーバー混雑中・自動再試行待機中</div>', unsafe_allow_html=True)
 
