@@ -146,7 +146,7 @@ hr {
 </style>
 """, unsafe_allow_html=True)
 
-# エリアごとの気象庁エリアコード
+# エリアごとの気象庁エリアコードと中心座標
 REGION_CODES = {
     "北海道": {"code": "016000", "lat": 43.0642, "lon": 141.3469},
     "東北": {"code": "040000", "lat": 38.2688, "lon": 140.8721},
@@ -255,7 +255,7 @@ def fetch_jma_area_names():
 
 @st.cache_data(ttl=60)
 def fetch_jma_earthquake_info():
-    """気象庁の公式地震情報JSONを取得（安定したエンドポイントを使用）"""
+    """気象庁の地震情報JSONから、震源地の情報および緯度・経度を安全に抽出"""
     url = "https://www.jma.go.jp/bosai/information/data/quake.json"
     try:
         req = urllib.request.Request(
@@ -268,9 +268,28 @@ def fetch_jma_earthquake_info():
         if quakes and isinstance(quakes, list):
             latest = quakes[0]
             time_str = latest.get("at", "日時不明")
-            hypo = latest.get("hypocenter", {}).get("name", "震源地不明")
+            hypo_obj = latest.get("hypocenter", {})
+            hypo = hypo_obj.get("name", "震源地不明")
             max_scale = latest.get("maxScale", "不明")
             
+            # 緯度・経度の安全な抽出（エラー回避用防壁）
+            lat, lon = None, None
+            coord_str = hypo_obj.get("coordinate", "")
+            # 気象庁の座標フォーマットから緯度・経度を正規表現で安全にパース
+            if coord_str:
+                # 例: "+35.6+139.6-10000/" のような形式に対応
+                lat_match = re.search(r'([+-]\d+\.\d+)', coord_str)
+                lon_match = re.search(r'([+-]\d+\.\d+)', coord_str[6:] if len(coord_str)>6 else '')
+                # または一般的な数値表現を試みる
+                try:
+                    # 簡易的なパース処理
+                    parts = coord_str.replace('+', ' +').replace('-', ' -').split()
+                    if len(parts) >= 2:
+                        lat = float(parts[0])
+                        lon = float(parts[1])
+                except Exception:
+                    pass
+
             scale_map = {
                 "10": "震度1", "20": "震度2", "30": "震度3", "40": "震度4",
                 "45": "震度5弱", "50": "震度5強", "55": "震度6弱", "60": "震度6強", "70": "震度7"
@@ -282,6 +301,8 @@ def fetch_jma_earthquake_info():
                 "time": time_str,
                 "hypocenter": hypo,
                 "max_scale": scale_text,
+                "lat": lat,
+                "lon": lon,
                 "detail": latest.get("text", "直近の地震活動に特段の異常はありません。")
             }
     except Exception:
@@ -292,6 +313,8 @@ def fetch_jma_earthquake_info():
         "time": "取得待機中",
         "hypocenter": "通信制限またはキャッシュ待機中",
         "max_scale": "--",
+        "lat": None,
+        "lon": None,
         "detail": "現在、気象庁地震情報APIへの接続を確認しています。"
     }
 
@@ -480,7 +503,7 @@ st.title("🛡️ 全国インフラ・気象防災カルテ・リアルリン�
 st.markdown("災害時のリアルタイム気象状況・インフラ・地震情報をモバイル最適化で提供します。")
 st.markdown("---")
 
-# 2. 地震情報の常時表示セクション（st.metricによる崩れを防ぎ、見やすいカード形式に変更）
+# 2. 地震情報の常時表示セクション
 st.markdown("### 📳 直近の地震情報（気象庁速報）")
 eq_data = fetch_jma_earthquake_info()
 
@@ -503,10 +526,52 @@ st.markdown("---")
 # 3. 監視エリア選択
 selected_region = st.selectbox("🌍 監視エリアを選択してください", list(REGION_CODES.keys()), index=2)
 
-# 4. 気象データ取得
+# 4. 地震情報と連動した安全設計マップ（Folium地図）
+# 震源地の座標が安全に取得できた場合はその場所をプロットし、取得できない場合は監視エリア中心にフォールバック
+st.markdown(f"### 🗺️ 防災・地震マップ（{selected_region}エリア / 震源地連動）")
+region_info = REGION_CODES.get(selected_region, REGION_CODES["関東"])
+
+# マップの中心座標を決定（地震の緯度・経度があれば最優先、なければエリア中心）
+map_lat = region_info["lat"]
+map_lon = region_info["lon"]
+has_eq_coord = False
+
+if eq_data.get("lat") is not None and eq_data.get("lon") is not None:
+    # 日本国内の妥当な範囲内かチェック
+    if 20.0 <= eq_data["lat"] <= 46.0 and 122.0 <= eq_data["lon"] <= 154.0:
+        map_lat = eq_data["lat"]
+        map_lon = eq_data["lon"]
+        has_eq_coord = True
+
+m = folium.Map(
+    location=[map_lat, map_lon],
+    zoom_start=7 if not has_eq_coord else 8,
+    tiles="CartoDB dark_matter"
+)
+
+# マーカーの追加（震源地連動またはエリア中心）
+if has_eq_coord:
+    folium.Marker(
+        [map_lat, map_lon],
+        popup=f"直近の震源: {eq_data['hypocenter']}",
+        tooltip=f"震源地: {eq_data['hypocenter']} ({eq_data['max_scale']})",
+        icon=folium.Icon(color="red", icon="warning-sign", prefix="fa")
+    ).add_to(m)
+else:
+    folium.Marker(
+        [region_info["lat"], region_info["lon"]],
+        popup=f"{selected_region}エリア中心",
+        tooltip=selected_region,
+        icon=folium.Icon(color="blue", icon="info-sign")
+    ).add_to(m)
+
+st_folium(m, width="100%", height=300, key=f"map_{selected_region}")
+st.markdown("---")
+
+# 5. 気象データ取得
 weather_data = fetch_jma_realtime_data(selected_region)
 
-# 5. 気象・温度状況の常時表示レイアウト
+# 6. 気象・温度状況の常時表示レイアウト
 st.markdown(f"### 🌡️ 気象・温度状況 ({selected_region}エリアの代表値)")
 
 col1, col2 = st.columns(2)
@@ -517,7 +582,7 @@ with col2:
 
 st.markdown("---")
 
-# 6. 警戒レベル・警報・注意報発令状況
+# 7. 警戒レベル・警報・注意報発令状況
 st.markdown(f"### ⚠️ {selected_region}エリアの警戒レベル・警報発令状況")
 
 warning_levels = fetch_jma_warning_level_areas(selected_region)
@@ -553,14 +618,14 @@ if not has_any_warning:
 
 st.markdown("---")
 
-# 7. リアルタイム天気予報の表示
+# 8. リアルタイム天気予報の表示
 st.markdown(f"### 📡 {selected_region}地方の気象情報 ({weather_data['office']})")
 for forecast in weather_data["forecasts"]:
     st.markdown(f"- {forecast}")
 
 st.markdown("---")
 
-# 8. 都道府県別の詳細ステータス
+# 9. 都道府県別の詳細ステータス
 st.markdown(f"### 📋 {selected_region}管内 都道府県別ステータス")
 pref_weather_list = fetch_region_prefecture_weather(selected_region)
 for pw in pref_weather_list:
