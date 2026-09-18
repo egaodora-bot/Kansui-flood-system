@@ -387,7 +387,7 @@ with st.expander("📱 【タップして展開】 スマホ操作解説・ご�
 
 st.markdown("---")
 
-# 🌀 台風情報カテゴリ（ダークモード専用カード表示）
+# 🌀 台風情報カテゴリ（メタデータを美しく整形して表示）
 st.markdown("### 🌀 台風情報・進路速報")
 st.markdown("<p style='font-size:13px; color:#cbd5e1;'>現在発生している台風の状況や進路予報を確認できます。</p>", unsafe_allow_html=True)
 
@@ -399,18 +399,19 @@ if typhoon_res["success"] and typhoon_res["data"]:
     </div>
     """, unsafe_allow_html=True)
     
-    # st.json の代わりにダークモード対応のカスタムカードで安全に一覧表示
     with st.expander("📁 台風データの詳細を確認（タップして展開）"):
         for i, item in enumerate(typhoon_res["data"]):
-            title = item.get("title", f"台風情報 #{i+1}")
-            datetime_str = item.get("dateTime", item.get("targetDateTime", "日時不明"))
-            body_text = item.get("body", item.get("text", json.dumps(item, ensure_ascii=False)))
+            head_title = item.get("headTitle", item.get("controlTitle", f"台風情報 #{i+1}"))
+            pub_office = item.get("publishingOffice", "気象庁")
+            datetime_str = item.get("targetDateTime", item.get("dateTime", "日時不明"))
             
             st.markdown(f"""
             <div style="background-color: #111827; border: 1px solid #475569; padding: 14px; border-radius: 8px; margin-bottom: 10px; border-left: 5px solid #3b82f6;">
-                <div style="color: #fde047; font-weight: 900; font-size: 14px; margin-bottom: 4px;">{title}</div>
-                <div style="color: #94a3b8; font-size: 12px; margin-bottom: 8px;">発表日時: {datetime_str}</div>
-                <div style="color: #f8fafc; font-size: 13px; white-space: pre-wrap; line-height: 1.5;">{body_text}</div>
+                <div style="color: #fde047; font-weight: 900; font-size: 15px; margin-bottom: 6px;">{head_title}</div>
+                <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; color: #94a3b8; font-size: 12px; margin-bottom: 4px;">
+                    <div><b>発表官署:</b> {pub_office}</div>
+                    <div><b>発表日時:</b> {datetime_str}</div>
+                </div>
             </div>
             """, unsafe_allow_html=True)
 else:
