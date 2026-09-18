@@ -358,29 +358,15 @@ st.markdown("災害時のリアルタイム気象状況・インフラ・地震�
 
 with st.expander("📱 【タップして展開】 スマホ操作解説・ご利用案内・開発目的"):
     st.markdown("""
-<div style="background-color: #1e293b; padding: 4px 0px; border-radius: 6px;">
-    <p style="margin-bottom: 8px; font-size: 14px; line-height: 1.6; font-weight: 700; color: #93c5fd;">
-    📲 画面がフリーズ・スリープした時
-    </p>
-    <p style="margin-top: 0px; margin-bottom: 14px; font-size: 13px; line-height: 1.5; color: #ffffff;">
-    長時間放置等で動かなくなった場合は、画面内の青い復帰ボタン（<strong>「Yes, reload this page」</strong>等）をタップして再読み込みしてください。
-    </p>
+### 📲 画面がフリーズ・スリープした時
+長時間放置等で動かなくなった場合は、画面内の青い復帰ボタン（**「Yes, reload this page」**等）をタップして再読み込みしてください。
 
-    <p style="margin-bottom: 8px; font-size: 14px; line-height: 1.6; font-weight: 700; color: #fde047;">
-    📌 基本的な使い方
-    </p>
-    <p style="margin-top: 0px; margin-bottom: 14px; font-size: 13px; line-height: 1.5; color: #ffffff;">
-    中段のセレクトボックスで地域（関東・関西など）を切り替えると、地震・警戒レベル・温度が自動で切り替わります。最下部のリンク集から各種外部公式情報へアクセスできます。
-    </p>
+### 📌 基本的な使い方
+中段のセレクトボックスで地域（関東・関西など）を切り替えると、地震・警戒レベル・温度が自動で切り替わります。最下部のリンク集から各種外部公式情報へアクセスできます。
 
-    <p style="margin-bottom: 8px; font-size: 14px; line-height: 1.6; font-weight: 700; color: #34d399;">
-    🎯 開発の目的
-    </p>
-    <p style="margin-top: 0px; margin-bottom: 0px; font-size: 13px; line-height: 1.5; color: #ffffff;">
-    気象庁の公式一次情報（地震・台風・特別警報・キキクル）とインフラ状況を1画面に集約し、スマホから素早く安全確認を行えるようにしています。
-    </p>
-</div>
-    """, unsafe_allow_html=True)
+### 🎯 開発の目的
+気象庁の公式一次情報（地震・台風・特別警報・キキクル）とインフラ状況を1画面に集約し、スマホから素早く安全確認を行えるようにしています。
+""")
 
 st.markdown("---")
 
@@ -390,9 +376,9 @@ st.markdown("<p style='font-size:13px; color:#cbd5e1;'>現在接近中の台風2
 
 st.markdown("""
 <div style="background-color: #111827; border: 1px solid #334155; border-left: 7px solid #3b82f6; padding: 14px; border-radius: 8px; margin-bottom: 15px;">
-    <div style="font-weight: 900; color: #ffffff; margin-bottom: 6px; font-size: 15px;">🗺️ 気象庁 公式「台風進路図・予報円」クイックリンク</div>
-    <p style="font-size: 13px; color: #cbd5e1; margin-bottom: 10px;">現在の正確な中心位置や勢力、今後の進路予想図（予報円）を気象庁公式サイトで直接確認できます。</p>
-    <a href="https://www.jma.go.jp/bosai/map.html#typhoon=" target="_blank" style="background-color: #2563eb; color: #ffffff; padding: 8px 14px; border-radius: 6px; text-decoration: none; font-weight: 900; display: inline-block; font-size: 13px;">👉 気象庁台風進路マップを開く (外部サイト)</a>
+    <div style="font-weight: 900; color: #ffffff; margin-bottom: 6px; font-size: 15px;">🗺️ 気象庁 公式「台風情報（マルチリンガル対応）」クイックリンク</div>
+    <p style="font-size: 13px; color: #cbd5e1; margin-bottom: 10px;">現在の正確な中心位置や勢力、今後の進路情報を気象庁公式サイトで直接確認できます。</p>
+    <a href="https://www.data.jma.go.jp/multi/cyclone/index.html?lang=jp" target="_blank" style="background-color: #2563eb; color: #ffffff; padding: 8px 14px; border-radius: 6px; text-decoration: none; font-weight: 900; display: inline-block; font-size: 13px;">👉 気象庁 台風情報ページを開く (外部サイト)</a>
 </div>
 """, unsafe_allow_html=True)
 
@@ -522,7 +508,7 @@ st.markdown(
     <div class="link-card">
         <b>🔗 インフラ・交通・防災関連リンク集（公式リアルタイム情報）</b><br>
         <ul>
-            <li><b>【台風進路図】</b> <a href="https://www.jma.go.jp/bosai/map.html#typhoon=" target="_blank">気象庁 台風進路マップ</a></li>
+            <li><b>【台風情報】</b> <a href="https://www.data.jma.go.jp/multi/cyclone/index.html?lang=jp" target="_blank">気象庁 台風情報ページ</a></li>
             <li><b>【雨雲ズーム】</b> <a href="https://weather.yahoo.co.jp/weather/zoomradar/" target="_blank">Yahoo!天気（雨雲ズームレーダー）</a></li>
             <li><b>【防災情報】</b> <a href="https://www.jma.go.jp/bosai/" target="_blank">気象庁 防災情報ポータル</a></li>
             <li><b>【道路規制】</b> <a href="https://www.jartic.or.jp/" target="_blank">JARTIC 日本道路交通情報センター</a></li>
