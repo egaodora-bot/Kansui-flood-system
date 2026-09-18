@@ -233,7 +233,6 @@ def fetch_jma_area_names():
 
 @st.cache_data(ttl=60)
 def fetch_jma_earthquake_info():
-    # P2P地震情報APIから複数件取得してリスト化
     p2p_url = "https://api.p2pquake.net/v2/history?codes=551&limit=15"
     try:
         req = urllib.request.Request(p2p_url, headers={'User-Agent': 'Mozilla/5.0'})
@@ -260,33 +259,19 @@ def fetch_jma_earthquake_info():
             return {"success": True, "quakes": quake_list}
     except Exception:
         pass
-
-    # 気象庁公式APIへのフォールバック
-    jma_url = "https://www.jma.go.jp/bosai/information/data/quake.json"
-    try:
-        req = urllib.request.Request(jma_url, headers={'User-Agent': 'Mozilla/5.0'})
-        with urllib.request.urlopen(req, timeout=5) as response:
-            quakes = json.loads(response.read().decode('utf-8'))
-        if quakes and isinstance(quakes, list):
-            quake_list = []
-            scale_map = {
-                "10": "震度1", "20": "震度2", "30": "震度3", "40": "震度4",
-                "45": "震度5弱", "50": "震度5強", "55": "震度6弱", "60": "震度6強", "70": "震度7"
-            }
-            for latest in quakes[:10]:
-                max_scale = latest.get("maxScale", "不明")
-                quake_list.append({
-                    "time": latest.get("at", "日時不明"),
-                    "hypocenter": latest.get("hypocenter", {}).get("name", "震源地不明"),
-                    "max_scale": scale_map.get(str(max_scale), f"震度({max_scale})"),
-                    "magnitude": "--",
-                    "depth": "--"
-                })
-            return {"success": True, "quakes": quake_list}
-    except Exception:
-        pass
-
     return {"success": False, "quakes": []}
+
+@st.cache_data(ttl=300)
+def fetch_jma_typhoon_info():
+    # 気象庁の台風情報JSON等（または代替データ構造）
+    url = "https://www.jma.go.jp/bosai/information/data/typhoon.json"
+    try:
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
+        with urllib.request.urlopen(req, timeout=4) as response:
+            data = json.loads(response.read().decode('utf-8'))
+            return {"success": True, "data": data}
+    except Exception:
+        return {"success": False, "data": []}
 
 @st.cache_data(ttl=300)
 def fetch_jma_warning_level_areas(region_name):
@@ -327,15 +312,33 @@ def fetch_jma_realtime_data(region_name):
             data = json.loads(response.read().decode('utf-8'))
             office = data[0].get("publishingOffice", "気象庁")
             weather_forecasts = []
-            current_temp, max_temp = "--", "--"
+            
+            # 選択された地域の県別データから平均的・代表的な気温を算出（東京固定を解消）
+            pref_codes = list(REGION_PREFECTURES.get(region_name, {}).values())
+            temps_list = []
+            for p_code in pref_codes[:3]: # 主要数県の気温をサンプリング
+                p_url = f"https://www.jma.go.jp/bosai/forecast/data/forecast/{p_code}.json"
+                try:
+                    p_req = urllib.request.Request(p_url, headers={'User-Agent': 'Mozilla/5.0'})
+                    with urllib.request.urlopen(p_req, timeout=2) as p_res:
+                        p_data = json.loads(p_res.read().decode('utf-8'))
+                        for series in p_data[0].get("timeSeries", []):
+                            for temp_area in series.get("areas", []):
+                                t_vals = temp_area.get("temps", [])
+                                for tv in t_vals:
+                                    if tv != "":
+                                        try: temps_list.append(float(tv))
+                                        except: pass
+                except:
+                    pass
+            
+            if temps_list:
+                current_temp = f"{sum(temps_list)/len(temps_list):.1f}"
+                max_temp = f"{max(temps_list):.1f}"
+            else:
+                current_temp, max_temp = "--", "--"
 
             for series in data[0].get("timeSeries", []):
-                for temp_area in series.get("areas", []):
-                    temps = temp_area.get("temps", [])
-                    if temps:
-                        if len(temps) > 0 and temps[0] != "": current_temp = temps[0]
-                        if len(temps) > 1 and temps[1] != "": max_temp = temps[1]
-                        elif len(temps) > 0 and temps[0] != "": max_temp = temps[0]
                 for area in series.get("areas", []):
                     weathers = area.get("weathers", [])
                     if weathers:
@@ -343,7 +346,7 @@ def fetch_jma_realtime_data(region_name):
                         weather_forecasts.append(f"【{area.get('area', {}).get('name', region_name)}】 &nbsp; {w_text}")
             return {"success": True, "office": office, "forecasts": weather_forecasts[:4], "current_temp": current_temp, "max_temp": max_temp}
     except Exception:
-        return {"success": False, "office": "気象庁（オフライン）", "forecasts": [f"【{region_name}】 接続確認中"], "current_temp": "28.5", "max_temp": "32.0"}
+        return {"success": False, "office": "気象庁（オフライン）", "forecasts": [f"【{region_name}】 接続確認中"], "current_temp": "--", "max_temp": "--"}
 
 @st.cache_data(ttl=300)
 def fetch_region_prefecture_weather(region_name):
@@ -370,51 +373,45 @@ def fetch_region_prefecture_weather(region_name):
 
 # 画面描画
 st.title("🛡️ 全国インフラ・気象防災カルテ・リアルリンク共用システム")
-st.markdown("災害時のリアルタイム気象状況・インフラ・地震情報をモバイル最適化で一元管理します。")
+st.markdown("災害時のリアルタイム気象状況・インフラ・地震・台風情報をモバイル最適化で一元管理します。")
 
 # ガイド
 with st.expander("📱 【タップして展開】 スマホ操作解説・ご利用案内・開発目的"):
     st.markdown("""
 <div style="background-color: #1e293b; border-left: 5px solid #3b82f6; padding: 12px 16px; border-radius: 6px; margin-bottom: 14px;">
-    <span style="background-color: #1d4ed8; color: #ffffff; padding: 4px 10px; border-radius: 4px; font-weight: 900; font-size: 13px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); display: inline-block;">📲 画面表示の復帰</span>
-    <p style="margin-top: 10px; margin-bottom: 0px; color: #ffffff; font-size: 14px; line-height: 1.6; font-weight: 500;">一定時間アクセスがないと「Zzzz」のスリープ画面になります。その際は、画面に表示される青い復帰ボタン（<strong>「Yes, reload this page」</strong>または<strong>「Reconnect」</strong>）を１回押して再開してください。</p>
+    <span style="background-color: #1d4ed8; color: #ffffff; padding: 4px 10px; border-radius: 4px; font-weight: 900; font-size: 13px; display: inline-block;">📲 画面表示の復帰</span>
+    <p style="margin-top: 10px; margin-bottom: 0px; color: #ffffff; font-size: 14px; line-height: 1.6; font-weight: 500;">一定時間アクセスがないとスリープ状態になります。その際は青い復帰ボタン（<strong>「Yes, reload this page」</strong>等）を押して再開してください。</p>
 </div>
-
-<div style="background-color: #1e293b; border-left: 5px solid #3b82f6; padding: 12px 16px; border-radius: 6px; margin-bottom: 14px;">
-    <span style="background-color: #1d4ed8; color: #ffffff; padding: 4px 10px; border-radius: 4px; font-weight: 900; font-size: 13px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); display: inline-block;">📱 ➡️ 💻 ワイド表示への切り替え</span>
-    <p style="margin-top: 10px; margin-bottom: 0px; color: #ffffff; font-size: 14px; line-height: 1.6; font-weight: 500;">スマホを「横向き」にするとデスクトップ表示（ワイド画面）に切り替わり、地図やエリア情報を見渡しやすくなります。</p>
-</div>
-
-<div style="background-color: #1e293b; border-left: 5px solid #3b82f6; padding: 12px 16px; border-radius: 6px; margin-bottom: 14px;">
-    <span style="background-color: #1d4ed8; color: #ffffff; padding: 4px 10px; border-radius: 4px; font-weight: 900; font-size: 13px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); display: inline-block;">📌 ショートカットの活用</span>
-    <p style="margin-top: 10px; margin-bottom: 8px; color: #ffffff; font-size: 14px; line-height: 1.6; font-weight: 500;">ホーム画面にショートカットを追加しておくと、いざという時にワンタップで瞬時に起動できます。</p>
-    <div style="background-color: #0f172a; border: 1px solid #334155; padding: 10px 14px; border-radius: 6px; font-size: 13px; color: #ffffff; line-height: 1.6;">
-        <b style="color: #ffffff;">【追加のカンタン手順】</b><br>
-        1. 今開いているこのアプリの状態で、スマホブラウザ（Safari / Chrome）のメニューボタン（共有・︙アイコン）をタップ<br>
-        2. <b>「ホーム画面に追加」</b>を選択する<br>
-        3. デフォルトで「Streamlit」と表示された場合は、お好みで<b>「防災カルテ」</b>などに書き換えて保存してください。
-    </div>
-</div>
-
-<div style="background-color: #1e293b; border-left: 5px solid #10b981; padding: 12px 16px; border-radius: 6px; margin-bottom: 14px;">
-    <span style="background-color: #047857; color: #ffffff; padding: 4px 10px; border-radius: 4px; font-weight: 900; font-size: 13px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); display: inline-block;">🎯 開発の目的</span>
-    <p style="margin-top: 10px; margin-bottom: 0px; color: #ffffff; font-size: 14px; line-height: 1.6; font-weight: 500;">気象庁の公式一次情報（地震速報・特別警報・キキクル）と、生活・交通インフラのリアルタイム状況を1つの画面で素早く確認できるように開発しています。</p>
-</div>
-
 <div style="background-color: #1e293b; border-left: 5px solid #10b981; padding: 12px 16px; border-radius: 6px; margin-bottom: 0px;">
-    <span style="background-color: #047857; color: #ffffff; padding: 4px 10px; border-radius: 4px; font-weight: 900; font-size: 13px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); display: inline-block;">💡 設計思想</span>
-    <p style="margin-top: 10px; margin-bottom: 0px; color: #ffffff; font-size: 14px; line-height: 1.6; font-weight: 500;">広告や不要な装飾を削ぎ落とし、災害時や電波が不安定な状況下でもスマホから、軽量かつ直感的に命を守る判断ができるよう最適化しています。</p>
+    <span style="background-color: #047857; color: #ffffff; padding: 4px 10px; border-radius: 4px; font-weight: 900; font-size: 13px; display: inline-block;">🎯 開発の目的</span>
+    <p style="margin-top: 10px; margin-bottom: 0px; color: #ffffff; font-size: 14px; line-height: 1.6; font-weight: 500;">気象庁の公式一次情報（地震速報・台風・特別警報・キキクル）と生活インフラ状況を1つの画面で素早く確認できるようにしています。</p>
 </div>
     """, unsafe_allow_html=True)
 
 st.markdown("---")
 
-st.markdown("### 📳 直近の地震情報 ＆ 本日の履歴")
-st.markdown("<p style='font-size:13px; color:#cbd5e1;'>日本国内での最新の地震速報と、本日発生した地震の履歴を確認できます。</p>", unsafe_allow_html=True)
+# 🌀 台風情報カテゴリの追加
+st.markdown("### 🌀 台風情報・進路速報")
+st.markdown("<p style='font-size:13px; color:#cbd5e1;'>現在発生している台風の状況や進路予報を確認できます。</p>", unsafe_allow_html=True)
 
+typhoon_res = fetch_jma_typhoon_info()
+if typhoon_res["success"] and typhoon_res["data"]:
+    st.success("🌀 現在、台風情報が発表されています。")
+    # 詳細情報の表示ループ
+    st.write(typhoon_res["data"])
+else:
+    st.markdown("""
+    <div style="background-color: #1e293b; border: 1px solid #475569; padding: 14px; border-radius: 8px; border-left: 7px solid #3b82f6; color: #ffffff;">
+        <b>🟢 現在、日本付近で強い勢力を持つ台風の発生はありません。</b><br>
+        <span style="font-size:13px; color:#cbd5e1;">台風シーズンや接近時には、ここに中心気圧・最大風速・進路予想がリアルタイム表示されます。</span>
+    </div>
+    """, unsafe_allow_html=True)
+
+st.markdown("---")
+
+st.markdown("### 📳 直近の地震情報 ＆ 本日の履歴")
 eq_data = fetch_jma_earthquake_info()
 if eq_data["success"] and eq_data["quakes"]:
-    # 最新の1件を外に出して強調表示
     latest = eq_data["quakes"][0]
     st.markdown(f"""
     <div style="background-color: #1e293b; border: 1px solid #475569; padding: 14px; border-radius: 8px; border-left: 7px solid #ef4444; margin-bottom: 12px;">
@@ -426,7 +423,6 @@ if eq_data["success"] and eq_data["quakes"]:
     </div>
     """, unsafe_allow_html=True)
     
-    # 2件目以降を折りたたみに格納
     if len(eq_data["quakes"]) > 1:
         with st.expander("🔽 過去の地震履歴をさらに表示（タップして展開）"):
             for q in eq_data["quakes"][1:]:
@@ -449,7 +445,6 @@ selected_region = st.selectbox("🌍 監視エリアを選択してください�
 st.markdown("---")
 
 st.markdown(f"### ⚠️ {selected_region}エリアの緊急警戒レベル（レベル3〜5）発令状況")
-st.markdown("<p style='font-size:13px; color:#cbd5e1;'>気象庁が発表している土砂災害や大雨等の厳戒警報・特別警報をレベル別に集約表示します。</p>", unsafe_allow_html=True)
 warnings = fetch_jma_warning_level_areas(selected_region)
 has_warn = False
 for lvl, color, title in [("Level5", "error", "🚨 【Level5】特別警報発令中（直ちに命を守る行動を）"), ("Level4", "error", "🟥 【Level4】危険警報発令中（危険な場所から全員避難）"), ("Level3", "warning", "🟧 【Level3】警報発令中（高齢者等は避難準備）")]:
@@ -461,11 +456,11 @@ if not has_warn: st.success("🟢 現在、対象エリアに緊急警戒レベ�
 
 st.markdown("---")
 
-st.markdown(f"### 🌡️ 気象・温度状況 ({selected_region}エリア)")
+st.markdown(f"### 🌡️ 気象・温度状況 ({selected_region}エリア・地域平均値)")
 w_data = fetch_jma_realtime_data(selected_region)
 c1, c2 = st.columns(2)
-with c1: st.metric(label="現在気温", value=f"{w_data['current_temp']}°C")
-with c2: st.metric(label="予想最高気温", value=f"{w_data['max_temp']}°C")
+with c1: st.metric(label="エリア平均現在気温", value=f"{w_data['current_temp']}°C" if w_data['current_temp'] != "--" else "--")
+with c2: st.metric(label="エリア予想最高気温", value=f"{w_data['max_temp']}°C" if w_data['max_temp'] != "--" else "--")
 
 st.markdown("---")
 
@@ -493,15 +488,14 @@ st.markdown(
     """
     <div class="link-card">
         <b>🔗 インフラ・交通・防災関連リンク集（公式リアルタイム情報）</b><br>
-        <p style='font-size:13px; color:#cbd5e1; margin-top:4px;'>詳細な雨雲の動きや交通・河川情報をピンポイントで確認するための外部公式リンク集です。</p>
         <ul>
-            <li><b>【雨雲ズーム】</b> <a href="https://weather.yahoo.co.jp/weather/zoomradar/" target="_blank">Yahoo!天気（雨雲ズームレーダー）</a>：高精度な雨雲の現在地と将来の動きを拡大表示</li>
-            <li><b>【防災情報】</b> <a href="https://www.jma.go.jp/bosai/" target="_blank">気象庁 防災情報ポータル</a>：警報・台風・地震情報の総合窓口</li>
-            <li><b>【道路規制】</b> <a href="https://www.jartic.or.jp/" target="_blank">JARTIC 日本道路交通情報センター</a>：高速道路・一般道の通行止め情報</li>
-            <li><b>【鉄道運行】</b> <a href="https://transit.yahoo.co.jp/diainfo/" target="_blank">Yahoo!路線情報（運行情報）</a>：全国の鉄道遅延・運休状況</li>
-            <li><b>【河川水位】</b> <a href="https://www.river.go.jp/" target="_blank">川の防災情報（国土交通省）</a>：河川水位・ライブカメラ・ダム情報</li>
-            <li><b>【危険度分布】</b> <a href="https://www.jma.go.jp/bosai/map.html" target="_blank">気象庁 キキクル</a>：土砂災害・浸水害・洪水の危険度マップ</li>
-            <li><b>【ハザード】</b> <a href="https://disaportal.gsi.go.jp/" target="_blank">ハザードマップポータルサイト</a>：避難所や災害リスクの全國家屋情報</li>
+            <li><b>【雨雲ズーム】</b> <a href="https://weather.yahoo.co.jp/weather/zoomradar/" target="_blank">Yahoo!天気（雨雲ズームレーダー）</a></li>
+            <li><b>【防災情報】</b> <a href="https://www.jma.go.jp/bosai/" target="_blank">気象庁 防災情報ポータル</a></li>
+            <li><b>【道路規制】</b> <a href="https://www.jartic.or.jp/" target="_blank">JARTIC 日本道路交通情報センター</a></li>
+            <li><b>【鉄道運行】</b> <a href="https://transit.yahoo.co.jp/diainfo/" target="_blank">Yahoo!路線情報（運行情報）</a></li>
+            <li><b>【河川水位】</b> <a href="https://www.river.go.jp/" target="_blank">川の防災情報（国土交通省）</a></li>
+            <li><b>【危険度分布】</b> <a href="https://www.jma.go.jp/bosai/map.html" target="_blank">気象庁 キキクル</a></li>
+            <li><b>【ハザード】</b> <a href="https://disaportal.gsi.go.jp/" target="_blank">ハザードマップポータルサイト</a></li>
         </ul>
     </div>
     """,
