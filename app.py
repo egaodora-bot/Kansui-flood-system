@@ -4,6 +4,7 @@ from streamlit_folium import st_folium
 import urllib.request
 import json
 import re
+from datetime import datetime, timezone, timedelta
 
 st.set_page_config(
     page_title="防災カルテ（全国インフラ・気象防災システム）", 
@@ -14,7 +15,6 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-
 html, body,
 [data-testid="stAppViewContainer"],
 [data-testid="stApp"],
@@ -23,31 +23,26 @@ section[data-testid="stMain"] {
     background-color: #080d16 !important;
     color: #ffffff !important;
 }
-
 [data-testid="stAppViewContainer"] .main .block-container {
     background-color: #080d16 !important;
     color: #ffffff !important;
 }
-
 [data-testid="stAppViewContainer"] p,
 [data-testid="stAppViewContainer"] li,
 [data-testid="stAppViewContainer"] span {
     color: #ffffff;
 }
-
 [data-testid="stAppViewContainer"] h1 {
     color: #ffffff !important;
     font-size: 1.8rem !important;
     font-weight: 800 !important;
 }
-
 [data-testid="stAppViewContainer"] h2,
 [data-testid="stAppViewContainer"] h3,
 [data-testid="stAppViewContainer"] h4 {
     color: #ffffff !important;
     font-weight: 900 !important;
 }
-
 .notice-card {
     background-color: #111827 !important;
     border: 1px solid #334155 !important;
@@ -57,7 +52,6 @@ section[data-testid="stMain"] {
     margin-bottom: 20px;
     color: #ffffff !important;
 }
-
 .link-card {
     background-color: #111827 !important;
     border: 1px solid #334155 !important;
@@ -67,26 +61,22 @@ section[data-testid="stMain"] {
     margin-top: 20px;
     margin-bottom: 20px;
 }
-
 div[data-testid="stExpander"] {
     background-color: #111827 !important;
     border: 1px solid #475569 !important;
     border-left: 7px solid #10b981 !important;
     border-radius: 8px !important;
 }
-
 div[data-testid="stExpander"] summary p {
     font-weight: 900 !important;
     color: #ffffff !important;
     font-size: 15px !important;
 }
-
 div[data-testid="stSelectbox"] {
     background-color: #080d16 !important;
     border-left: 7px solid #ffe600;
     padding-left: 10px;
 }
-
 div[data-testid="stSelectbox"] [data-baseweb="select"] > div {
     background: #000000 !important;
     background-color: #000000 !important;
@@ -95,40 +85,33 @@ div[data-testid="stSelectbox"] [data-baseweb="select"] > div {
     color: #ffffff !important;
     min-height: 48px !important;
 }
-
 div[data-testid="stSelectbox"] [data-baseweb="select"] span {
     color: #ffffff !important;
     -webkit-text-fill-color: #ffffff !important;
     font-weight: 900 !important;
 }
-
 div[data-baseweb="popover"],
 div[data-baseweb="menu"],
 div[role="listbox"] {
     background-color: #111827 !important;
     color: #ffffff !important;
 }
-
 div[role="option"] {
     background-color: #111827 !important;
     color: #ffffff !important;
     font-weight: 700 !important;
 }
-
 div[role="option"]:hover {
     background-color: #1e3a8a !important;
     color: #ffffff !important;
 }
-
 a {
     color: #60a5fa !important;
     font-weight: 800 !important;
 }
-
 hr {
     border-color: #64748b !important;
 }
-
 </style>
 """, unsafe_allow_html=True)
 
@@ -268,7 +251,26 @@ def fetch_jma_typhoon_info():
         req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         with urllib.request.urlopen(req, timeout=4) as response:
             data = json.loads(response.read().decode('utf-8'))
-            return {"success": True, "data": data}
+            
+            # 有効な最新データのみをフィルタリングする（古すぎるサンプルやキャッシュを除外）
+            valid_items = []
+            if isinstance(data, list):
+                for item in data:
+                    # 例として、datetimeが極端に古い（あるいは存在しない）場合は除外する判定を入れることも可能
+                    # ここではリスト形式であればそのまま、あるいは中身をチェック
+                    datetime_str = item.get("targetDateTime", item.get("dateTime", ""))
+                    if datetime_str:
+                        try:
+                            # 2日前より古いものは除外するなどの安全フィルター
+                            dt = datetime.fromisoformat(datetime_str.replace("Z", "+00:00"))
+                            if datetime.now(timezone.utc) - dt < timedelta(days=3):
+                                valid_items.append(item)
+                        except:
+                            valid_items.append(item)
+                    else:
+                        # 日時不明のデータは古いキャッシュの可能性が高いため除外
+                        continue
+            return {"success": True, "data": valid_items}
     except Exception:
         return {"success": False, "data": []}
 
@@ -387,7 +389,7 @@ with st.expander("📱 【タップして展開】 スマホ操作解説・ご�
 
 st.markdown("---")
 
-# 🌀 台風情報カテゴリ（メタデータを美しく整形して表示）
+# 🌀 台風情報カテゴリ
 st.markdown("### 🌀 台風情報・進路速報")
 st.markdown("<p style='font-size:13px; color:#cbd5e1;'>現在発生している台風の状況や進路予報を確認できます。</p>", unsafe_allow_html=True)
 
