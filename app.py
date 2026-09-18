@@ -58,21 +58,22 @@ div[data-testid="stExpander"] {
     border-radius: 8px !important;
     margin-bottom: 12px !important;
 }
-/* 外側のメイン開閉ボタンのタイトル */
+/* 外側のメイン開閉ボタンのタイトル（下線を消してスッキリ） */
 div[data-testid="stExpander"] summary p {
     font-weight: 900 !important;
-    color: #ffffff !important;
+    color: #60a5fa !important;
     font-size: 15px !important;
-    border-bottom: 2px solid #3b82f6 !important;
-    padding-bottom: 6px !important;
+    border-bottom: none !important;
+    padding-bottom: 0 !important;
 }
-/* 内部の各項目の見出し（H3）に明るい色と下線をつけて目立たせる */
+/* 内部の各項目の見出し（H3）：青文字にして下線を完全に消す */
 div[data-testid="stExpander"] div[data-testid="stMarkdownContainer"] h3 {
-    color: #38bdf8 !important; /* 鮮やかな水色で文字を色づけ */
+    color: #38bdf8 !important; /* 鮮やかな青（水色） */
     font-size: 17px !important;
-    border-bottom: 2px solid #3b82f6 !important; /* 下線を追加 */
-    padding-bottom: 4px !important;
-    margin-top: 10px !important;
+    border-bottom: none !important; /* 下線を非表示に */
+    padding-bottom: 0 !important;
+    margin-top: 14px !important;
+    margin-bottom: 8px !important;
 }
 div[data-testid="stSelectbox"] {
     background-color: #080d16 !important;
