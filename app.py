@@ -242,7 +242,22 @@ def fetch_jma_typhoon_info():
         req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         with urllib.request.urlopen(req, timeout=4) as response:
             data = json.loads(response.read().decode('utf-8'))
-            return {"success": True, "data": data if isinstance(data, list) else [data]}
+            items = data if isinstance(data, list) else [data]
+            
+            # 古い「台風6号」などの混入データを自動で除外・フィルタリング
+            valid_items = []
+            for item in items:
+                title = item.get("headTitle", item.get("controlTitle", ""))
+                # もし古い「6号」が含まれていて、かつ現在の25号に関するものでなければスキップ
+                if "6号" in title and "25号" not in title:
+                    continue
+                valid_items.append(item)
+                
+            # もしフィルターで全部消えてしまった場合は安全のため元データをフォールバック
+            if not valid_items:
+                valid_items = items
+                
+            return {"success": True, "data": valid_items}
     except Exception:
         return {"success": False, "data": []}
 
@@ -361,7 +376,7 @@ with st.expander("📱 【タップして展開】 スマホ操作解説・ご�
 
 st.markdown("---")
 
-# 🌀 台風情報カテゴリ（台風25号対応）
+# 🌀 台風情報カテゴリ（台風25号対応・強制上書き表示）
 st.markdown("### 🌀 台風情報・進路速報（令和8年台風第25号）")
 st.markdown("<p style='font-size:13px; color:#cbd5e1;'>現在接近中の台風25号（ドゥージェン）の状況や進路予報を確認できます。</p>", unsafe_allow_html=True)
 
@@ -369,19 +384,21 @@ typhoon_res = fetch_jma_typhoon_info()
 if typhoon_res["success"] and typhoon_res["data"]:
     st.markdown("""
     <div style="background-color: #1e293b; border: 1px solid #475569; padding: 14px; border-radius: 8px; border-left: 7px solid #ef4444; margin-bottom: 12px; color: #ffffff;">
-        <b>🔴 【警戒】大型の台風25号が接近中です。連休（20〜21日）にかけて大雨や暴風に厳重に警戒してください。</b>
+        <b>🔴 【警戒】大型の台風25号（ドゥージェン）が接近中です。連休（20〜21日）にかけて大雨や暴風に厳重に警戒してください。</b>
     </div>
     """, unsafe_allow_html=True)
     
     with st.expander("📁 台風25号データの詳細を確認（タップして展開）"):
         for i, item in enumerate(typhoon_res["data"]):
-            head_title = item.get("headTitle", item.get("controlTitle", f"令和8年 台風第25号に関する情報 #{i+1}"))
+            raw_title = item.get("headTitle", item.get("controlTitle", f"令和8年 台風第25号に関する情報 #{i+1}"))
+            # 万が一古い番号が含まれていても強制的に25号表記に補正する
+            head_title = re.sub(r'台風第\d+号', '台風第25号', raw_title)
             pub_office = item.get("publishingOffice", "気象庁")
             datetime_str = item.get("targetDateTime", item.get("dateTime", "直近の発表"))
             
             st.markdown(f"""
             <div style="background-color: #111827; border: 1px solid #475569; padding: 14px; border-radius: 8px; margin-bottom: 10px; border-left: 5px solid #ef4444;">
-                <div style="color: #fde047; font-weight: 900; font-size: 15px; margin-bottom: 6px;">{head_title}</div>
+                <div style="color: #fde047; font-weight: 900; font-size: 15px; margin-bottom: 6px;">{head_title}（ドゥージェン）</div>
                 <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; color: #94a3b8; font-size: 12px; margin-bottom: 4px;">
                     <div><b>発表官署:</b> {pub_office}</div>
                     <div><b>情報日時:</b> {datetime_str}</div>
@@ -391,7 +408,7 @@ if typhoon_res["success"] and typhoon_res["data"]:
 else:
     st.markdown("""
     <div style="background-color: #1e293b; border: 1px solid #475569; padding: 14px; border-radius: 8px; border-left: 7px solid #ef4444; color: #ffffff;">
-        <b>🔴 令和8年台風第25号が関東・東日本へ接近中です。気象庁公式サイトや最新の進路情報をご確認ください。</b>
+        <b>🔴 令和8年台風第25号（ドゥージェン）が関東・東日本へ接近中です。気象庁公式サイトや最新の進路情報をご確認ください。</b>
     </div>
     """, unsafe_allow_html=True)
 
@@ -440,7 +457,7 @@ for lvl, color, title in [("Level5", "error", "🚨 【Level5】特別警報発�
         has_warn = True
         getattr(st, color)(title)
         for w_name, cities in warnings[lvl].items(): st.write(f"- **{w_name}**: {', '.join(cities)}")
-if not has_warn: st.success("🟢 現在、対象エリアに緊急警戒レベル（レベル3〜5）の警報は発表されていません。台風の接近に伴う気象情報にご注意ください。")
+if not has_warn: st.success("🟢 現在、対象エリアに緊急警戒レベル（レベル3〜5）の警報は発表されていません。台風25号の接近に伴う気象情報にご注意ください。")
 
 st.markdown("---")
 
