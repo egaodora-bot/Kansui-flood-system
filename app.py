@@ -51,40 +51,38 @@ section[data-testid="stMain"] {
     margin-top: 10px;
     margin-bottom: 20px;
 }
-div[data-testid="stExpander"] {
+/* Streamlit製エキスパンダーを完全に排除し、HTML標準のdetails/summaryで代用 */
+details.custom-expander {
     background-color: #111827 !important;
     border: 1px solid #475569 !important;
     border-left: 7px solid #10b981 !important;
     border-radius: 8px !important;
-    margin-bottom: 12px !important;
+    padding: 14px 16px;
+    margin-bottom: 12px;
 }
-/* エキスパンダーのヘッダーおよび内部の線を徹底的に消去 */
-div[data-testid="stExpander"] summary,
-div[data-testid="stExpander"] summary *,
-div[data-testid="stExpander"] [data-testid="stMarkdownContainer"],
-div[data-testid="stExpander"] [data-testid="stMarkdownContainer"] p {
-    border-bottom: none !important;
-    box-shadow: none !important;
-    border-top: none !important;
-    border-left: none !important;
-    border-right: none !important;
-}
-div[data-testid="stExpander"] summary p {
+details.custom-expander summary {
     font-weight: 900 !important;
     color: #60a5fa !important;
     font-size: 15px !important;
-    padding-bottom: 0 !important;
-    margin: 0 !important;
-}
-/* 内部の各項目の見出し（H3） */
-div[data-testid="stExpander"] div[data-testid="stMarkdownContainer"] h3 {
-    color: #38bdf8 !important;
-    font-size: 17px !important;
-    border-bottom: none !important;
+    cursor: pointer;
+    list-style: none;
+    outline: none;
+    border: none !important;
     box-shadow: none !important;
-    padding-bottom: 0 !important;
-    margin-top: 14px !important;
-    margin-bottom: 8px !important;
+}
+details.custom-expander summary::-webkit-details-marker {
+    display: none;
+}
+details.custom-expander[open] {
+    border-bottom: 1px solid #475569 !important;
+}
+details.custom-expander .content-body {
+    margin-top: 12px;
+    padding-top: 10px;
+    border-top: 1px dashed #334155;
+    color: #e2e8f0;
+    font-size: 13px;
+    line-height: 1.6;
 }
 div[data-testid="stSelectbox"] {
     background-color: #080d16 !important;
@@ -373,24 +371,24 @@ def fetch_region_prefecture_weather(region_name):
 st.title("🛡️ 全国インフラ・気象防災カルテ・リアルリンク共用システム")
 st.markdown("災害時のリアルタイム気象状況・インフラ・地震・台風情報を一元管理します。**※スマホ等でご利用の際は、画面を「横向き」にしていただくと全体がより見やすくなります。**")
 
-with st.expander("📱 【タップして展開】 スマホ操作解説・横向き推奨・ご利用案内"):
-    st.markdown("""
-### 🎯 開発コンセプト
-本システムは、大規模災害発生時におけるインフラ状況、気象警報、地震、台風などの重要情報を一元化し、迅速な初動対応と的確な意思決定を支援することを目的として開発されています。専門的な防災情報をシンプルかつ直感的に集約し、現場や行政、一般利用者の安全確保に貢献します。
-
-### ⏳ サーバー仕様によるスリープ復帰について（半日ほどアクセスがない場合）
-半日（約12時間）ほどアクセスがない状態が続くと、無料クラウドサーバーの仕様により自動的に一時的なスリープ状態になるため、再アクセス時に復帰処理が入ります。その際、画面に**クルクルと回る読み込み中のマークや進行状況を表すバー**が表示され、**起動に10〜30秒ほどかかる**ことがあります。
-これはシステムの**サーバー仕様**による正常な動作ですので、画面が切り替わるまでそのままお待ちください（何度も再読み込みボタンを押すと、かえって時間がかかる場合があります）。
-
-### 🔄 画面を横向きにすると見やすくなります
-スマホの自動回転をオンにして**画面を横にしていただく**と、地図や各データが広く表示され、操作しやすくなります。
-
-### 📲 フリーズ・スリープした時
-長時間放置等で動かなくなった場合は、画面内の青い復帰ボタン（**「Yes, reload this page」**等）をタップして再読み込みしてください。
-
-### 📌 基本的な使い方
-中段のセレクトボックスで地域（関東・関西など）を切り替えると、地震・警戒レベル・温度が自動で切り替わります。最下部のリンク集から各種外部公式情報へアクセスできます。
-""")
+# 自前のHTMLトグル（カスタムエキスパンダー）
+st.markdown("""
+<details class="custom-expander">
+    <summary>📱 【タップして展開】 スマホ操作解説・横向き推奨・ご利用案内</summary>
+    <div class="content-body">
+        <b style="color: #38bdf8; font-size: 14px;">🎯 開発コンセプト</b><br>
+        本システムは、大規模災害発生時におけるインフラ状況、気象警報、地震、台風などの重要情報を一元化し、迅速な初動対応と的確な意思決定を支援することを目的として開発されています。専門的な防災情報をシンプルかつ直感的に集約し、現場や行政、一般利用者の安全確保に貢献します。<br><br>
+        <b style="color: #38bdf8; font-size: 14px;">⏳ サーバー仕様によるスリープ復帰について（半日ほどアクセスがない場合）</b><br>
+        半日（約12時間）ほどアクセスがない状態が続くと、無料クラウドサーバーの仕様により自動的に一時的なスリープ状態になるため、再アクセス時に復帰処理が入ります。その際、画面にクルクルと回る読み込み中のマークや進行状況を表すバーが表示され、起動に10〜30秒ほどかかることがあります。<br><br>
+        <b style="color: #38bdf8; font-size: 14px;">🔄 画面を横向きにすると見やすくなります</b><br>
+        スマホの自動回転をオンにして画面を横にしていただくと、地図や各データが広く表示され、操作しやすくなります。<br><br>
+        <b style="color: #38bdf8; font-size: 14px;">📲 フリーズ・スリープした時</b><br>
+        長時間放置等で動かなくなった場合は、画面内の青い復帰ボタン（「Yes, reload this page」等）をタップして再読み込みしてください。<br><br>
+        <b style="color: #38bdf8; font-size: 14px;">📌 基本的な使い方</b><br>
+        中段のセレクトボックスで地域（関東・関西など）を切り替えると、地震・警戒レベル・温度が自動で切り替わります。最下部のリンク集から各種外部公式情報へアクセスできます。
+    </div>
+</details>
+""", unsafe_allow_html=True)
 
 st.markdown("---")
 
@@ -416,29 +414,33 @@ st.markdown(
 
 typhoon_res = fetch_jma_typhoon_info()
 if typhoon_res["success"] and typhoon_res["data"]:
-    with st.expander("📁 台風データの詳細文面を確認（タップして展開）"):
-        for i, item in enumerate(typhoon_res["data"]):
-            head_title = item.get("headTitle", item.get("controlTitle", f"台風に関する情報 #{i+1}"))
-            pub_office = item.get("publishingOffice", "気象庁")
-            datetime_str = item.get("targetDateTime", item.get("dateTime", "直近の発表"))
-            
-            body_text = item.get("body", item.get("text", ""))
-            if not body_text or len(str(body_text).strip()) < 5:
-                body_text = "現在発表されている台風情報詳細です。気象庁公式サイトや最新の進路情報をご確認ください。"
-            
-            st.markdown(f"""
-            <div style="background-color: #111827; border: 1px solid #475569; padding: 14px; border-radius: 8px; margin-bottom: 10px; border-left: 5px solid #ef4444; text-align: left;">
-                <div style="color: #fde047; font-weight: 900; font-size: 15px; margin-bottom: 6px;">{head_title}</div>
-                <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; color: #94a3b8; font-size: 12px; margin-bottom: 10px;">
-                    <div><b>発表官署:</b> {pub_office}</div>
-                    <div><b>情報日時:</b> {datetime_str}</div>
-                </div>
-                <hr style="border-color: #334155; margin: 8px 0;">
-                <div style="color: #f8fafc; font-size: 13px; line-height: 1.6;">
-                    {body_text}
-                </div>
+    typhoon_items_html = ""
+    for i, item in enumerate(typhoon_res["data"]):
+        head_title = item.get("headTitle", item.get("controlTitle", f"台風に関する情報 #{i+1}"))
+        pub_office = item.get("publishingOffice", "気象庁")
+        datetime_str = item.get("targetDateTime", item.get("dateTime", "直近の発表"))
+        body_text = item.get("body", item.get("text", ""))
+        if not body_text or len(str(body_text).strip()) < 5:
+            body_text = "現在発表されている台風情報詳細です。気象庁公式サイトや最新の進路情報をご確認ください。"
+        
+        typhoon_items_html += f"""
+        <div style="background-color: #111827; border: 1px solid #475569; padding: 14px; border-radius: 8px; margin-bottom: 10px; border-left: 5px solid #ef4444; text-align: left;">
+            <div style="color: #fde047; font-weight: 900; font-size: 15px; margin-bottom: 6px;">{head_title}</div>
+            <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; color: #94a3b8; font-size: 12px; margin-bottom: 10px;">
+                <div><b>発表官署:</b> {pub_office}</div>
+                <div><b>情報日時:</b> {datetime_str}</div>
             </div>
-            """, unsafe_allow_html=True)
+            <hr style="border-color: #334155; margin: 8px 0;">
+            <div style="color: #f8fafc; font-size: 13px; line-height: 1.6;">{body_text}</div>
+        </div>
+        """
+    
+    st.markdown(f"""
+    <details class="custom-expander">
+        <summary>📁 台風データの詳細文面を確認（タップして展開）</summary>
+        <div class="content-body">{typhoon_items_html}</div>
+    </details>
+    """, unsafe_allow_html=True)
 else:
     st.markdown("""
     <div style="background-color: #111827; border: 1px solid #334155; padding: 12px 16px; border-radius: 8px; border-left: 5px solid #10b981; color: #e2e8f0; font-size: 13px; margin-bottom: 15px;">
@@ -484,17 +486,23 @@ if eq_data["success"] and eq_data["quakes"]:
     """, unsafe_allow_html=True)
     
     if len(eq_data["quakes"]) > 1:
-        with st.expander("🔽 過去の地震履歴をさらに表示（タップして展開）"):
-            for q in eq_data["quakes"][1:]:
-                st.markdown(f"""
-                <div style="background-color: #1e293b; border: 1px solid #475569; padding: 10px 14px; border-radius: 8px; margin-bottom: 8px; border-left: 5px solid #3b82f6;">
-                    <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
-                        <div><b style="color: #ffffff;">最大震度:</b> <span style="color: #fde047; font-weight: 900;">{q['max_scale']}</span></div>
-                        <div><b style="color: #ffffff;">発生日時:</b> <span style="color: #f8fafc;">{q['time']}</span></div>
-                    </div>
-                    <div style="margin-top:4px;"><b style="color: #ffffff;">震源地:</b> <span style="color: #93c5fd; font-weight: 900;">{q['hypocenter']}</span> <span style="font-size:12px; color:#cbd5e1;">(M{q['magnitude']} / 深さ:{q['depth']}km)</span></div>
+        quakes_html = ""
+        for q in eq_data["quakes"][1:]:
+            quakes_html += f"""
+            <div style="background-color: #1e293b; border: 1px solid #475569; padding: 10px 14px; border-radius: 8px; margin-bottom: 8px; border-left: 5px solid #3b82f6;">
+                <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+                    <div><b style="color: #ffffff;">最大震度:</b> <span style="color: #fde047; font-weight: 900;">{q['max_scale']}</span></div>
+                    <div><b style="color: #ffffff;">発生日時:</b> <span style="color: #f8fafc;">{q['time']}</span></div>
                 </div>
-                """, unsafe_allow_html=True)
+                <div style="margin-top:4px;"><b style="color: #ffffff;">震源地:</b> <span style="color: #93c5fd; font-weight: 900;">{q['hypocenter']}</span> <span style="font-size:12px; color:#cbd5e1;">(M{q['magnitude']} / 深さ:{q['depth']}km)</span></div>
+            </div>
+            """
+        st.markdown(f"""
+        <details class="custom-expander">
+            <summary>🔽 過去の地震履歴をさらに表示（タップして展開）</summary>
+            <div class="content-body">{quakes_html}</div>
+        </details>
+        """, unsafe_allow_html=True)
 else:
     st.markdown('<div style="background-color: #1e293b; border: 1px solid #475569; padding: 14px; border-radius: 8px; border-left: 7px solid #ef4444; color: #ffffff;">サーバー混雑中・自動再試行待機中</div>', unsafe_allow_html=True)
 
