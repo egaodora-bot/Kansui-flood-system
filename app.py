@@ -58,7 +58,11 @@ div[data-testid="stExpander"] {
     border-radius: 8px !important;
     margin-bottom: 12px !important;
 }
-/* 外側のメイン開閉ボタンのタイトル（下線を消してスッキリ） */
+/* エキスパンダーのヘッダー自体の線を完全に消去 */
+div[data-testid="stExpander"] summary {
+    border-bottom: none !important;
+    box-shadow: none !important;
+}
 div[data-testid="stExpander"] summary p {
     font-weight: 900 !important;
     color: #60a5fa !important;
@@ -66,11 +70,12 @@ div[data-testid="stExpander"] summary p {
     border-bottom: none !important;
     padding-bottom: 0 !important;
 }
-/* 内部の各項目の見出し（H3）：青文字にして下線を完全に消す */
+/* 内部の各項目の見出し（H3）：青文字にして下線を強制排除 */
 div[data-testid="stExpander"] div[data-testid="stMarkdownContainer"] h3 {
-    color: #38bdf8 !important; /* 鮮やかな青（水色） */
+    color: #38bdf8 !important; /* 鮮やかな水色 */
     font-size: 17px !important;
-    border-bottom: none !important; /* 下線を非表示に */
+    border-bottom: none !important;
+    box-shadow: none !important;
     padding-bottom: 0 !important;
     margin-top: 14px !important;
     margin-bottom: 8px !important;
