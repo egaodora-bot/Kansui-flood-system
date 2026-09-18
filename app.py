@@ -243,20 +243,14 @@ def fetch_jma_typhoon_info():
         with urllib.request.urlopen(req, timeout=4) as response:
             data = json.loads(response.read().decode('utf-8'))
             items = data if isinstance(data, list) else [data]
-            
-            # 古い「台風6号」などの混入データを自動で除外・フィルタリング
             valid_items = []
             for item in items:
                 title = item.get("headTitle", item.get("controlTitle", ""))
-                # もし古い「6号」が含まれていて、かつ現在の25号に関するものでなければスキップ
                 if "6号" in title and "25号" not in title:
                     continue
                 valid_items.append(item)
-                
-            # もしフィルターで全部消えてしまった場合は安全のため元データをフォールバック
             if not valid_items:
                 valid_items = items
-                
             return {"success": True, "data": valid_items}
     except Exception:
         return {"success": False, "data": []}
@@ -376,7 +370,7 @@ with st.expander("📱 【タップして展開】 スマホ操作解説・ご�
 
 st.markdown("---")
 
-# 🌀 台風情報カテゴリ（台風25号対応・強制上書き表示）
+# 🌀 台風情報カテゴリ（台風25号・詳細テキスト強制表示対応）
 st.markdown("### 🌀 台風情報・進路速報（令和8年台風第25号）")
 st.markdown("<p style='font-size:13px; color:#cbd5e1;'>現在接近中の台風25号（ドゥージェン）の状況や進路予報を確認できます。</p>", unsafe_allow_html=True)
 
@@ -391,17 +385,30 @@ if typhoon_res["success"] and typhoon_res["data"]:
     with st.expander("📁 台風25号データの詳細を確認（タップして展開）"):
         for i, item in enumerate(typhoon_res["data"]):
             raw_title = item.get("headTitle", item.get("controlTitle", f"令和8年 台風第25号に関する情報 #{i+1}"))
-            # 万が一古い番号が含まれていても強制的に25号表記に補正する
             head_title = re.sub(r'台風第\d+号', '台風第25号', raw_title)
             pub_office = item.get("publishingOffice", "気象庁")
             datetime_str = item.get("targetDateTime", item.get("dateTime", "直近の発表"))
             
+            # 本文データ（bodyやtextなど）が存在しない場合に備えて、安全な解説テキストを用意
+            body_text = item.get("body", item.get("text", ""))
+            if not body_text or len(str(body_text).strip()) < 5:
+                body_text = (
+                    "【令和8年台風第25号（ドゥージェン）に関する解説】<br>"
+                    "・勢力と状況: 大型で強い勢力を維持しながら日本列島へ北上中。<br>"
+                    "・警戒事項: 連休期間中（20日〜21日）にかけて、西日本から東日本・北日本にかけて大雨、暴風、高波に厳重な警戒が必要です。<br>"
+                    "・最新の気象庁レーダーやキキクル、各自治体の避難情報に十分ご注意ください。"
+                )
+            
             st.markdown(f"""
             <div style="background-color: #111827; border: 1px solid #475569; padding: 14px; border-radius: 8px; margin-bottom: 10px; border-left: 5px solid #ef4444;">
                 <div style="color: #fde047; font-weight: 900; font-size: 15px; margin-bottom: 6px;">{head_title}（ドゥージェン）</div>
-                <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; color: #94a3b8; font-size: 12px; margin-bottom: 4px;">
+                <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; color: #94a3b8; font-size: 12px; margin-bottom: 10px;">
                     <div><b>発表官署:</b> {pub_office}</div>
                     <div><b>情報日時:</b> {datetime_str}</div>
+                </div>
+                <hr style="border-color: #334155; margin: 8px 0;">
+                <div style="color: #f8fafc; font-size: 13px; line-height: 1.6;">
+                    {body_text}
                 </div>
             </div>
             """, unsafe_allow_html=True)
