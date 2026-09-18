@@ -367,9 +367,9 @@ st.markdown("---")
 # 🌀 台風情報カテゴリ
 st.markdown("### 🌀 台風情報・進路 最新速報")
 
-# 赤柿色のアクセントライン付きテキスト表示（枠なし）
+# 🔴 【警戒】メッセージを大きくし、赤柿色のアクセントラインを太くして上に配置
 st.markdown("""
-<div style="border-left: 5px solid #c2410c; padding-left: 10px; margin-top: 10px; margin-bottom: 8px; color: #fca5a5; font-size: 13px; font-weight: 700; text-align: left;">
+<div style="border-left: 7px solid #c2410c; padding-left: 14px; margin-top: 14px; margin-bottom: 12px; color: #fca5a5; font-size: 16px; font-weight: 900; text-align: left; line-height: 1.5;">
     🔴 【警戒】現在発表されている台風情報および今後の気象情報に厳重に警戒してください。
 </div>
 """, unsafe_allow_html=True)
