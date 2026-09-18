@@ -376,14 +376,9 @@ st.markdown("---")
 st.markdown("### 🌀 台風情報・進路速報（令和8年台風第25号）")
 with st.container():
     st.markdown('<div class="link-card" style="margin-top: 5px; margin-bottom: 15px;">', unsafe_allow_html=True)
-    col_text, col_btn = st.columns([3, 1])
-    with col_text:
-        st.markdown("**🗺️ 気象庁 公式「台風情報（マルチリンガル対応）」**")
-        st.markdown("<p style='font-size:13px; color:#cbd5e1; margin:0;'>現在の中心位置・勢力・今後の進路予報を気象庁公式サイトで直接確認できます。</p>", unsafe_allow_html=True)
-    with col_btn:
-        st.markdown("<div style='text-align: right; padding-top: 5px;'>", unsafe_allow_html=True)
-        st.markdown('[👉 気象庁 地図で台風情報](https://www.data.jma.go.jp/multi/cyclone/index.html?lang=jp)', unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown("**🗺️ 気象庁 公式「台風情報（マルチリンガル対応）」**")
+    st.markdown("<p style='font-size:13px; color:#cbd5e1; margin-bottom: 10px;'>現在の中心位置・勢力・今後の進路予報を気象庁公式サイトで直接確認できます。</p>", unsafe_allow_html=True)
+    st.markdown('[👉 気象庁 地図で台風情報](https://www.data.jma.go.jp/multi/cyclone/index.html?lang=jp)', unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
 typhoon_res = fetch_jma_typhoon_info()
