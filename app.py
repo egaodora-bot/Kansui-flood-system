@@ -4,7 +4,6 @@ from streamlit_folium import st_folium
 import urllib.request
 import json
 import re
-from datetime import datetime, timezone, timedelta
 
 st.set_page_config(
     page_title="防災カルテ（全国インフラ・気象防災システム）", 
@@ -354,38 +353,40 @@ def fetch_region_prefecture_weather(region_name):
 
 # 画面描画
 st.title("🛡️ 全国インフラ・気象防災カルテ・リアルリンク共用システム")
-st.markdown("災害時のリアルタイム気象状況・インフラ・地震・台風情報をモバイル最適化で一元管理します。")
+st.markdown("災害時のリアルタイム気象状況・インフラ・地震・台風情報を一元管理します。**※スマホ等でご利用の際は、画面を「横向き」にしていただくと全体がより見やすくなります。**")
 
-with st.expander("📱 【タップして展開】 スマホ操作解説・ご利用案内・開発目的"):
+with st.expander("📱 【タップして展開】 スマホ操作解説・横向き推奨・ご利用案内"):
     st.markdown("""
-### 📲 画面がフリーズ・スリープした時
+### 🔄 画面を横向きにすると見やすくなります
+スマホの自動回転をオンにして**画面を横にしていただく**と、地図や各データが広く表示され、操作しやすくなります。
+
+### 📲 フリーズ・スリープした時
 長時間放置等で動かなくなった場合は、画面内の青い復帰ボタン（**「Yes, reload this page」**等）をタップして再読み込みしてください。
 
 ### 📌 基本的な使い方
 中段のセレクトボックスで地域（関東・関西など）を切り替えると、地震・警戒レベル・温度が自動で切り替わります。最下部のリンク集から各種外部公式情報へアクセスできます。
-
-### 🎯 開発の目的
-気象庁の公式一次情報（地震・台風・特別警報・キキクル）とインフラ状況を1画面に集約し、スマホから素早く安全確認を行えるようにしています。
 """)
 
 st.markdown("---")
 
-# 🌀 台風情報カテゴリ
+# 🌀 台風情報カテゴリ（見やすくすっきりと1つのブロックに統合・改善）
 st.markdown("### 🌀 台風情報・進路速報（令和8年台風第25号）")
-st.markdown("<p style='font-size:13px; color:#cbd5e1;'>現在接近中の台風25号（ドゥージェン）の状況や進路予報を確認できます。</p>", unsafe_allow_html=True)
-
 st.markdown("""
-<div style="background-color: #111827; border: 1px solid #334155; border-left: 7px solid #3b82f6; padding: 14px; border-radius: 8px; margin-bottom: 15px;">
-    <div style="font-weight: 900; color: #ffffff; margin-bottom: 6px; font-size: 15px;">🗺️ 気象庁 公式「台風情報（マルチリンガル対応）」クイックリンク</div>
-    <p style="font-size: 13px; color: #cbd5e1; margin-bottom: 10px;">現在の正確な中心位置や勢力、今後の進路情報を気象庁公式サイトで直接確認できます。</p>
-    <a href="https://www.data.jma.go.jp/multi/cyclone/index.html?lang=jp" target="_blank" style="background-color: #2563eb; color: #ffffff; padding: 8px 14px; border-radius: 6px; text-decoration: none; font-weight: 900; display: inline-block; font-size: 13px;">👉 気象庁 台風情報ページを開く (外部サイト)</a>
+<div style="background-color: #111827; border: 1px solid #334155; border-left: 7px solid #3b82f6; padding: 14px; border-radius: 8px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+    <div>
+        <div style="font-weight: 900; color: #ffffff; margin-bottom: 4px; font-size: 15px;">🗺️ 気象庁 公式「台風情報（マルチリンガル対応）」</div>
+        <p style="font-size: 13px; color: #cbd5e1; margin: 0;">現在の中心位置・勢力・今後の進路予報を気象庁公式サイトで直接確認できます。</p>
+    </div>
+    <div>
+        <a href="https://www.data.jma.go.jp/multi/cyclone/index.html?lang=jp" target="_blank" style="background-color: #2563eb; color: #ffffff; padding: 10px 16px; border-radius: 6px; text-decoration: none; font-weight: 900; display: inline-block; font-size: 13px; white-space: nowrap;">👉 気象庁 台風情報を開く</a>
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
 typhoon_res = fetch_jma_typhoon_info()
 if typhoon_res["success"] and typhoon_res["data"]:
     st.markdown("""
-    <div style="background-color: #1e293b; border: 1px solid #475569; padding: 14px; border-radius: 8px; border-left: 7px solid #ef4444; margin-bottom: 12px; color: #ffffff;">
+    <div style="background-color: #1e293b; border: 1px solid #475569; padding: 12px 14px; border-radius: 8px; border-left: 7px solid #ef4444; margin-bottom: 12px; color: #ffffff; font-size: 13px;">
         <b>🔴 【警戒】大型の台風25号（ドゥージェン）が接近中です。連休（20〜21日）にかけて大雨や暴風に厳重に警戒してください。</b>
     </div>
     """, unsafe_allow_html=True)
