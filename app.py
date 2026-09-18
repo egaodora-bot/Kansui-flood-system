@@ -242,7 +242,6 @@ def fetch_jma_typhoon_info():
         with urllib.request.urlopen(req, timeout=4) as response:
             data = json.loads(response.read().decode('utf-8'))
             items = data if isinstance(data, list) else [data]
-            # 中身が空の場合の安全対策
             if not items or (len(items) == 1 and not items[0]):
                 return {"success": True, "data": []}
             return {"success": True, "data": items}
@@ -370,14 +369,12 @@ st.markdown("---")
 # 🌀 台風情報カテゴリ
 st.markdown("### 🌀 台風情報・進路 最新速報")
 
-# 🔴 【警戒】メッセージを上に配置（赤柿色の太いアクセントライン）
 st.markdown("""
 <div style="border-left: 7px solid #c2410c; padding-left: 14px; margin-top: 14px; margin-bottom: 12px; color: #fca5a5; font-size: 16px; font-weight: 900; text-align: left; line-height: 1.5;">
     🔴 【警戒】現在発表されている台風情報および今後の気象情報に厳重に警戒してください。
 </div>
 """, unsafe_allow_html=True)
 
-# 公式リンクカード
 st.markdown(
     """
     <div class="link-card" style="margin-top: 4px; margin-bottom: 15px;">
@@ -415,12 +412,32 @@ if typhoon_res["success"] and typhoon_res["data"]:
             </div>
             """, unsafe_allow_html=True)
 else:
-    # 台風情報がない場合（または取得できない場合）の表示
     st.markdown("""
     <div style="background-color: #111827; border: 1px solid #334155; padding: 12px 16px; border-radius: 8px; border-left: 5px solid #10b981; color: #e2e8f0; font-size: 13px; margin-bottom: 15px;">
         🟢 <b>現在発表されている台風情報はありません。</b>（平常時は詳細データ非表示）
     </div>
     """, unsafe_allow_html=True)
+
+# 🚄 鉄道・道路インフラ情報のクイック案内セクションを追加
+st.markdown("### 🚄 鉄道・道路インフラの運行・規制状況")
+st.markdown("""
+<div style="background-color: #111827; border: 1px solid #334155; padding: 14px; border-radius: 8px; border-left: 7px solid #3b82f6; margin-bottom: 20px;">
+    <p style="font-size: 13px; color: #cbd5e1; margin-bottom: 12px; margin-top: 0;">
+        台風や大雨などの気象レーダー・警報発令時は、交通機関に大きな影響が出る恐れがあります。お出かけ前や避難時には必ず最新の運行・規制情報をご確認ください。
+    </p>
+    <div style="display: flex; flex-wrap: wrap; gap: 10px;">
+        <a href="https://transit.yahoo.co.jp/diainfo/" target="_blank" style="background: #1e3a8a; color: #ffffff !important; padding: 8px 14px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold;">
+            🚆 Yahoo! 鉄道運行情報
+        </a>
+        <a href="https://www.jartic.or.jp/" target="_blank" style="background: #1e3a8a; color: #ffffff !important; padding: 8px 14px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold;">
+            🚗 JARTIC 道路交通情報
+        </a>
+        <a href="https://www.c-nexco.co.jp/" target="_blank" style="background: #1e3a8a; color: #ffffff !important; padding: 8px 14px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold;">
+            🛣️ NEXCO高速道路規制
+        </a>
+    </div>
+</div>
+""", unsafe_allow_html=True)
 
 st.markdown("---")
 
@@ -505,10 +522,10 @@ st.markdown(
         <b>🔗 インフラ・交通・防災関連リンク集（公式リアルタイム情報）</b><br>
         <ul>
             <li><b>【台風情報】</b> <a href="https://www.data.jma.go.jp/multi/cyclone/index.html?lang=jp" target="_blank">気象庁 台風情報ページ</a></li>
+            <li><b>【鉄道運行】</b> <a href="https://transit.yahoo.co.jp/diainfo/" target="_blank">Yahoo!路線情報（運行情報）</a></li>
+            <li><b>【道路規制】</b> <a href="https://www.jartic.or.jp/" target="_blank">JARTIC 日本道路交通情報センター</a></li>
             <li><b>【雨雲ズーム】</b> <a href="https://weather.yahoo.co.jp/weather/zoomradar/" target="_blank">Yahoo!天気（雨雲ズームレーダー）</a></li>
             <li><b>【防災情報】</b> <a href="https://www.jma.go.jp/bosai/" target="_blank">気象庁 防災情報ポータル</a></li>
-            <li><b>【道路規制】</b> <a href="https://www.jartic.or.jp/" target="_blank">JARTIC 日本道路交通情報センター</a></li>
-            <li><b>【鉄道運行】</b> <a href="https://transit.yahoo.co.jp/diainfo/" target="_blank">Yahoo!路線情報（運行情報）</a></li>
             <li><b>【河川水位】</b> <a href="https://www.river.go.jp/" target="_blank">川の防災情報（国土交通省）</a></li>
             <li><b>【危険度分布】</b> <a href="https://www.jma.go.jp/bosai/map.html" target="_blank">気象庁 キキクル</a></li>
             <li><b>【ハザード】</b> <a href="https://disaportal.gsi.go.jp/" target="_blank">ハザードマップポータルサイト</a></li>
