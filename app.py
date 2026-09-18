@@ -370,9 +370,18 @@ with st.expander("📱 【タップして展開】 スマホ操作解説・ご�
 
 st.markdown("---")
 
-# 🌀 台風情報カテゴリ（台風25号・詳細テキスト強制表示対応）
+# 🌀 台風情報カテゴリ（台風25号・進路図リンクカード付き）
 st.markdown("### 🌀 台風情報・進路速報（令和8年台風第25号）")
 st.markdown("<p style='font-size:13px; color:#cbd5e1;'>現在接近中の台風25号（ドゥージェン）の状況や進路予報を確認できます。</p>", unsafe_allow_html=True)
+
+# 台風進路図へのクイックアクセスカードを追加
+st.markdown("""
+<div style="background-color: #111827; border: 1px solid #334155; border-left: 7px solid #3b82f6; padding: 14px; border-radius: 8px; margin-bottom: 15px;">
+    <div style="font-weight: 900; color: #ffffff; margin-bottom: 6px; font-size: 15px;">🗺️ 気象庁 公式「台風進路図・予報円」クイックリンク</div>
+    <p style="font-size: 13px; color: #cbd5e1; margin-bottom: 10px;">現在の正確な中心位置や勢力、今後の進路予想図（予報円）を気象庁公式サイトで直接確認できます。</p>
+    <a href="https://www.jma.go.jp/bosai/map.html#typhoon=" target="_blank" style="background-color: #2563eb; color: #ffffff; padding: 8px 14px; border-radius: 6px; text-decoration: none; font-weight: 900; display: inline-block; font-size: 13px;">👉 気象庁台風進路マップを開く (外部サイト)</a>
+</div>
+""", unsafe_allow_html=True)
 
 typhoon_res = fetch_jma_typhoon_info()
 if typhoon_res["success"] and typhoon_res["data"]:
@@ -382,14 +391,13 @@ if typhoon_res["success"] and typhoon_res["data"]:
     </div>
     """, unsafe_allow_html=True)
     
-    with st.expander("📁 台風25号データの詳細を確認（タップして展開）"):
+    with st.expander("📁 台風25号データの詳細文面を確認（タップして展開）"):
         for i, item in enumerate(typhoon_res["data"]):
             raw_title = item.get("headTitle", item.get("controlTitle", f"令和8年 台風第25号に関する情報 #{i+1}"))
             head_title = re.sub(r'台風第\d+号', '台風第25号', raw_title)
             pub_office = item.get("publishingOffice", "気象庁")
             datetime_str = item.get("targetDateTime", item.get("dateTime", "直近の発表"))
             
-            # 本文データ（bodyやtextなど）が存在しない場合に備えて、安全な解説テキストを用意
             body_text = item.get("body", item.get("text", ""))
             if not body_text or len(str(body_text).strip()) < 5:
                 body_text = (
@@ -501,6 +509,7 @@ st.markdown(
     <div class="link-card">
         <b>🔗 インフラ・交通・防災関連リンク集（公式リアルタイム情報）</b><br>
         <ul>
+            <li><b>【台風進路図】</b> <a href="https://www.jma.go.jp/bosai/map.html#typhoon=" target="_blank">気象庁 台風進路マップ</a></li>
             <li><b>【雨雲ズーム】</b> <a href="https://weather.yahoo.co.jp/weather/zoomradar/" target="_blank">Yahoo!天気（雨雲ズームレーダー）</a></li>
             <li><b>【防災情報】</b> <a href="https://www.jma.go.jp/bosai/" target="_blank">気象庁 防災情報ポータル</a></li>
             <li><b>【道路規制】</b> <a href="https://www.jartic.or.jp/" target="_blank">JARTIC 日本道路交通情報センター</a></li>
