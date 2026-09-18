@@ -263,7 +263,6 @@ def fetch_jma_earthquake_info():
 
 @st.cache_data(ttl=300)
 def fetch_jma_typhoon_info():
-    # 気象庁の台風情報JSON等（または代替データ構造）
     url = "https://www.jma.go.jp/bosai/information/data/typhoon.json"
     try:
         req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
@@ -313,10 +312,9 @@ def fetch_jma_realtime_data(region_name):
             office = data[0].get("publishingOffice", "気象庁")
             weather_forecasts = []
             
-            # 選択された地域の県別データから平均的・代表的な気温を算出（東京固定を解消）
             pref_codes = list(REGION_PREFECTURES.get(region_name, {}).values())
             temps_list = []
-            for p_code in pref_codes[:3]: # 主要数県の気温をサンプリング
+            for p_code in pref_codes[:3]:
                 p_url = f"https://www.jma.go.jp/bosai/forecast/data/forecast/{p_code}.json"
                 try:
                     p_req = urllib.request.Request(p_url, headers={'User-Agent': 'Mozilla/5.0'})
@@ -375,7 +373,6 @@ def fetch_region_prefecture_weather(region_name):
 st.title("🛡️ 全国インフラ・気象防災カルテ・リアルリンク共用システム")
 st.markdown("災害時のリアルタイム気象状況・インフラ・地震・台風情報をモバイル最適化で一元管理します。")
 
-# ガイド
 with st.expander("📱 【タップして展開】 スマホ操作解説・ご利用案内・開発目的"):
     st.markdown("""
 <div style="background-color: #1e293b; border-left: 5px solid #3b82f6; padding: 12px 16px; border-radius: 6px; margin-bottom: 14px;">
@@ -390,15 +387,20 @@ with st.expander("📱 【タップして展開】 スマホ操作解説・ご�
 
 st.markdown("---")
 
-# 🌀 台風情報カテゴリの追加
+# 🌀 台風情報カテゴリの改善表示
 st.markdown("### 🌀 台風情報・進路速報")
 st.markdown("<p style='font-size:13px; color:#cbd5e1;'>現在発生している台風の状況や進路予報を確認できます。</p>", unsafe_allow_html=True)
 
 typhoon_res = fetch_jma_typhoon_info()
 if typhoon_res["success"] and typhoon_res["data"]:
-    st.success("🌀 現在、台風情報が発表されています。")
-    # 詳細情報の表示ループ
-    st.write(typhoon_res["data"])
+    st.markdown("""
+    <div style="background-color: #1e293b; border: 1px solid #475569; padding: 14px; border-radius: 8px; border-left: 7px solid #f59e0b; margin-bottom: 12px; color: #ffffff;">
+        <b>⚠️ 現在、台風情報が発表されています。詳細な進路・解説は以下の公式リンクよりご確認ください。</b>
+    </div>
+    """, unsafe_allow_html=True)
+    # 安全にテキストやJSONの概要を表示
+    with st.expander("📁 台風データの詳細JSONを展開"):
+        st.json(typhoon_res["data"])
 else:
     st.markdown("""
     <div style="background-color: #1e293b; border: 1px solid #475569; padding: 14px; border-radius: 8px; border-left: 7px solid #3b82f6; color: #ffffff;">
