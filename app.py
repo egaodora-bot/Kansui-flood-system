@@ -369,14 +369,16 @@ with st.expander("📱 【タップして展開】 スマホ操作解説・横�
 
 st.markdown("---")
 
-# 🌀 台風情報カテゴリ（ボタンを中央に大きく配置して視認性と押しやすさを改善）
+# 🌀 台風情報カテゴリ（文字を左端、リンクボタンを右横に配置）
 st.markdown("### 🌀 台風情報・進路速報（令和8年台風第25号）")
 st.markdown("""
-<div style="background-color: #111827; border: 1px solid #334155; border-left: 7px solid #3b82f6; padding: 18px; border-radius: 8px; margin-bottom: 15px; text-align: center;">
-    <div style="font-weight: 900; color: #ffffff; margin-bottom: 6px; font-size: 16px;">🗺️ 気象庁 公式「台風情報（マルチリンガル対応）」</div>
-    <p style="font-size: 13px; color: #cbd5e1; margin-bottom: 14px;">現在の中心位置・勢力・今後の進路予報を気象庁公式サイトで直接確認できます。</p>
-    <div>
-        <a href="https://www.data.jma.go.jp/multi/cyclone/index.html?lang=jp" target="_blank" style="background-color: #2563eb; color: #ffffff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 900; display: inline-block; font-size: 14px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">👉 気象庁 台風情報ページを開く (外部サイト)</a>
+<div style="background-color: #111827; border: 1px solid #334155; border-left: 7px solid #3b82f6; padding: 16px; border-radius: 8px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; text-align: left;">
+    <div style="flex: 1; min-width: 260px;">
+        <div style="font-weight: 900; color: #ffffff; margin-bottom: 4px; font-size: 15px;">🗺️ 気象庁 公式「台風情報（マルチリンガル対応）」</div>
+        <p style="font-size: 13px; color: #cbd5e1; margin: 0;">現在の中心位置・勢力・今後の進路予報を気象庁公式サイトで直接確認できます。</p>
+    </div>
+    <div style="white-space: nowrap;">
+        <a href="https://www.data.jma.go.jp/multi/cyclone/index.html?lang=jp" target="_blank" style="background-color: #2563eb; color: #ffffff; padding: 10px 18px; border-radius: 6px; text-decoration: none; font-weight: 900; display: inline-block; font-size: 13px;">👉 気象庁 台風情報ページを開く</a>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -384,7 +386,7 @@ st.markdown("""
 typhoon_res = fetch_jma_typhoon_info()
 if typhoon_res["success"] and typhoon_res["data"]:
     st.markdown("""
-    <div style="background-color: #1e293b; border: 1px solid #475569; padding: 12px 14px; border-radius: 8px; border-left: 7px solid #ef4444; margin-bottom: 12px; color: #ffffff; font-size: 13px;">
+    <div style="background-color: #1e293b; border: 1px solid #475569; padding: 12px 14px; border-radius: 8px; border-left: 7px solid #ef4444; margin-bottom: 12px; color: #ffffff; font-size: 13px; text-align: left;">
         <b>🔴 【警戒】大型の台風25号（ドゥージェン）が接近中です。連休（20〜21日）にかけて大雨や暴風に厳重に警戒してください。</b>
     </div>
     """, unsafe_allow_html=True)
@@ -406,7 +408,7 @@ if typhoon_res["success"] and typhoon_res["data"]:
                 )
             
             st.markdown(f"""
-            <div style="background-color: #111827; border: 1px solid #475569; padding: 14px; border-radius: 8px; margin-bottom: 10px; border-left: 5px solid #ef4444;">
+            <div style="background-color: #111827; border: 1px solid #475569; padding: 14px; border-radius: 8px; margin-bottom: 10px; border-left: 5px solid #ef4444; text-align: left;">
                 <div style="color: #fde047; font-weight: 900; font-size: 15px; margin-bottom: 6px;">{head_title}（ドゥージェン）</div>
                 <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; color: #94a3b8; font-size: 12px; margin-bottom: 10px;">
                     <div><b>発表官署:</b> {pub_office}</div>
@@ -420,7 +422,7 @@ if typhoon_res["success"] and typhoon_res["data"]:
             """, unsafe_allow_html=True)
 else:
     st.markdown("""
-    <div style="background-color: #1e293b; border: 1px solid #475569; padding: 14px; border-radius: 8px; border-left: 7px solid #ef4444; color: #ffffff;">
+    <div style="background-color: #1e293b; border: 1px solid #475569; padding: 14px; border-radius: 8px; border-left: 7px solid #ef4444; color: #ffffff; text-align: left;">
         <b>🔴 令和8年台風第25号（ドゥージェン）が関東・東日本へ接近中です。気象庁公式サイトや最新の進路情報をご確認ください。</b>
     </div>
     """, unsafe_allow_html=True)
