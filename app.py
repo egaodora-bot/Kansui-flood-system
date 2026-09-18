@@ -358,23 +358,36 @@ st.markdown("災害時のリアルタイム気象状況・インフラ・地震�
 
 with st.expander("📱 【タップして展開】 スマホ操作解説・ご利用案内・開発目的"):
     st.markdown("""
-<div style="background-color: #1e293b; border-left: 5px solid #3b82f6; padding: 12px 16px; border-radius: 6px; margin-bottom: 14px;">
-    <span style="background-color: #1d4ed8; color: #ffffff; padding: 4px 10px; border-radius: 4px; font-weight: 900; font-size: 13px; display: inline-block;">📲 画面表示の復帰</span>
-    <p style="margin-top: 10px; margin-bottom: 0px; color: #ffffff; font-size: 14px; line-height: 1.6; font-weight: 500;">一定時間アクセスがないとスリープ状態になります。その際は青い復帰ボタン（<strong>「Yes, reload this page」</strong>等）を押して再開してください。</p>
-</div>
-<div style="background-color: #1e293b; border-left: 5px solid #10b981; padding: 12px 16px; border-radius: 6px; margin-bottom: 0px;">
-    <span style="background-color: #047857; color: #ffffff; padding: 4px 10px; border-radius: 4px; font-weight: 900; font-size: 13px; display: inline-block;">🎯 開発の目的</span>
-    <p style="margin-top: 10px; margin-bottom: 0px; color: #ffffff; font-size: 14px; line-height: 1.6; font-weight: 500;">気象庁の公式一次情報（地震速報・台風・特別警報・キキクル）と生活インフラ状況を1つの画面で素早く確認できるようにしています。</p>
+<div style="background-color: #1e293b; padding: 4px 0px; border-radius: 6px;">
+    <p style="margin-bottom: 8px; font-size: 14px; line-height: 1.6; font-weight: 700; color: #93c5fd;">
+    📲 画面がフリーズ・スリープした時
+    </p>
+    <p style="margin-top: 0px; margin-bottom: 14px; font-size: 13px; line-height: 1.5; color: #ffffff;">
+    長時間放置等で動かなくなった場合は、画面内の青い復帰ボタン（<strong>「Yes, reload this page」</strong>等）をタップして再読み込みしてください。
+    </p>
+
+    <p style="margin-bottom: 8px; font-size: 14px; line-height: 1.6; font-weight: 700; color: #fde047;">
+    📌 基本的な使い方
+    </p>
+    <p style="margin-top: 0px; margin-bottom: 14px; font-size: 13px; line-height: 1.5; color: #ffffff;">
+    中段のセレクトボックスで地域（関東・関西など）を切り替えると、地震・警戒レベル・温度が自動で切り替わります。最下部のリンク集から各種外部公式情報へアクセスできます。
+    </p>
+
+    <p style="margin-bottom: 8px; font-size: 14px; line-height: 1.6; font-weight: 700; color: #34d399;">
+    🎯 開発の目的
+    </p>
+    <p style="margin-top: 0px; margin-bottom: 0px; font-size: 13px; line-height: 1.5; color: #ffffff;">
+    気象庁の公式一次情報（地震・台風・特別警報・キキクル）とインフラ状況を1画面に集約し、スマホから素早く安全確認を行えるようにしています。
+    </p>
 </div>
     """, unsafe_allow_html=True)
 
 st.markdown("---")
 
-# 🌀 台風情報カテゴリ（台風25号・進路図リンクカード付き）
+# 🌀 台風情報カテゴリ
 st.markdown("### 🌀 台風情報・進路速報（令和8年台風第25号）")
 st.markdown("<p style='font-size:13px; color:#cbd5e1;'>現在接近中の台風25号（ドゥージェン）の状況や進路予報を確認できます。</p>", unsafe_allow_html=True)
 
-# 台風進路図へのクイックアクセスカードを追加
 st.markdown("""
 <div style="background-color: #111827; border: 1px solid #334155; border-left: 7px solid #3b82f6; padding: 14px; border-radius: 8px; margin-bottom: 15px;">
     <div style="font-weight: 900; color: #ffffff; margin-bottom: 6px; font-size: 15px;">🗺️ 気象庁 公式「台風進路図・予報円」クイックリンク</div>
