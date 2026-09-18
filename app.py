@@ -242,6 +242,9 @@ def fetch_jma_typhoon_info():
         with urllib.request.urlopen(req, timeout=4) as response:
             data = json.loads(response.read().decode('utf-8'))
             items = data if isinstance(data, list) else [data]
+            # 中身が空の場合の安全対策
+            if not items or (len(items) == 1 and not items[0]):
+                return {"success": True, "data": []}
             return {"success": True, "data": items}
     except Exception:
         return {"success": False, "data": []}
@@ -367,7 +370,7 @@ st.markdown("---")
 # 🌀 台風情報カテゴリ
 st.markdown("### 🌀 台風情報・進路 最新速報")
 
-# 🔴 【警戒】メッセージを大きくし、赤柿色のアクセントラインを太くして上に配置
+# 🔴 【警戒】メッセージを上に配置（赤柿色の太いアクセントライン）
 st.markdown("""
 <div style="border-left: 7px solid #c2410c; padding-left: 14px; margin-top: 14px; margin-bottom: 12px; color: #fca5a5; font-size: 16px; font-weight: 900; text-align: left; line-height: 1.5;">
     🔴 【警戒】現在発表されている台風情報および今後の気象情報に厳重に警戒してください。
@@ -411,6 +414,13 @@ if typhoon_res["success"] and typhoon_res["data"]:
                 </div>
             </div>
             """, unsafe_allow_html=True)
+else:
+    # 台風情報がない場合（または取得できない場合）の表示
+    st.markdown("""
+    <div style="background-color: #111827; border: 1px solid #334155; padding: 12px 16px; border-radius: 8px; border-left: 5px solid #10b981; color: #e2e8f0; font-size: 13px; margin-bottom: 15px;">
+        🟢 <b>現在発表されている台風情報はありません。</b>（平常時は詳細データ非表示）
+    </div>
+    """, unsafe_allow_html=True)
 
 st.markdown("---")
 
