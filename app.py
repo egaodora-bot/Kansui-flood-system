@@ -58,13 +58,21 @@ div[data-testid="stExpander"] {
     border-radius: 8px !important;
     margin-bottom: 12px !important;
 }
-/* 👇 ここに青い下線とパディングを追加して視認性・立体感をアップ */
+/* 外側のメイン開閉ボタンのタイトル */
 div[data-testid="stExpander"] summary p {
     font-weight: 900 !important;
     color: #ffffff !important;
     font-size: 15px !important;
     border-bottom: 2px solid #3b82f6 !important;
     padding-bottom: 6px !important;
+}
+/* 内部の各項目の見出し（H3）に明るい色と下線をつけて目立たせる */
+div[data-testid="stExpander"] div[data-testid="stMarkdownContainer"] h3 {
+    color: #38bdf8 !important; /* 鮮やかな水色で文字を色づけ */
+    font-size: 17px !important;
+    border-bottom: 2px solid #3b82f6 !important; /* 下線を追加 */
+    padding-bottom: 4px !important;
+    margin-top: 10px !important;
 }
 div[data-testid="stSelectbox"] {
     background-color: #080d16 !important;
