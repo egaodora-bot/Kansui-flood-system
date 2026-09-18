@@ -43,15 +43,6 @@ section[data-testid="stMain"] {
     color: #ffffff !important;
     font-weight: 900 !important;
 }
-.notice-card {
-    background-color: #111827 !important;
-    border: 1px solid #334155 !important;
-    border-left: 7px solid #ffe600 !important;
-    padding: 14px 18px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    color: #ffffff !important;
-}
 .link-card {
     background-color: #111827 !important;
     border: 1px solid #334155 !important;
@@ -180,7 +171,7 @@ JMA_WARNING_NAMES = {
     "15": "強風注意報", "05": "暴風警報", "35": "暴風特別警報", "13": "風雪注意報", "02": "暴風雪警報", "32": "暴風雪特別警報",
     "16": "波浪注意報", "07": "波浪警報", "37": "波浪特別警報", "12": "大雪注意報", "06": "大雪警報", "36": "大雪特別警報",
     "17": "融雪注意報", "14": "雷注意報", "20": "濃霧注意報", "21": "乾燥注意報", "22": "なだれ注意報",
-    "23": "低温注意報", "24": "霜注意報", "25": "着氷注意報", "26": "着雪注意報", "27": "その他の注意報",
+    "23": "低温注意報", "24": "霜注意報", "25": "着氷注意報", "26": "着雪注意報", "27": "そのほかの注意報",
     "30": "Level3氾濫警報", "31": "Level3氾濫警報", "40": "Level4氾濫危険警報", "41": "Level4氾濫危険警報",
     "51": "Level5氾濫特別警報", "53": "Level5氾濫特別警報",
 }
@@ -251,26 +242,7 @@ def fetch_jma_typhoon_info():
         req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         with urllib.request.urlopen(req, timeout=4) as response:
             data = json.loads(response.read().decode('utf-8'))
-            
-            # 有効な最新データのみをフィルタリングする（古すぎるサンプルやキャッシュを除外）
-            valid_items = []
-            if isinstance(data, list):
-                for item in data:
-                    # 例として、datetimeが極端に古い（あるいは存在しない）場合は除外する判定を入れることも可能
-                    # ここではリスト形式であればそのまま、あるいは中身をチェック
-                    datetime_str = item.get("targetDateTime", item.get("dateTime", ""))
-                    if datetime_str:
-                        try:
-                            # 2日前より古いものは除外するなどの安全フィルター
-                            dt = datetime.fromisoformat(datetime_str.replace("Z", "+00:00"))
-                            if datetime.now(timezone.utc) - dt < timedelta(days=3):
-                                valid_items.append(item)
-                        except:
-                            valid_items.append(item)
-                    else:
-                        # 日時不明のデータは古いキャッシュの可能性が高いため除外
-                        continue
-            return {"success": True, "data": valid_items}
+            return {"success": True, "data": data if isinstance(data, list) else [data]}
     except Exception:
         return {"success": False, "data": []}
 
@@ -389,38 +361,37 @@ with st.expander("📱 【タップして展開】 スマホ操作解説・ご�
 
 st.markdown("---")
 
-# 🌀 台風情報カテゴリ
-st.markdown("### 🌀 台風情報・進路速報")
-st.markdown("<p style='font-size:13px; color:#cbd5e1;'>現在発生している台風の状況や進路予報を確認できます。</p>", unsafe_allow_html=True)
+# 🌀 台風情報カテゴリ（台風25号対応）
+st.markdown("### 🌀 台風情報・進路速報（令和8年台風第25号）")
+st.markdown("<p style='font-size:13px; color:#cbd5e1;'>現在接近中の台風25号（ドゥージェン）の状況や進路予報を確認できます。</p>", unsafe_allow_html=True)
 
 typhoon_res = fetch_jma_typhoon_info()
 if typhoon_res["success"] and typhoon_res["data"]:
     st.markdown("""
-    <div style="background-color: #1e293b; border: 1px solid #475569; padding: 14px; border-radius: 8px; border-left: 7px solid #f59e0b; margin-bottom: 12px; color: #ffffff;">
-        <b>⚠️ 現在、台風情報が発表されています。詳細な進路・解説は以下の公式リンクよりご確認ください。</b>
+    <div style="background-color: #1e293b; border: 1px solid #475569; padding: 14px; border-radius: 8px; border-left: 7px solid #ef4444; margin-bottom: 12px; color: #ffffff;">
+        <b>🔴 【警戒】大型の台風25号が接近中です。連休（20〜21日）にかけて大雨や暴風に厳重に警戒してください。</b>
     </div>
     """, unsafe_allow_html=True)
     
-    with st.expander("📁 台風データの詳細を確認（タップして展開）"):
+    with st.expander("📁 台風25号データの詳細を確認（タップして展開）"):
         for i, item in enumerate(typhoon_res["data"]):
-            head_title = item.get("headTitle", item.get("controlTitle", f"台風情報 #{i+1}"))
+            head_title = item.get("headTitle", item.get("controlTitle", f"令和8年 台風第25号に関する情報 #{i+1}"))
             pub_office = item.get("publishingOffice", "気象庁")
-            datetime_str = item.get("targetDateTime", item.get("dateTime", "日時不明"))
+            datetime_str = item.get("targetDateTime", item.get("dateTime", "直近の発表"))
             
             st.markdown(f"""
-            <div style="background-color: #111827; border: 1px solid #475569; padding: 14px; border-radius: 8px; margin-bottom: 10px; border-left: 5px solid #3b82f6;">
+            <div style="background-color: #111827; border: 1px solid #475569; padding: 14px; border-radius: 8px; margin-bottom: 10px; border-left: 5px solid #ef4444;">
                 <div style="color: #fde047; font-weight: 900; font-size: 15px; margin-bottom: 6px;">{head_title}</div>
                 <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; color: #94a3b8; font-size: 12px; margin-bottom: 4px;">
                     <div><b>発表官署:</b> {pub_office}</div>
-                    <div><b>発表日時:</b> {datetime_str}</div>
+                    <div><b>情報日時:</b> {datetime_str}</div>
                 </div>
             </div>
             """, unsafe_allow_html=True)
 else:
     st.markdown("""
-    <div style="background-color: #1e293b; border: 1px solid #475569; padding: 14px; border-radius: 8px; border-left: 7px solid #3b82f6; color: #ffffff;">
-        <b>🟢 現在、日本付近で強い勢力を持つ台風の発生はありません。</b><br>
-        <span style="font-size:13px; color:#cbd5e1;">台風シーズンや接近時には、ここに中心気圧・最大風速・進路予想がリアルタイム表示されます。</span>
+    <div style="background-color: #1e293b; border: 1px solid #475569; padding: 14px; border-radius: 8px; border-left: 7px solid #ef4444; color: #ffffff;">
+        <b>🔴 令和8年台風第25号が関東・東日本へ接近中です。気象庁公式サイトや最新の進路情報をご確認ください。</b>
     </div>
     """, unsafe_allow_html=True)
 
@@ -469,7 +440,7 @@ for lvl, color, title in [("Level5", "error", "🚨 【Level5】特別警報発�
         has_warn = True
         getattr(st, color)(title)
         for w_name, cities in warnings[lvl].items(): st.write(f"- **{w_name}**: {', '.join(cities)}")
-if not has_warn: st.success("🟢 現在、対象エリアに緊急警戒レベル（レベル3〜5）の警報は発表されていません。")
+if not has_warn: st.success("🟢 現在、対象エリアに緊急警戒レベル（レベル3〜5）の警報は発表されていません。台風の接近に伴う気象情報にご注意ください。")
 
 st.markdown("---")
 
