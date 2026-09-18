@@ -242,15 +242,7 @@ def fetch_jma_typhoon_info():
         with urllib.request.urlopen(req, timeout=4) as response:
             data = json.loads(response.read().decode('utf-8'))
             items = data if isinstance(data, list) else [data]
-            valid_items = []
-            for item in items:
-                title = item.get("headTitle", item.get("controlTitle", ""))
-                if "6号" in title and "25号" not in title:
-                    continue
-                valid_items.append(item)
-            if not valid_items:
-                valid_items = items
-            return {"success": True, "data": valid_items}
+            return {"success": True, "data": items}
     except Exception:
         return {"success": False, "data": []}
 
@@ -373,7 +365,7 @@ with st.expander("📱 【タップして展開】 スマホ操作解説・横�
 st.markdown("---")
 
 # 🌀 台風情報カテゴリ
-st.markdown("### 🌀 台風情報・進路速報（令和8年台風第25号）")
+st.markdown("### 🌀 台風情報・進路 最新速報")
 st.markdown(
     """
     <div class="link-card" style="margin-top: 5px; margin-bottom: 15px;">
@@ -389,29 +381,23 @@ typhoon_res = fetch_jma_typhoon_info()
 if typhoon_res["success"] and typhoon_res["data"]:
     st.markdown("""
     <div style="background-color: #1e293b; border: 1px solid #475569; padding: 12px 14px; border-radius: 8px; border-left: 7px solid #ef4444; margin-bottom: 12px; color: #ffffff; font-size: 13px; text-align: left;">
-        <b>🔴 【警戒】大型の台風25号（ドゥージェン）が接近中です。連休（20〜21日）にかけて大雨や暴風に厳重に警戒してください。</b>
+        <b>🔴 【警戒】現在発表されている台風情報および今後の気象情報に厳重に警戒してください。</b>
     </div>
     """, unsafe_allow_html=True)
     
-    with st.expander("📁 台風25号データの詳細文面を確認（タップして展開）"):
+    with st.expander("📁 台風データの詳細文面を確認（タップして展開）"):
         for i, item in enumerate(typhoon_res["data"]):
-            raw_title = item.get("headTitle", item.get("controlTitle", f"令和8年 台風第25号に関する情報 #{i+1}"))
-            head_title = re.sub(r'台風第\d+号', '台風第25号', raw_title)
+            head_title = item.get("headTitle", item.get("controlTitle", f"台風に関する情報 #{i+1}"))
             pub_office = item.get("publishingOffice", "気象庁")
             datetime_str = item.get("targetDateTime", item.get("dateTime", "直近の発表"))
             
             body_text = item.get("body", item.get("text", ""))
             if not body_text or len(str(body_text).strip()) < 5:
-                body_text = (
-                    "【令和8年台風第25号（ドゥージェン）に関する解説】<br>"
-                    "・勢力と状況: 大型で強い勢力を維持しながら日本列島へ北上中。<br>"
-                    "・警戒事項: 連休期間中（20日〜21日）にかけて、西日本から東日本・北日本にかけて大雨、暴風、高波に厳重な警戒が必要です。<br>"
-                    "・最新の気象庁レーダーやキキクル、各自治体の避難情報に十分ご注意ください。"
-                )
+                body_text = "現在発表されている台風情報詳細です。気象庁公式サイトや最新の進路情報をご確認ください。"
             
             st.markdown(f"""
             <div style="background-color: #111827; border: 1px solid #475569; padding: 14px; border-radius: 8px; margin-bottom: 10px; border-left: 5px solid #ef4444; text-align: left;">
-                <div style="color: #fde047; font-weight: 900; font-size: 15px; margin-bottom: 6px;">{head_title}（ドゥージェン）</div>
+                <div style="color: #fde047; font-weight: 900; font-size: 15px; margin-bottom: 6px;">{head_title}</div>
                 <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; color: #94a3b8; font-size: 12px; margin-bottom: 10px;">
                     <div><b>発表官署:</b> {pub_office}</div>
                     <div><b>情報日時:</b> {datetime_str}</div>
@@ -425,7 +411,7 @@ if typhoon_res["success"] and typhoon_res["data"]:
 else:
     st.markdown("""
     <div style="background-color: #1e293b; border: 1px solid #475569; padding: 14px; border-radius: 8px; border-left: 7px solid #ef4444; color: #ffffff; text-align: left;">
-        <b>🔴 令和8年台風第25号（ドゥージェン）が関東・東日本へ接近中です。気象庁公式サイトや最新の進路情報をご確認ください。</b>
+        <b>🔴 現在、発生している台風情報については気象庁公式サイトをご確認ください。</b>
     </div>
     """, unsafe_allow_html=True)
 
@@ -474,7 +460,7 @@ for lvl, color, title in [("Level5", "error", "🚨 【Level5】特別警報発�
         has_warn = True
         getattr(st, color)(title)
         for w_name, cities in warnings[lvl].items(): st.write(f"- **{w_name}**: {', '.join(cities)}")
-if not has_warn: st.success("🟢 現在、対象エリアに緊急警戒レベル（レベル3〜5）の警報は発表されていません。台風25号の接近に伴う気象情報にご注意ください。")
+if not has_warn: st.success("🟢 現在、対象エリアに緊急警戒レベル（レベル3〜5）の警報は発表されていません。最新の気象情報にご注意ください。")
 
 st.markdown("---")
 
