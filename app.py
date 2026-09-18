@@ -369,19 +369,19 @@ with st.expander("📱 【タップして展開】 スマホ操作解説・横�
 
 st.markdown("---")
 
-# 🌀 台風情報カテゴリ（文字の右横にボタンをぴったり配置）
+# 🌀 台風情報カテゴリ（Streamlitのカラムを用いて左側に文字、右横にボタンをぴったり配置）
 st.markdown("### 🌀 台風情報・進路速報（令和8年台風第25号）")
-st.markdown("""
-<div style="background-color: #111827; border: 1px solid #334155; border-left: 7px solid #3b82f6; padding: 16px; border-radius: 8px; margin-bottom: 15px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; text-align: left;">
-    <div>
-        <div style="font-weight: 900; color: #ffffff; margin-bottom: 4px; font-size: 15px;">🗺️ 気象庁 公式「台風情報（マルチリンガル対応）」</div>
-        <p style="font-size: 13px; color: #cbd5e1; margin: 0;">現在の中心位置・勢力・今後の進路予報を気象庁公式サイトで直接確認できます。</p>
-    </div>
-    <div>
-        <a href="https://www.data.jma.go.jp/multi/cyclone/index.html?lang=jp" target="_blank" style="background-color: #2563eb; color: #ffffff; padding: 10px 18px; border-radius: 6px; text-decoration: none; font-weight: 900; display: inline-block; font-size: 13px; white-space: nowrap;">👉 気象庁 台風情報ページを開く</a>
-    </div>
-</div>
-""", unsafe_allow_html=True)
+with st.container():
+    st.markdown('<div class="link-card" style="margin-top: 5px; margin-bottom: 15px;">', unsafe_allow_html=True)
+    col_text, col_btn = st.columns([3, 1])
+    with col_text:
+        st.markdown("**🗺️ 気象庁 公式「台風情報（マルチリンガル対応）」**")
+        st.markdown("<p style='font-size:13px; color:#cbd5e1; margin:0;'>現在の中心位置・勢力・今後の進路予報を気象庁公式サイトで直接確認できます。</p>", unsafe_allow_html=True)
+    with col_btn:
+        st.markdown("<div style='text-align: right; padding-top: 5px;'>", unsafe_allow_html=True)
+        st.markdown('[👉 気象庁 台風情報ページを開く](https://www.data.jma.go.jp/multi/cyclone/index.html?lang=jp)', unsafe_allow_html=True)
+        st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 typhoon_res = fetch_jma_typhoon_info()
 if typhoon_res["success"] and typhoon_res["data"]:
@@ -518,6 +518,17 @@ st.markdown(
             <li><b>【危険度分布】</b> <a href="https://www.jma.go.jp/bosai/map.html" target="_blank">気象庁 キキクル</a></li>
             <li><b>【ハザード】</b> <a href="https://disaportal.gsi.go.jp/" target="_blank">ハザードマップポータルサイト</a></li>
         </ul>
+    </div>
+    """,
+    unsafe_allow_html=True
+)
+
+st.markdown("---")
+st.markdown(
+    """
+    <div style="text-align: center; color: #94a3b8; font-size: 12px; padding: 10px 0;">
+        <p style="margin: 0;"><b>💻 システム開発・運営:</b> 全国インフラ・気象防災システム開発プロジェクトチーム</p>
+        <p style="margin: 4px 0 0 0;">© 2026 National Infrastructure & Meteorological Disaster Prevention System. All Rights Reserved.</p>
     </div>
     """,
     unsafe_allow_html=True
