@@ -48,7 +48,7 @@ section[data-testid="stMain"] {
     border-left: 7px solid #10b981 !important;
     padding: 16px;
     border-radius: 8px;
-    margin-top: 20px;
+    margin-top: 10px;
     margin-bottom: 20px;
 }
 div[data-testid="stExpander"] {
@@ -372,7 +372,7 @@ with st.expander("📱 【タップして展開】 スマホ操作解説・横�
 
 st.markdown("---")
 
-# 🌀 台風情報カテゴリ（Streamlitのカラムを用いて左側に文字、右横にボタンをぴったり配置）
+# 🌀 台風情報カテゴリ
 st.markdown("### 🌀 台風情報・進路速報（令和8年台風第25号）")
 with st.container():
     st.markdown('<div class="link-card" style="margin-top: 5px; margin-bottom: 15px;">', unsafe_allow_html=True)
@@ -382,7 +382,7 @@ with st.container():
         st.markdown("<p style='font-size:13px; color:#cbd5e1; margin:0;'>現在の中心位置・勢力・今後の進路予報を気象庁公式サイトで直接確認できます。</p>", unsafe_allow_html=True)
     with col_btn:
         st.markdown("<div style='text-align: right; padding-top: 5px;'>", unsafe_allow_html=True)
-        st.markdown('[👉 気象庁 台風情報ページを開く](https://www.data.jma.go.jp/multi/cyclone/index.html?lang=jp)', unsafe_allow_html=True)
+        st.markdown('[👉 気象庁 地図で台風情報](https://www.data.jma.go.jp/multi/cyclone/index.html?lang=jp)', unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
