@@ -366,9 +366,18 @@ st.markdown("---")
 
 # 🌀 台風情報カテゴリ
 st.markdown("### 🌀 台風情報・進路 最新速報")
+
+# 1. 赤字の警戒メッセージを最上部に配置
+st.markdown("""
+<div style="background-color: #1e293b; border: 1px solid #475569; padding: 12px 14px; border-radius: 8px; border-left: 7px solid #ef4444; margin-top: 5px; margin-bottom: 12px; color: #ffffff; font-size: 13px; text-align: left;">
+    <b>🔴 【警戒】現在発表されている台風情報および今後の気象情報に厳重に警戒してください。</b>
+</div>
+""", unsafe_allow_html=True)
+
+# 2. 公式リンクカードをその下に配置
 st.markdown(
     """
-    <div class="link-card" style="margin-top: 5px; margin-bottom: 15px;">
+    <div class="link-card" style="margin-top: 0px; margin-bottom: 15px;">
         <b>🗺️ 気象庁 公式「台風情報（マルチリンガル対応）」</b><br>
         <p style="font-size:13px; color:#cbd5e1; margin: 6px 0 10px 0;">現在の中心位置・勢力・今後の進路予報を気象庁公式サイトで直接確認できます。</p>
         <a href="https://www.data.jma.go.jp/multi/cyclone/index.html?lang=jp" target="_blank">👉 気象庁 地図で台風情報</a>
@@ -379,12 +388,6 @@ st.markdown(
 
 typhoon_res = fetch_jma_typhoon_info()
 if typhoon_res["success"] and typhoon_res["data"]:
-    st.markdown("""
-    <div style="background-color: #1e293b; border: 1px solid #475569; padding: 12px 14px; border-radius: 8px; border-left: 7px solid #ef4444; margin-bottom: 12px; color: #ffffff; font-size: 13px; text-align: left;">
-        <b>🔴 【警戒】現在発表されている台風情報および今後の気象情報に厳重に警戒してください。</b>
-    </div>
-    """, unsafe_allow_html=True)
-    
     with st.expander("📁 台風データの詳細文面を確認（タップして展開）"):
         for i, item in enumerate(typhoon_res["data"]):
             head_title = item.get("headTitle", item.get("controlTitle", f"台風に関する情報 #{i+1}"))
@@ -408,12 +411,6 @@ if typhoon_res["success"] and typhoon_res["data"]:
                 </div>
             </div>
             """, unsafe_allow_html=True)
-else:
-    st.markdown("""
-    <div style="background-color: #1e293b; border: 1px solid #475569; padding: 14px; border-radius: 8px; border-left: 7px solid #ef4444; color: #ffffff; text-align: left;">
-        <b>🔴 現在、発生している台風情報については気象庁公式サイトをご確認ください。</b>
-    </div>
-    """, unsafe_allow_html=True)
 
 st.markdown("---")
 
