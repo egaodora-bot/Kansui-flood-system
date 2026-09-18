@@ -31,10 +31,12 @@ section[data-testid="stMain"] {
 [data-testid="stAppViewContainer"] span {
     color: #ffffff;
 }
+/* タイトルの文字サイズをここで大きく指定（エラーしない安全な指定方法） */
 [data-testid="stAppViewContainer"] h1 {
     color: #ffffff !important;
-    font-size: 1.8rem !important;
-    font-weight: 800 !important;
+    font-size: 2.3rem !important;
+    font-weight: 900 !important;
+    line-height: 1.3 !important;
 }
 [data-testid="stAppViewContainer"] h2,
 [data-testid="stAppViewContainer"] h3,
@@ -51,7 +53,6 @@ section[data-testid="stMain"] {
     margin-top: 10px;
     margin-bottom: 20px;
 }
-/* Streamlit製エキスパンダーを完全に排除し、HTML標準のdetails/summaryで代用 */
 details.custom-expander {
     background-color: #111827 !important;
     border: 1px solid #475569 !important;
