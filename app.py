@@ -369,16 +369,14 @@ with st.expander("📱 【タップして展開】 スマホ操作解説・横�
 
 st.markdown("---")
 
-# 🌀 台風情報カテゴリ（見やすくすっきりと1つのブロックに統合・改善）
+# 🌀 台風情報カテゴリ（ボタンを中央に大きく配置して視認性と押しやすさを改善）
 st.markdown("### 🌀 台風情報・進路速報（令和8年台風第25号）")
 st.markdown("""
-<div style="background-color: #111827; border: 1px solid #334155; border-left: 7px solid #3b82f6; padding: 14px; border-radius: 8px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px;">
+<div style="background-color: #111827; border: 1px solid #334155; border-left: 7px solid #3b82f6; padding: 18px; border-radius: 8px; margin-bottom: 15px; text-align: center;">
+    <div style="font-weight: 900; color: #ffffff; margin-bottom: 6px; font-size: 16px;">🗺️ 気象庁 公式「台風情報（マルチリンガル対応）」</div>
+    <p style="font-size: 13px; color: #cbd5e1; margin-bottom: 14px;">現在の中心位置・勢力・今後の進路予報を気象庁公式サイトで直接確認できます。</p>
     <div>
-        <div style="font-weight: 900; color: #ffffff; margin-bottom: 4px; font-size: 15px;">🗺️ 気象庁 公式「台風情報（マルチリンガル対応）」</div>
-        <p style="font-size: 13px; color: #cbd5e1; margin: 0;">現在の中心位置・勢力・今後の進路予報を気象庁公式サイトで直接確認できます。</p>
-    </div>
-    <div>
-        <a href="https://www.data.jma.go.jp/multi/cyclone/index.html?lang=jp" target="_blank" style="background-color: #2563eb; color: #ffffff; padding: 10px 16px; border-radius: 6px; text-decoration: none; font-weight: 900; display: inline-block; font-size: 13px; white-space: nowrap;">👉 気象庁 台風情報を開く</a>
+        <a href="https://www.data.jma.go.jp/multi/cyclone/index.html?lang=jp" target="_blank" style="background-color: #2563eb; color: #ffffff; padding: 12px 24px; border-radius: 6px; text-decoration: none; font-weight: 900; display: inline-block; font-size: 14px; box-shadow: 0 4px 6px rgba(0,0,0,0.3);">👉 気象庁 台風情報ページを開く (外部サイト)</a>
     </div>
 </div>
 """, unsafe_allow_html=True)
