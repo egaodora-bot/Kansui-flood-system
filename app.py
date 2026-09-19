@@ -378,7 +378,7 @@ st.markdown("""
 
 st.markdown("---")
 
-# 🌀 台風情報カテゴリ（不整合な残留データを排除し、公式リンクと仕様の案内を明記）
+# 🌀 台風情報カテゴリ（リンク切れのない安全な公式ポータルURLに修正）
 st.markdown("### 🌀 台風情報・進路 最新速報")
 
 st.markdown("""
@@ -393,8 +393,8 @@ st.markdown("""
         <a href="https://www.data.jma.go.jp/multi/cyclone/index.html?lang=jp" target="_blank" style="background: #1e3a8a; color: #ffffff !important; padding: 8px 14px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold;">
             🗺️ 気象庁 台風情報（公式）
         </a>
-        <a href="https://weather.yahoo.co.jp/weather/typhoon/" target="_blank" style="background: #1e3a8a; color: #ffffff !important; padding: 8px 14px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold;">
-            🌀 Yahoo!天気 台風情報
+        <a href="https://weather.yahoo.co.jp/weather/" target="_blank" style="background: #1e3a8a; color: #ffffff !important; padding: 8px 14px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold;">
+            🌀 Yahoo!天気・災害 トップ
         </a>
     </div>
 </div>
