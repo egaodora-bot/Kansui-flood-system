@@ -378,7 +378,7 @@ st.markdown("""
 
 st.markdown("---")
 
-# 🌀 台風情報カテゴリ（リンク切れのない安全な公式ポータルURLに修正）
+# 🌀 台風情報カテゴリ（ウェザーニュースリンクを追加）
 st.markdown("### 🌀 台風情報・進路 最新速報")
 
 st.markdown("""
@@ -393,8 +393,11 @@ st.markdown("""
         <a href="https://www.data.jma.go.jp/multi/cyclone/index.html?lang=jp" target="_blank" style="background: #1e3a8a; color: #ffffff !important; padding: 8px 14px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold;">
             🗺️ 気象庁 台風情報（公式）
         </a>
+        <a href="https://weathernews.jp/s/typhoon/" target="_blank" style="background: #1e3a8a; color: #ffffff !important; padding: 8px 14px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold;">
+            🌀 ウェザーニュース 台風情報
+        </a>
         <a href="https://weather.yahoo.co.jp/weather/" target="_blank" style="background: #1e3a8a; color: #ffffff !important; padding: 8px 14px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold;">
-            🌀 Yahoo!天気・災害 トップ
+            ☀️ Yahoo!天気・災害
         </a>
     </div>
 </div>
@@ -509,7 +512,7 @@ st.markdown(
     <div class="link-card">
         <b>🔗 インフラ・交通・防災関連リンク集（公式リアルタイム情報）</b><br>
         <ul>
-            <li><b>【台風情報】</b> <a href="https://www.data.jma.go.jp/multi/cyclone/index.html?lang=jp" target="_blank">気象庁 台風情報ページ</a></li>
+            <li><b>【台風情報】</b> <a href="https://www.data.jma.go.jp/multi/cyclone/index.html?lang=jp" target="_blank">気象庁 台風情報ページ</a> / <a href="https://weathernews.jp/s/typhoon/" target="_blank">ウェザーニュース 台風情報</a></li>
             <li><b>【鉄道運行】</b> <a href="https://transit.yahoo.co.jp/diainfo/" target="_blank">Yahoo!路線情報（運行情報）</a></li>
             <li><b>【道路規制】</b> <a href="https://www.jartic.or.jp/" target="_blank">JARTIC 日本道路交通情報センター</a></li>
             <li><b>【雨雲ズーム】</b> <a href="https://weather.yahoo.co.jp/weather/zoomradar/" target="_blank">Yahoo!天気（雨雲ズームレーダー）</a></li>
