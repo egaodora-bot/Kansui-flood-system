@@ -403,8 +403,8 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# 🚄 鉄道・道路インフラ情報のクイック案内セクション（ジョルダン運行情報を反映）
-st.markdown("### 🚄 鉄道・道路インフラの運行・規制状況")
+# 🚄 鉄道・道路インフラの運行規制・放射線リアル状況セクション
+st.markdown("### 🚄 鉄道・道路インフラの運行規制・放射線リアル状況")
 st.markdown("""
 <div style="background-color: #111827; border: 1px solid #334155; padding: 14px; border-radius: 8px; border-left: 7px solid #3b82f6; margin-bottom: 20px;">
     <p style="font-size: 13px; color: #cbd5e1; margin-bottom: 12px; margin-top: 0;">
@@ -414,8 +414,8 @@ st.markdown("""
         <a href="https://www.jorudan.co.jp/unk/" target="_blank" style="background: #1e3a8a; color: #ffffff !important; padding: 8px 14px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold;">
             🚆 ジョルダン 運行情報
         </a>
-        <a href="https://www.ramis.nra.go.jp/" target="_blank" style="background: #1e3a8a; color: #ffffff !important; padding: 8px 14px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold;">
-            🏛️ 国交省 防災ポータル（RAMIS）
+        <a href="https://www.mlit.go.jp/river/bousai/bousai-portal/index.html" target="_blank" style="background: #1e3a8a; color: #ffffff !important; padding: 8px 14px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold;">
+            🏛️ 国土交通省 防災ポータル
         </a>
         <a href="https://www.jartic.or.jp/" target="_blank" style="background: #1e3a8a; color: #ffffff !important; padding: 8px 14px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold;">
             🚗 JARTIC 道路交通情報
@@ -517,7 +517,7 @@ st.markdown(
         <ul>
             <li><b>【台風情報】</b> <a href="https://www.data.jma.go.jp/multi/cyclone/index.html?lang=jp" target="_blank">気象庁 台風情報ページ</a> / <a href="https://weathernews.jp/s/typhoon/" target="_blank">ウェザーニュース</a></li>
             <li><b>【鉄道運行】</b> <a href="https://www.jorudan.co.jp/unk/" target="_blank">ジョルダン 運行情報</a></li>
-            <li><b>【国交省防災】</b> <a href="https://www.ramis.nra.go.jp/" target="_blank">国土交通省 防災ポータル（RAMIS）</a></li>
+            <li><b>【国交省防災】</b> <a href="https://www.mlit.go.jp/river/bousai/bousai-portal/index.html" target="_blank">国土交通省 防災ポータル</a></li>
             <li><b>【道路規制】</b> <a href="https://www.jartic.or.jp/" target="_blank">JARTIC 日本道路交通情報センター</a></li>
             <li><b>【雨雲ズーム】</b> <a href="https://weather.yahoo.co.jp/weather/zoomradar/" target="_blank">Yahoo!天気（雨雲ズームレーダー）</a></li>
             <li><b>【防災情報】</b> <a href="https://www.jma.go.jp/bosai/" target="_blank">気象庁 防災情報ポータル</a></li>
