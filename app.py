@@ -265,23 +265,10 @@ def fetch_jma_typhoon_info():
             data = json.loads(response.read().decode('utf-8'))
             items = data if isinstance(data, list) else [data]
             if not items or (len(items) == 1 and not items[0]):
-                return {"has_active_typhoon": False, "data": []}
-            
-            # APIデータが存在する場合でも、中身が実質空か古い残留テキストのみの場合は非アクティブと判定
-            valid_items = []
-            for item in items:
-                body = item.get("body", item.get("text", ""))
-                title = item.get("headTitle", item.get("controlTitle", ""))
-                # 「台風に関する情報」等が含まれていても、具体的な内容がない、または古い場合は除外判定を入れる
-                if body and len(str(body).strip()) > 10:
-                    valid_items.append(item)
-            
-            if not valid_items:
-                return {"has_active_typhoon": False, "data": []}
-                
-            return {"has_active_typhoon": True, "data": valid_items}
+                return {"success": True, "data": []}
+            return {"success": True, "data": items}
     except Exception:
-        return {"has_active_typhoon": False, "data": []}
+        return {"success": False, "data": []}
 
 @st.cache_data(ttl=300)
 def fetch_jma_warning_level_areas(region_name):
@@ -405,25 +392,44 @@ st.markdown("""
 
 st.markdown("---")
 
-# 🌀 台風情報カテゴリ（API自動判定 ＋ 公式リアルタイムリンク直行型）
+# 🌀 台風情報カテゴリ（常に最新データを取得・表示しつつ、公式への直行リンクも併設）
 st.markdown("### 🌀 台風情報・進路 最新速報")
 
-typhoon_res = fetch_jma_typhoon_info()
+st.markdown("""
+<div style="border-left: 7px solid #c2410c; padding-left: 14px; margin-top: 14px; margin-bottom: 12px; color: #fca5a5; font-size: 16px; font-weight: 900; text-align: left; line-height: 1.5;">
+    🔴 【警戒】現在発表されている台風情報および今後の気象情報に厳重に警戒してください。
+</div>
+""", unsafe_allow_html=True)
 
-if typhoon_res["has_active_typhoon"] and typhoon_res["data"]:
-    # 【台風が発生している場合】詳細文面を表示
-    st.markdown("""
-    <div style="border-left: 7px solid #c2410c; padding-left: 14px; margin-top: 14px; margin-bottom: 12px; color: #fca5a5; font-size: 16px; font-weight: 900; text-align: left; line-height: 1.5;">
-        🔴 【警戒】現在発表されている台風情報および今後の気象情報に厳重に警戒してください。
+st.markdown(
+    """
+    <div class="link-card" style="margin-top: 4px; margin-bottom: 15px;">
+        <b>🗺️ 気象庁 公式「台風情報（マルチリンガル対応）」＆ Yahoo!天気</b><br>
+        <p style="font-size:13px; color:#cbd5e1; margin: 6px 0 10px 0;">現在の中心位置・勢力・今後の進路予報を公式サイトで直接確認できます。</p>
+        <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 8px;">
+            <a href="https://www.data.jma.go.jp/multi/cyclone/index.html?lang=jp" target="_blank" style="background: #1e3a8a; color: #ffffff !important; padding: 8px 14px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold;">
+                🗺️ 気象庁 台風情報（公式）
+            </a>
+            <a href="https://weather.yahoo.co.jp/weather/typhoon/" target="_blank" style="background: #1e3a8a; color: #ffffff !important; padding: 8px 14px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold;">
+                🌀 Yahoo!天気 台風情報
+            </a>
+        </div>
     </div>
-    """, unsafe_allow_html=True)
+    """,
+    unsafe_allow_html=True
+)
 
+typhoon_res = fetch_jma_typhoon_info()
+if typhoon_res["success"] and typhoon_res["data"]:
     typhoon_items_html = ""
     for i, item in enumerate(typhoon_res["data"]):
         head_title = item.get("headTitle", item.get("controlTitle", f"台風に関する情報 #{i+1}"))
         pub_office = item.get("publishingOffice", "気象庁")
         datetime_str = item.get("targetDateTime", item.get("dateTime", "直近の発表"))
+        
         body_text = item.get("body", item.get("text", ""))
+        if not body_text or len(str(body_text).strip()) < 5:
+            body_text = "現在発表されている台風情報詳細です。気象庁公式サイトや最新の進路情報をご確認ください。"
         
         typhoon_items_html += f"""
         <div style="background-color: #111827; border: 1px solid #475569; padding: 14px; border-radius: 8px; margin-bottom: 10px; border-left: 5px solid #ef4444; text-align: left;">
@@ -433,34 +439,22 @@ if typhoon_res["has_active_typhoon"] and typhoon_res["data"]:
                 <div><b>情報日時:</b> {datetime_str}</div>
             </div>
             <hr style="border-color: #334155; margin: 8px 0;">
-            <div style="color: #f8fafc; font-size: 13px; line-height: 1.6;">{body_text}</div>
+            <div style="color: #f8fafc; font-size: 13px; line-height: 1.6;">
+                {body_text}
+            </div>
         </div>
         """
     
     st.markdown(f"""
     <details class="custom-expander" open>
-        <summary>📁 現在発表中の台風詳細データを確認（タップして折りたたみ）</summary>
+        <summary>📁 台風データの詳細文面を確認（タップして折りたたみ）</summary>
         <div class="content-body">{typhoon_items_html}</div>
     </details>
     """, unsafe_allow_html=True)
 else:
-    # 【平常時（台風なし）の場合】スッキリ表示 ＋ 公式リアルタイムページへの直行リンク案内
     st.markdown("""
-    <div style="background-color: #111827; border: 1px solid #334155; padding: 14px 16px; border-radius: 8px; border-left: 5px solid #10b981; margin-bottom: 15px;">
-        <div style="color: #34d399; font-weight: 900; font-size: 15px; margin-bottom: 6px;">
-            🟢 現在、日本付近に発表されているアクティブな台風情報はありません。（平常時）
-        </div>
-        <p style="font-size: 13px; color: #cbd5e1; margin: 6px 0 12px 0;">
-            台風の発生状況や最新の進路予報は、気象庁や各種公式ポータルサイトでいつでも直接ご確認いただけます。
-        </p>
-        <div style="display: flex; flex-wrap: wrap; gap: 10px;">
-            <a href="https://www.data.jma.go.jp/multi/cyclone/index.html?lang=jp" target="_blank" style="background: #1e3a8a; color: #ffffff !important; padding: 8px 14px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold;">
-                🗺️ 気象庁 台風情報（公式）
-            </a>
-            <a href="https://weather.yahoo.co.jp/weather/typhoon/" target="_blank" style="background: #1e3a8a; color: #ffffff !important; padding: 8px 14px; border-radius: 6px; text-decoration: none; font-size: 13px; font-weight: bold;">
-                🌀 Yahoo!天気 台風情報
-            </a>
-        </div>
+    <div style="background-color: #111827; border: 1px solid #334155; padding: 12px 16px; border-radius: 8px; border-left: 5px solid #10b981; color: #e2e8f0; font-size: 13px; margin-bottom: 15px;">
+        🟢 <b>現在発表されている台風情報はありません。</b>（平常時は詳細データ非表示）
     </div>
     """, unsafe_allow_html=True)
 
