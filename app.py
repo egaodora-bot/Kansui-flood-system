@@ -6,7 +6,7 @@ import json
 import re
 
 st.set_page_config(
-    page_title="防災カルテ（全国インフラ・気象防災システム）", 
+    page_title="気象防災カルテ・インフラリアルリンクシステム", 
     page_icon="🛡️", 
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -354,7 +354,7 @@ def fetch_region_prefecture_weather(region_name):
     return results
 
 # 画面描画
-st.title("🛡️ 全国インフラ・気象防災カルテ・リアルリンク共用システム")
+st.title("🛡️ 気象防災カルテ・インフラリアルリンクシステム")
 st.markdown("災害時のリアルタイム気象状況・インフラ・地震・台風情報を一元管理します。**※スマホ等でご利用の際は、画面を「横向き」にしていただくと全体がより見やすくなります。**")
 
 # 自前のHTMLトグル（カスタムエキスパンダー）
@@ -378,7 +378,7 @@ st.markdown("""
 
 st.markdown("---")
 
-# 🌀 台風情報カテゴリ（ウェザーニュースリンクを追加）
+# 🌀 台風情報カテゴリ（ウェザーニュース＆気象庁＆Yahoo!直行リンク、仕様解説明記）
 st.markdown("### 🌀 台風情報・進路 最新速報")
 
 st.markdown("""
@@ -512,7 +512,7 @@ st.markdown(
     <div class="link-card">
         <b>🔗 インフラ・交通・防災関連リンク集（公式リアルタイム情報）</b><br>
         <ul>
-            <li><b>【台風情報】</b> <a href="https://www.data.jma.go.jp/multi/cyclone/index.html?lang=jp" target="_blank">気象庁 台風情報ページ</a> / <a href="https://weathernews.jp/s/typhoon/" target="_blank">ウェザーニュース 台風情報</a></li>
+            <li><b>【台風情報】</b> <a href="https://www.data.jma.go.jp/multi/cyclone/index.html?lang=jp" target="_blank">気象庁 台風情報ページ</a> / <a href="https://weathernews.jp/s/typhoon/" target="_blank">ウェザーニュース</a></li>
             <li><b>【鉄道運行】</b> <a href="https://transit.yahoo.co.jp/diainfo/" target="_blank">Yahoo!路線情報（運行情報）</a></li>
             <li><b>【道路規制】</b> <a href="https://www.jartic.or.jp/" target="_blank">JARTIC 日本道路交通情報センター</a></li>
             <li><b>【雨雲ズーム】</b> <a href="https://weather.yahoo.co.jp/weather/zoomradar/" target="_blank">Yahoo!天気（雨雲ズームレーダー）</a></li>
@@ -530,8 +530,8 @@ st.markdown("---")
 st.markdown(
     """
     <div style="text-align: center; color: #94a3b8; font-size: 12px; padding: 10px 0;">
-        <p style="margin: 0;"><b>💻 システム開発・運営:</b> 全国インフラ・気象防災システム開発プロジェクトチーム</p>
-        <p style="margin: 4px 0 0 0;">© 2026 National Infrastructure & Meteorological Disaster Prevention System. All Rights Reserved.</p>
+        <p style="margin: 0;"><b>💻 システム開発・運営:</b> 気象防災カルテ・インフラリアルリンクシステム開発プロジェクトチーム</p>
+        <p style="margin: 4px 0 0 0;">© 2026 Meteorological Disaster Prevention & Infrastructure Real-Link System. All Rights Reserved.</p>
     </div>
     """,
     unsafe_allow_html=True
