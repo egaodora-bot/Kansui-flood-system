@@ -316,7 +316,7 @@ def fetch_region_prefecture_weather(region_name):
 st.title("🛡️ 気象防災カルテ・インフラリアルリンクシステム")
 st.markdown("災害時のリアルタイム気象状況・インフラ・地震・台風・キキクル（危険度分布）連動情報を一元管理します。")
 
-# ガイドセクション（正常にHTMLとして描画されるよう修正）
+# ガイドセクション
 st.markdown(
     """
     <div class="custom-card">
