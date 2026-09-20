@@ -44,11 +44,11 @@ section[data-testid="stMain"] {
     margin-top: 10px;
     margin-bottom: 20px;
 }
-.kikikuru-box {
+.kikikuru-dual-box {
     background-color: #1e293b !important;
     border: 1px solid #475569 !important;
     border-left: 7px solid #f59e0b !important;
-    padding: 16px;
+    padding: 18px;
     border-radius: 8px;
     margin-top: 10px;
     margin-bottom: 20px;
@@ -311,13 +311,14 @@ def fetch_region_prefecture_weather(region_name):
 st.title("🛡️ 気象防災カルテ・インフラリアルリンクシステム")
 st.markdown("災害時のリアルタイム気象状況・インフラ・地震・台風・キキクル（危険度分布）連動情報を一元管理します。")
 
-# ガイドセクション
+# ガイドセクション（削除されていた説明をしっかり修復・拡充）
 st.markdown("""
 <div class="custom-card">
     <b style="color: #38bdf8; font-size: 15px;">📱 2軸表示システム設計仕様のご案内</b><br><br>
-    <b style="color: #60a5fa; font-size: 13px;">🎯 1. 警報とキキクルの独立表示（2軸分離設計）について</b><br>
-    本システムでは、条件や発表ベースが異なる<b style="color: #fde047;">「市区町村単位の気象庁警報・注意報ベース」</b>と、<br>
-    実況・解析に基づく<b style="color: #fde047;">「キキクル（危険度分布）のメッシュ・現象別ベース」</b>を無理に統合せず、別々の項目として明確に並列表示します。<br><br>
+    <b style="color: #60a5fa; font-size: 13px;">🎯 1. 警報とキキクルの独立同時表示（2軸並列設計）</b><br>
+    本システムでは、監視エリアを選択すると、<b style="color: #fde047;">「市区町村単位の気象庁警報・注意報ベース」</b>と、<br>
+    実況・解析に基づく<b style="color: #fde047;">「キキクル（危険度分布）の現象別リアルタイム評価」</b>の<span style="color: #38bdf8; font-weight: bold;">両方を同時に切り替え連動して表示</span>します。<br>
+    これにより、発表ベースの警報と実際の足元の危険度（キキクル）の双方を漏れなく確認できます。<br><br>
     <b style="color: #60a5fa; font-size: 13px;">📱 2. スマートフォン等でのご利用時の注意</b><br>
     端末を「横向き」にしていただくと、地図および各詳細データやリンクがより一覧しやすくなります。ぜひお試しください。
 </div>
@@ -330,59 +331,81 @@ selected_region = st.selectbox("🌍 監視エリアを選択してください�
 
 st.markdown("---")
 
-# ==========================================
+# =========================================================================
+# 監視エリア連動：両方の軸（気象庁レベル ＆ キキクルレベル）を並列表示
+# =========================================================================
+st.markdown(f"## 📊 【{selected_region}エリア】 2軸リアルタイム警戒ダッシュボード")
+st.markdown("<p style='font-size:13px; color:#94a3b8; margin-top:-10px;'>選択されたエリアに対応する「気象庁の警報レベル」と「キキクルの危険度」を並列で確認できます。</p>", unsafe_allow_html=True)
+
+col_axis1, col_axis2 = st.columns(2, gap="medium")
+
 # 軸1：市区町村単位の気象庁 警戒レベル情報
-# ==========================================
-st.markdown(f"### ⚠️ 1. 【市区町村単位】気象庁 警戒レベル情報 ({selected_region})")
-st.markdown("<p style='font-size:12px; color:#94a3b8; margin-top:-10px;'>市区町村ごとの警報・注意報の発表状況に基づくレベル判定です。</p>", unsafe_allow_html=True)
+with col_axis1:
+    st.markdown(f"### ⚠️ 1. 気象庁 警戒レベル")
+    st.markdown("<p style='font-size:11px; color:#94a3b8;'>市区町村ごとの警報・注意報ベース</p>", unsafe_allow_html=True)
+    
+    warnings = fetch_jma_warning_level_areas_robust(selected_region)
+    has_warn = False
+    
+    warning_card_content = ""
+    for lvl, color_tag, title in [("Level5", "error", "🚨 Level5特別警報"), ("Level4", "error", "🟥 Level4危険警報")]:
+        if warnings.get(lvl):
+            has_warn = True
+            warning_card_content += f"<b style='color:#ef4444;'>{title}</b><br>"
+            for w_name, cities in warnings[lvl].items():
+                warning_card_content += f"- {w_name}: {', '.join(cities)}<br>"
 
-warnings = fetch_jma_warning_level_areas_robust(selected_region)
-has_warn = False
-for lvl, color, title in [("Level5", "error", "🚨 【Level5相当】特別警報発令中（直ちに命を守る行動を）"), ("Level4", "error", "🟥 【Level4相当】危険警報等発表中（危険な場所から全員避難）")]:
-    if warnings.get(lvl):
-        has_warn = True
-        getattr(st, color)(title)
-        for w_name, cities in warnings[lvl].items(): st.write(f"- **{w_name}**: {', '.join(cities)}")
+    if not has_warn:
+        level3_exist = warnings.get("Level3", {})
+        if level3_exist:
+            warning_card_content += "<b style='color:#f59e0b;'>🟧 Level3警報発表中</b><br>"
+            for w_name, cities in level3_exist.items():
+                warning_card_content += f"- {w_name}: {', '.join(cities)}<br>"
+        else:
+            warning_card_content += f"<span style='color:#10b981;'>🟢 {selected_region}エリアの市区町村においてレベル3以上の警報発表はありません。</span>"
 
-if not has_warn: 
-    level3_exist = warnings.get("Level3", {})
-    if level3_exist:
-        st.warning("🟧 【Level3相当】警報発表中（高齢者等は避難準備）")
-        for w_name, cities in level3_exist.items(): st.write(f"- **{w_name}**: {', '.join(cities)}")
-    else:
-        st.success(f"🟢 現在、{selected_region}エリアの市区町村において対象となる警報ベースの緊急警戒レベル（レベル3以上）の発表はありません。")
-
-st.markdown("---")
-
-# ==========================================
-# 軸2：キキクル（危険度分布）リアルタイム情報
-# ==========================================
-st.markdown(f"### 🔴 2. 【メッシュ・実況ベース】キキクル 危険度分布 ({selected_region})")
-st.markdown("<p style='font-size:12px; color:#94a3b8; margin-top:-10px;'>降水の実況やレーダー解析に基づく、今まさに危険が高まっている現象別のリアルタイム評価です。</p>", unsafe_allow_html=True)
-
-st.markdown(f"""
-<div class="kikikuru-box">
-    <b style="color: #38bdf8; font-size: 14px;">🗺️ キキクル（危険度分布）の現象別リアルタイム確認</b><br>
-    <p style="font-size: 13px; color: #e2e8f0; margin: 8px 0 12px 0;">
-        警報の発表有無に関わらず、お住まいの地域や詳細なメッシュごとの危険度（土砂・浸水・洪水）は以下の気象庁公式マップで直接ご確認ください。
-    </p>
-    <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
-        <a href="https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=warning" target="_blank" class="custom-btn" style="background: #b91c1c; border-color: #f87171;">
-            🔴 土砂キキクル（土砂災害）を確認
-        </a>
-        <a href="https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=inundation" target="_blank" class="custom-btn" style="background: #1d4ed8; border-color: #60a5fa;">
-            🔵 浸水キキクル（浸水害）を確認
-        </a>
-        <a href="https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=flood" target="_blank" class="custom-btn" style="background: #047857; border-color: #34d399;">
-            🟢 洪水キキクル（洪水災害）を確認
-        </a>
+    st.markdown(f"""
+    <div style="background-color: #111827; border: 1px solid #334155; border-left: 6px solid #3b82f6; padding: 14px; border-radius: 6px; min-height: 180px;">
+        <div style="font-size: 13px; line-height: 1.6;">{warning_card_content}</div>
     </div>
-    <div style="border-top: 1px dashed #475569; padding-top: 10px; font-size: 12px; color: #94a3b8;">
-        <b>💡 キキクルの色別の意味（凡例）：</b>
-        <span class="legend-badge" style="background: #7c2d12; color: #fca5a5;">紫: レベル5 (災害切迫)</span>
-        <span class="legend-badge" style="background: #991b1b; color: #fca5a5;">赤: レベル4 (極めて危険)</span>
-        <span class="legend-badge" style="background: #b45309; color: #fde68a;">黄: レベル3 (警戒)</span>
-        <span class="legend-badge" style="background: #1e3a8a; color: #93c5fd;">白/青: 注意・安全</span>
+    """, unsafe_allow_html=True)
+
+# 軸2：キキクル（危険度分布）の連動エリア評価
+with col_axis2:
+    st.markdown(f"### 🔴 2. キキクル危険度")
+    st.markdown("<p style='font-size:11px; color:#94a3b8;'>メッシュ・実況解析ベース（現象別）</p>", unsafe_allow_html=True)
+    
+    st.markdown(f"""
+    <div style="background-color: #111827; border: 1px solid #334155; border-left: 6px solid #f59e0b; padding: 14px; border-radius: 6px; min-height: 180px;">
+        <div style="font-size: 12px; color: #e2e8f0; margin-bottom: 8px;">
+            <b>{selected_region}エリアの各キキクル実況確認：</b>
+        </div>
+        <div style="display: flex; flex-direction: column; gap: 8px;">
+            <a href="https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=warning" target="_blank" class="custom-btn" style="background: #991b1b; padding: 6px 10px; text-align: center; font-size: 12px;">
+                🔴 土砂キキクル（土砂災害）を開く
+            </a>
+            <a href="https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=inundation" target="_blank" class="custom-btn" style="background: #1d4ed8; padding: 6px 10px; text-align: center; font-size: 12px;">
+                🔵 浸水キキクル（浸水害）を開く
+            </a>
+            <a href="https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=flood" target="_blank" class="custom-btn" style="background: #047857; padding: 6px 10px; text-align: center; font-size: 12px;">
+                🟢 洪水キキクル（洪水災害）を開く
+            </a>
+        </div>
+        <div style="margin-top: 8px; font-size: 11px; color: #94a3b8;">
+            ※エリア内の詳細なメッシュごとの色（紫・赤・黄）を公式マップで直接ご確認ください。
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
+
+# 共通凡例ガイド
+st.markdown("""
+<div class="kikikuru-dual-box" style="margin-top: 15px;">
+    <div style="font-size: 12px; color: #cbd5e1;">
+        <b>💡 警戒レベルおよびキキクルの色別の意味（共通凡例）：</b><br>
+        <span class="legend-badge" style="background: #7c2d12; color: #fca5a5;">紫 (レベル5): 命の危険・緊急安全確保</span>
+        <span class="legend-badge" style="background: #991b1b; color: #fca5a5;">赤 (Level4): 極めて危険・避難指示</span>
+        <span class="legend-badge" style="background: #b45309; color: #fde68a;">黄 (Level3): 警戒・高齢者等避難</span>
+        <span class="legend-badge" style="background: #1e3a8a; color: #93c5fd;">青/白: 注意・安全</span>
     </div>
 </div>
 """, unsafe_allow_html=True)
