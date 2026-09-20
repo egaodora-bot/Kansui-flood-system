@@ -12,27 +12,22 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# スタイルの定義（タイトルをさらに強力に目立たせるスタイル）
+# スタイルの定義（メインタイトルをダッシュボード見出しと同じ大きさに調整）
 st.markdown("""
 <style>
-    /* 最重要：メインタイトルを極太・特大化し、視覚的インパクトを最大化 */
+    /* メインタイトルをダッシュボードのH2見出しと同じサイズ（22px）に調整 */
     .custom-main-title {
-        font-size: 38px;
-        font-weight: 900;
+        font-size: 22px !important;
+        font-weight: bold;
         color: #ffffff;
-        background: linear-gradient(90deg, #ef4444, #f59e0b, #3b82f6);
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        margin-bottom: 2px;
-        line-height: 1.2;
-        letter-spacing: -0.5px;
+        margin-bottom: 0px;
+        margin-top: 0px;
     }
     .custom-sub-title {
-        font-size: 16px;
-        font-weight: bold;
+        font-size: 14px;
         color: #94a3b8;
-        margin-top: 4px;
-        margin-bottom: 16px;
+        margin-top: 2px;
+        margin-bottom: 12px;
     }
     
     /* 2. 監視エリア選択ラベルの赤文字 */
@@ -340,11 +335,11 @@ def fetch_region_prefecture_weather(region_name):
             results.append({"prefecture": prefecture, "weather": "取得できず", "comment": "通信エラー", "max_temp": "--"})
     return results
 
-# 最重要タイトルをグラデーション＆特大サイズで配置
+# メインタイトル（ダッシュボード見出しと同じサイズに調整）
 st.markdown('<p class="custom-main-title">🛡️ 気象防災カルテ・インフラリアルリンクシステム</p>', unsafe_allow_html=True)
 st.markdown('<p class="custom-sub-title">災害時のリアルタイム気象状況・インフラ・地震・台風・キキクル（危険度分布）連動情報を一元管理します。</p>', unsafe_allow_html=True)
 
-# 3. 操作ガイドの見出しを赤文字に設定
+# 操作ガイドの見出し
 with st.expander("📖 2軸表示システム設計仕様 & 操作ガイドのご案内", expanded=True):
     st.markdown("""
     <div class="guide-box-blue">
@@ -365,7 +360,7 @@ with st.expander("📖 2軸表示システム設計仕様 & 操作ガイドの�
 
 st.markdown("---")
 
-# 2. 監視エリア選択のラベルを赤文字に設定
+# 監視エリア選択のラベル
 st.markdown('<p class="custom-region-label">🌍 監視エリアを選択してください（地域を切り替えると各データが連動します）</p>', unsafe_allow_html=True)
 selected_region = st.selectbox("", list(REGION_CODES.keys()), index=2, key="region_selector", label_visibility="collapsed")
 
@@ -471,7 +466,7 @@ with c2: st.metric(label="エリア予想最高気温", value=f"{w_data['max_tem
 
 st.markdown("---")
 
-# 5. 気象解説のタイトルに下線を追加
+# 気象解説
 st.markdown(f'<p class="custom-underline-title">📡 {selected_region}地方の気象解説 ({w_data["office"]})</p>', unsafe_allow_html=True)
 for fc in w_data["forecasts"]: st.markdown(f"- {fc}")
 
