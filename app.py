@@ -12,7 +12,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# スタイルの定義（ご要望の文字サイズ・色・下線などを反映）
+# スタイルの定義（各項目の枠線や文字色などを細かく設定）
 st.markdown("""
 <style>
     /* 1. メインタイトルをさらに大きく */
@@ -86,6 +86,22 @@ st.markdown("""
         font-size: 13px;
         color: #e2e8f0;
         line-height: 1.6;
+    }
+
+    /* 各項目の枠線デザイン（青枠・緑枠など） */
+    .box-blue-border {
+        border: 2px solid #3b82f6;
+        padding: 16px;
+        border-radius: 8px;
+        background-color: rgba(59, 130, 246, 0.03);
+        margin-bottom: 10px;
+    }
+    .box-green-border {
+        border: 2px solid #10b981;
+        padding: 16px;
+        border-radius: 8px;
+        background-color: rgba(16, 185, 129, 0.03);
+        margin-bottom: 10px;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -347,9 +363,9 @@ selected_region = st.selectbox("", list(REGION_CODES.keys()), index=2, key="regi
 
 st.markdown("---")
 
-# 2軸並列ダッシュボード
+# 2軸並列ダッシュボード（青枠コンテナで囲む）
 st.markdown(f"## 📊 【{selected_region}エリア】 2軸リアルタイム警戒ダッシュボード")
-st.markdown("選択されたエリアに対応する「気象庁の警報レベル」と「キキクルの危険度」を並列で確認できます。")
+st.markdown("警報レベルと危険度レベルの基準判定レベルが違うため、選択されたエリアに対応する「気象庁の警報レベル」と「キキクルの危険度」を並列で確認できます。")
 
 col_axis1, col_axis2 = st.columns(2, gap="medium")
 
@@ -378,25 +394,29 @@ with col_axis1:
         else:
             warning_texts.append(f"🟢 {selected_region}エリアの市区町村においてレベル3以上の警報発表はありません。")
 
-    with st.container(border=True):
-        for line in warning_texts:
-            st.markdown(line)
+    # 青枠付きコンテナ
+    st.markdown('<div class="box-blue-border">', unsafe_allow_html=True)
+    for line in warning_texts:
+        st.markdown(line)
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # 軸2：キキクル（危険度分布）の連動エリア評価
 with col_axis2:
     st.markdown("### 🔴 2. キキクル危険度")
     st.caption("メッシュ・実況解析ベース（現象別）")
     
-    with st.container(border=True):
-        st.markdown("**【キキクル解説】**")
-        st.markdown("選択したエリアにおける大雨時の災害発生危険度をメッシュ単位で評価した気象庁の危険度分布です。")
-        # 4. 「リンクを開いた後〜」の注意書きを青文字に設定
-        st.markdown(f'<span class="custom-blue-text">※リンクを開いた後、地図上の都道府県や地域をクリックして詳細なレベル内容をご確認ください。</span>', unsafe_allow_html=True)
-        st.markdown(f"**{selected_region}のキキクル実況確認：**")
-        
-        st.markdown("[🔴 土砂キキクル（土砂災害）を開く](https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=warning)")
-        st.markdown("[🔴 浸水キキクル（浸水害）を開く](https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=inundation)")
-        st.markdown("[🔴 洪水キキクル（洪水災害）を開く](https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=flood)")
+    # 緑枠付きコンテナ
+    st.markdown('<div class="box-green-border">', unsafe_allow_html=True)
+    st.markdown("**【キキクル解説】**")
+    st.markdown("選択したエリアにおける大雨時の災害発生危険度をメッシュ単位で評価した気象庁の危険度分布です。")
+    # 4. 「リンクを開いた後〜」の注意書きを青文字に設定
+    st.markdown(f'<span class="custom-blue-text">※リンクを開いた後、地図上の都道府県や地域をクリックして詳細なレベル内容をご確認ください。</span>', unsafe_allow_html=True)
+    st.markdown(f"**{selected_region}のキキクル実況確認：**")
+    
+    st.markdown("[🔴 土砂キキクル（土砂災害）を開く](https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=warning)")
+    st.markdown("[🔴 浸水キキクル（浸水害）を開く](https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=inundation)")
+    st.markdown("[🔴 洪水キキクル（洪水災害）を開く](https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=flood)")
+    st.markdown('</div>', unsafe_allow_html=True)
 
 # 共通凡例ガイド
 with st.container(border=True):
@@ -443,7 +463,7 @@ with c2: st.metric(label="エリア予想最高気温", value=f"{w_data['max_tem
 
 st.markdown("---")
 
-# 5. 気象解説のタイトルに下線を追加（selected_regionが正しく反映されるように修正済み）
+# 5. 気象解説のタイトルに下線を追加
 st.markdown(f'<p class="custom-underline-title">📡 {selected_region}地方の気象解説 ({w_data["office"]})</p>', unsafe_allow_html=True)
 for fc in w_data["forecasts"]: st.markdown(f"- {fc}")
 
