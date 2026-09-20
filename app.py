@@ -374,7 +374,6 @@ def fetch_region_prefecture_weather(region_name):
 # 画面描画
 st.title("🛡️ 気象防災カルテ・インフラリアルリンクシステム")
 st.markdown("災害時のリアルタイム気象状況・インフラ・地震・台風・キキクル（危険度分布）連動情報を一元管理します。")
-st.markdown("💡 **【スマホ・タブレットご利用者様へ】** 画面を**「横向き」**にしていただくと、マップや各データ一覧がより見やすくなります。ぜひ横向きモードでお試しください。")
 
 st.markdown("""
 <details class="custom-expander" open>
@@ -382,7 +381,7 @@ st.markdown("""
     <div class="content-body">
         <b style="color: #38bdf8; font-size: 14px;">🎯 1. 開発内容・システム概要について</b><br>
         本システムは、気象庁が提供する各種防災情報（警報・注意報・台風・地震）およびキキクル（危険度分布）、交通・ライフライン情報（鉄道・道路・原子力モニタリング）を統合し、迅速な意思決定を支援するWebアプリケーションです。<br>
-        <span style="color: #fde047; font-weight: bold;">※スマートフォンやタブレット等でご利用の際は、画面を「横向き」にしていただくと全体がより見やすくなります。</span><br><br>
+        <span style="color: #fde047; font-weight: bold;">※スマートフォンやタブレット等でご利用の際は、画面を「横向き」にしていただくと全体がより見やすくなります。ぜひ横向きモードでお試しください。</span><br><br>
         <b style="color: #38bdf8; font-size: 14px;">🔄 2. キキクル統合・フェイルセーフ設計について</b><br>
         一般警報JSONデータとキキクル情報を相互に補完し、危険検知時に「レベル4以上（キキクル優先）」を安全側に反映させるフェイルセーフ機構を搭載しています。<br><br>
         <b style="color: #38bdf8; font-size: 14px;">📐 3. リンクの正確性とUI最適化</b><br>
