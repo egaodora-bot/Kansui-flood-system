@@ -12,84 +12,6 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# 改行・スマホ表示崩れを完全に防ぐためのカスタムCSS
-st.markdown("""
-<style>
-html, body,
-[data-testid="stAppViewContainer"],
-[data-testid="stApp"],
-.main,
-section[data-testid="stMain"] {
-    background-color: #080d16 !important;
-    color: #ffffff !important;
-}
-[data-testid="stAppViewContainer"] p,
-[data-testid="stAppViewContainer"] li,
-[data-testid="stAppViewContainer"] span {
-    color: #ffffff !important;
-}
-[data-testid="stAppViewContainer"] h1,
-[data-testid="stAppViewContainer"] h2,
-[data-testid="stAppViewContainer"] h3,
-[data-testid="stAppViewContainer"] h4 {
-    color: #ffffff !important;
-    font-weight: 900 !important;
-}
-.custom-card {
-    background-color: #111827 !important;
-    border: 1px solid #334155 !important;
-    border-left: 7px solid #10b981 !important;
-    padding: 16px;
-    border-radius: 8px;
-    margin-top: 10px;
-    margin-bottom: 20px;
-    word-break: break-all;
-    overflow-wrap: break-word;
-}
-.kikikuru-dual-box {
-    background-color: #1e293b !important;
-    border: 1px solid #475569 !important;
-    border-left: 7px solid #f59e0b !important;
-    padding: 18px;
-    border-radius: 8px;
-    margin-top: 10px;
-    margin-bottom: 20px;
-    word-break: break-all;
-    overflow-wrap: break-word;
-}
-.custom-btn {
-    display: block;
-    width: 100%;
-    background: #1d4ed8;
-    color: #ffffff !important;
-    padding: 10px 12px;
-    border-radius: 6px;
-    text-decoration: none;
-    font-size: 13px;
-    font-weight: bold;
-    border: 1px solid #60a5fa;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    text-align: center;
-    box-sizing: border-box;
-    margin-top: 6px;
-}
-.custom-btn:hover {
-    background: #2563eb;
-    color: #fde047 !important;
-    border-color: #fde047;
-}
-.legend-badge {
-    display: inline-block;
-    padding: 3px 8px;
-    border-radius: 4px;
-    font-weight: bold;
-    font-size: 11px;
-    margin-right: 4px;
-    margin-bottom: 6px;
-}
-</style>
-""", unsafe_allow_html=True)
-
 REGION_CODES = {
     "北海道": {"code": "016000", "lat": 43.0642, "lon": 141.3469, "center_name": "札幌（北海道中心）"},
     "東北": {"code": "040000", "lat": 38.2688, "lon": 140.8721, "center_name": "仙台（東北中心）"},
@@ -320,38 +242,17 @@ def fetch_region_prefecture_weather(region_name):
 st.title("🛡️ 気象防災カルテ・インフラリアルリンクシステム")
 st.markdown("災害時のリアルタイム気象状況・インフラ・地震・台風・キキクル（危険度分布）連動情報を一元管理します。")
 
-# 操作ガイド（unsafe_allow_html=True を正しく付与）
-st.markdown(
-    """
-    <div class="custom-card">
-        <div style="font-size: 15px; font-weight: bold; color: #38bdf8; margin-bottom: 8px;">
-            📱 2軸表示システム設計仕様 &amp; 操作ガイドのご案内
-        </div>
-        
-        <div style="font-size: 13px; font-weight: bold; color: #60a5fa; margin-top: 10px;">
-            🎯 1. 警報とキキクルの独立同時表示（2軸並列設計）
-        </div>
-        <div style="font-size: 13px; color: #ffffff; line-height: 1.6; margin-top: 2px;">
-            監視エリアを選択すると、「市区町村単位の気象庁警報・注意報ベース」と、実況・解析に基づく「キキクル（危険度分布）の現象別リアルタイム評価」の両方を同時に切り替え連動して表示します。
-        </div>
-        
-        <div style="font-size: 13px; font-weight: bold; color: #60a5fa; margin-top: 12px;">
-            🗺️ 2. 地図およびエリア連動の操作方法について
-        </div>
-        <div style="font-size: 13px; color: #ffffff; line-height: 1.6; margin-top: 2px;">
-            上のセレクトボックスでエリアを選択するか、あるいは地図上の各地域や都道府県を選択・クリックしていただくことで、連動して下部の詳細な防災データや機器ステータスが切り替わります。
-        </div>
-        
-        <div style="font-size: 13px; font-weight: bold; color: #60a5fa; margin-top: 12px;">
-            📱 3. スマートフォン等でのご利用時の注意
-        </div>
-        <div style="font-size: 13px; color: #ffffff; line-height: 1.6; margin-top: 2px;">
-            端末を「横向き」にしていただくと、地図および各詳細データやリンクがより一覧しやすくなります。ぜひお試しください。
-        </div>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+# 操作ガイド（HTMLタグを廃止し、標準の st.info や Markdown を使用）
+with st.container():
+    st.info("📱 **2軸表示システム設計仕様 & 操作ガイドのご案内**")
+    st.markdown("""
+    * **1. 警報とキキクルの独立同時表示（2軸並列設計）**  
+      監視エリアを選択すると、「市区町村単位の気象庁警報・注意報ベース」と、実況・解析に基づく「キキクル（危険度分布）の現象別リアルタイム評価」の両方を同時に切り替え連動して表示します。
+    * **2. 地図およびエリア連動の操作方法について**  
+      上のセレクトボックスでエリアを選択するか、あるいは地図上の各地域や都道府県を選択・クリックしていただくことで、連動して下部の詳細な防災データや機器ステータスが切り替わります。
+    * **3. スマートフォン等でのご利用時の注意**  
+      端末を「横向き」にしていただくと、地図および各詳細データやリンクがより一覧しやすくなります。ぜひお試しください。
+    """)
 
 st.markdown("---")
 
@@ -362,88 +263,69 @@ st.markdown("---")
 
 # 2軸並列ダッシュボード
 st.markdown(f"## 📊 【{selected_region}エリア】 2軸リアルタイム警戒ダッシュボード")
-st.markdown("<p style='font-size:13px; color:#94a3b8; margin-top:-10px;'>選択されたエリアに対応する「気象庁の警報レベル」と「キキクルの危険度」を並列で確認できます。</p>", unsafe_allow_html=True)
+st.markdown("選択されたエリアに対応する「気象庁の警報レベル」と「キキクルの危険度」を並列で確認できます。")
 
 col_axis1, col_axis2 = st.columns(2, gap="medium")
 
 # 軸1：市区町村単位の気象庁 警戒レベル情報
 with col_axis1:
-    st.markdown(f"### ⚠️ 1. 気象庁 警戒レベル")
-    st.markdown("<p style='font-size:11px; color:#94a3b8;'>市区町村ごとの警報・注意報ベース</p>", unsafe_allow_html=True)
+    st.markdown("### ⚠️ 1. 気象庁 警戒レベル")
+    st.caption("市区町村ごとの警報・注意報ベース")
     
     warnings = fetch_jma_warning_level_areas_robust(selected_region)
     has_warn = False
     
-    warning_card_content = ""
-    for lvl, color_tag, title in [("Level5", "error", "🚨 Level5特別警報"), ("Level4", "error", "🟥 Level4危険警報")]:
+    warning_texts = []
+    for lvl, title in [("Level5", "🚨 Level5特別警報"), ("Level4", "🟥 Level4危険警報")]:
         if warnings.get(lvl):
             has_warn = True
-            warning_card_content += f"<b style='color:#ef4444;'>{title}</b><br>"
+            warning_texts.append(f"**{title}**")
             for w_name, cities in warnings[lvl].items():
-                warning_card_content += f"- {w_name}: {', '.join(cities)}<br>"
+                warning_texts.append(f"- {w_name}: {', '.join(cities)}")
 
     if not has_warn:
         level3_exist = warnings.get("Level3", {})
         if level3_exist:
-            warning_card_content += "<b style='color:#f59e0b;'>🟧 Level3警報発表中</b><br>"
+            warning_texts.append("**🟧 Level3警報発表中**")
             for w_name, cities in level3_exist.items():
-                warning_card_content += f"- {w_name}: {', '.join(cities)}<br>"
+                warning_texts.append(f"- {w_name}: {', '.join(cities)}")
         else:
-            warning_card_content += f"<span style='color:#10b981;'>🟢 {selected_region}エリアの市区町村においてレベル3以上の警報発表はありません。</span>"
+            warning_texts.append(f"🟢 {selected_region}エリアの市区町村においてレベル3以上の警報発表はありません。")
 
-    st.markdown(f"""
-    <div style="background-color: #111827; border: 1px solid #334155; border-left: 6px solid #3b82f6; padding: 14px; border-radius: 6px; min-height: 200px; word-break: break-all; overflow-wrap: break-word;">
-        <div style="font-size: 13px; line-height: 1.6;">{warning_card_content}</div>
-    </div>
-    """, unsafe_allow_html=True)
+    with st.container(border=True):
+        for line in warning_texts:
+            st.markdown(line)
 
 # 軸2：キキクル（危険度分布）の連動エリア評価
 with col_axis2:
-    st.markdown(f"### 🔴 2. キキクル危険度")
-    st.markdown("<p style='font-size:11px; color:#94a3b8;'>メッシュ・実況解析ベース（現象別）</p>", unsafe_allow_html=True)
+    st.markdown("### 🔴 2. キキクル危険度")
+    st.caption("メッシュ・実況解析ベース（現象別）")
     
-    st.markdown(f"""
-    <div style="background-color: #111827; border: 1px solid #334155; border-left: 6px solid #f59e0b; padding: 14px; border-radius: 6px; min-height: 200px; word-break: break-all; overflow-wrap: break-word;">
-        <div style="font-size: 12px; color: #cbd5e1; margin-bottom: 8px; line-height: 1.5;">
-            <b>【キキクル解説】</b><br>
-            選択したエリアにおける大雨時の災害発生危険度をメッシュ単位で評価した気象庁の危険度分布です。
-        </div>
-        <div style="font-size: 12px; color: #e2e8f0; margin-bottom: 6px; margin-top: 8px;">
-            <b>{selected_region}のキキクル実況確認：</b>
-        </div>
-        <div>
-            <a href="https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=warning" target="_blank" class="custom-btn" style="background: #991b1b;">
-                🔴 土砂キキクル（土砂災害）を開く
-            </a>
-            <a href="https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=inundation" target="_blank" class="custom-btn" style="background: #1d4ed8;">
-                🔵 浸水キキクル（浸水害）を開く
-            </a>
-            <a href="https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=flood" target="_blank" class="custom-btn" style="background: #047857;">
-                🟢 洪水キキクル（洪水災害）を開く
-            </a>
-        </div>
-    </div>
-    """, unsafe_allow_html=True)
+    with st.container(border=True):
+        st.markdown("**【キキクル解説】**")
+        st.markdown("選択したエリアにおける大雨時の災害発生危険度をメッシュ単位で評価した気象庁の危険度分布です。")
+        st.markdown(f"**{selected_region}のキキクル実況確認：**")
+        
+        st.markdown("[🔴 土砂キキクル（土砂災害）を開く](https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=warning)")
+        st.markdown("[🔵 浸水キキクル（浸水害）を開く](https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=inundation)")
+        st.markdown("[🟢 洪水キキクル（洪水災害）を開く](https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=flood)")
 
 # 共通凡例ガイド
-st.markdown("""
-<div class="kikikuru-dual-box" style="margin-top: 15px;">
-    <div style="font-size: 12px; color: #cbd5e1; line-height: 1.6;">
-        <b>💡 警戒レベルおよびキキクルの色別の意味（共通凡例）：</b><br>
-        <span class="legend-badge" style="background: #7c2d12; color: #fca5a5;">紫 (レベル5): 命の危険・緊急安全確保</span>
-        <span class="legend-badge" style="background: #991b1b; color: #fca5a5;">赤 (Level4): 極めて危険・避難指示</span>
-        <span class="legend-badge" style="background: #b45309; color: #fde68a;">黄 (Level3): 警戒・高齢者等避難</span>
-        <span class="legend-badge" style="background: #1e3a8a; color: #93c5fd;">青/白: 注意・安全</span>
-    </div>
-</div>
-""", unsafe_allow_html=True)
+with st.container(border=True):
+    st.markdown("**💡 警戒レベルおよびキキクルの色別の意味（共通凡例）：**")
+    st.markdown("""
+    * **紫 (レベル5):** 命の危険・緊急安全確保
+    * **赤 (Level4):** 極めて危険・避難指示
+    * **黄 (Level3):** 警戒・高齢者等避難
+    * **青/白:** 注意・安全
+    """)
 
 st.markdown("---")
 
 # 地図表示セクション
 reg_info = REGION_CODES.get(selected_region, REGION_CODES["関東"])
 st.markdown(f"### 🗺️ {selected_region}エリアの中心地図（中心：{reg_info['center_name']}）")
-st.markdown("<p style='font-size:12px; color:#94a3b8; margin-top:-8px;'>※地図上のピンや都道府県を選択すると、下部の管内都道府県別ステータス等の詳細データが連動して表示されます。</p>", unsafe_allow_html=True)
+st.caption("※地図上のピンや都道府県を選択すると、下部の管内都道府県別ステータス等の詳細データが連動して表示されます。")
 m = folium.Map(location=[reg_info["lat"], reg_info["lon"]], zoom_start=7, tiles="OpenStreetMap")
 folium.Marker([reg_info["lat"], reg_info["lon"]], popup=selected_region, icon=folium.Icon(color="red", icon="info-sign")).add_to(m)
 st_folium(m, width="100%", height=300, key=f"map_{selected_region}")
@@ -455,17 +337,16 @@ st.markdown("### 📳 直近の地震情報 ＆ 気象状況")
 eq_data = fetch_jma_earthquake_info()
 if eq_data["success"] and eq_data["quakes"]:
     latest = eq_data["quakes"][0]
-    st.markdown(f"""
-    <div class="custom-card" style="border-left-color: #ef4444; background-color: #1e293b !important;">
-        <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
-            <div><b style="color: #ffffff;">最大震度:</b> <span style="color: #fde047; font-weight: 900; font-size: 1.1em;">{latest['max_scale']}</span></div>
-            <div><b style="color: #ffffff;">発生日時:</b> <span style="color: #f8fafc;">{latest['time']}</span></div>
-        </div>
-        <div style="margin-top:6px;"><b style="color: #ffffff;">震源地:</b> <span style="color: #93c5fd; font-weight: 900; font-size: 1.1em;">{latest['hypocenter']}</span> <span style="font-size:12px; color:#e2e8f0;">(M{latest['magnitude']} / 深さ:{latest['depth']}km)</span></div>
-    </div>
-    """, unsafe_allow_html=True)
+    with st.container(border=True):
+        col_e1, col_e2 = st.columns(2)
+        with col_e1:
+            st.markdown(f"**最大震度:** :red[**{latest['max_scale']}**]")
+            st.markdown(f"**震源地:** {latest['hypocenter']}")
+        with col_e2:
+            st.markdown(f"**発生日時:** {latest['time']}")
+            st.markdown(f"**規模:** M{latest['magnitude']} / 深さ:{latest['depth']}km")
 else:
-    st.markdown('<div class="custom-card" style="border-left-color: #ef4444; background-color: #1e293b !important;">地震情報取得中...</div>', unsafe_allow_html=True)
+    st.info("地震情報取得中...")
 
 c1, c2 = st.columns(2)
 w_data = fetch_jma_realtime_data(selected_region)
@@ -481,28 +362,22 @@ st.markdown("---")
 
 st.markdown(f"### 📋 {selected_region}管内 都道府県別ステータス")
 for pw in fetch_region_prefecture_weather(selected_region):
-    st.markdown(f"**{pw['prefecture']}** (最高: {pw['max_temp']}°C) └ {pw['comment']}")
+    st.markdown(f"- **{pw['prefecture']}** (最高: {pw['max_temp']}°C) └ {pw['comment']}")
 
 st.markdown("---")
 
 # インフラ・防災リンク集
-st.markdown(
-    """
-    <div class="custom-card">
-        <b>🔗 インフラ・交通・防災・キキクル・放射線関連リンク集（公式リアルタイム情報）</b><br><br>
-        <ul>
-            <li><b>【キキクル総合】</b> <a href="https://www.jma.go.jp/bosai/map.html" target="_blank">気象庁 キキクル（危険度分布ポータル）</a></li>
-            <li><b>【台風情報】</b> <a href="https://www.jma.go.jp/bosai/multi/cyclone/index.html?lang=jp" target="_blank">気象庁 台風情報ページ</a></li>
-            <li><b>【道路規制】</b> <a href="https://www.jartic.or.jp/" target="_blank">JARTIC 日本道路交通情報センター</a></li>
-            <li><b>【雨雲ズーム】</b> <a href="https://weather.yahoo.co.jp/weather/zoomradar/" target="_blank">Yahoo!天気（雨雲ズームレーダー）</a></li>
-            <li><b>【防災情報】</b> <a href="https://www.jma.go.jp/bosai/" target="_blank">気象庁 防災情報ポータル</a></li>
-            <li><b>【河川水位】</b> <a href="https://www.river.go.jp/" target="_blank">川の防災情報（国土交通省）</a></li>
-            <li><b>【放射線状況】</b> <a href="https://www.ramis.nra.go.jp/" target="_blank">原子力規制庁 放射線モニタリング情報 (RAMIS)</a></li>
-        </ul>
-    </div>
-    """,
-    unsafe_allow_html=True
-)
+with st.container(border=True):
+    st.markdown("**🔗 インフラ・交通・防災・キキクル・放射線関連リンク集（公式リアルタイム情報）**")
+    st.markdown("""
+    * **【キキクル総合】** [気象庁 キキクル（危険度分布ポータル）](https://www.jma.go.jp/bosai/map.html)
+    * **【台風情報】** [気象庁 台風情報ページ](https://www.jma.go.jp/bosai/multi/cyclone/index.html?lang=jp)
+    * **【道路規制】** [JARTIC 日本道路交通情報センター](https://www.jartic.or.jp/)
+    * **【雨雲ズーム】** [Yahoo!天気（雨雲ズームレーダー）](https://weather.yahoo.co.jp/weather/zoomradar/)
+    * **【防災情報】** [気象庁 防災情報ポータル](https://www.jma.go.jp/bosai/)
+    * **【河川水位】** [川の防災情報（国土交通省）](https://www.river.go.jp/)
+    * **【放射線状況】** [原子力規制庁 放射線モニタリング情報 (RAMIS)](https://www.ramis.nra.go.jp/)
+    """)
 
 st.markdown("---")
 st.markdown(
