@@ -12,10 +12,10 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# スタイルの定義（メインタイトルをダッシュボード見出しと同じ大きさに調整）
+# スタイルの定義（セレクトボックスに常時美しい枠線を適用）
 st.markdown("""
 <style>
-    /* メインタイトルをダッシュボードのH2見出しと同じサイズ（22px）に調整 */
+    /* メインタイトル */
     .custom-main-title {
         font-size: 22px !important;
         font-weight: bold;
@@ -36,6 +36,16 @@ st.markdown("""
         font-weight: bold;
         color: #ef4444;
         margin-bottom: 6px;
+    }
+
+    /* セレクトボックスを最初から赤枠で強力に目立たせるスタイル */
+    [data-testid="stSelectbox"] div[data-baseweb="select"] {
+        border: 2px solid #ef4444 !important;
+        border-radius: 8px !important;
+        background-color: rgba(239, 68, 68, 0.05) !important;
+    }
+    [data-testid="stSelectbox"] div[data-baseweb="select"]:hover {
+        border-color: #f87171 !important;
     }
 
     /* 3. ガイドタイトルの赤文字 */
@@ -335,7 +345,7 @@ def fetch_region_prefecture_weather(region_name):
             results.append({"prefecture": prefecture, "weather": "取得できず", "comment": "通信エラー", "max_temp": "--"})
     return results
 
-# メインタイトル（ダッシュボード見出しと同じサイズに調整）
+# メインタイトル
 st.markdown('<p class="custom-main-title">🛡️ 気象防災カルテ・インフラリアルリンクシステム</p>', unsafe_allow_html=True)
 st.markdown('<p class="custom-sub-title">災害時のリアルタイム気象状況・インフラ・地震・台風・キキクル（危険度分布）連動情報を一元管理します。</p>', unsafe_allow_html=True)
 
@@ -360,7 +370,7 @@ with st.expander("📖 2軸表示システム設計仕様 & 操作ガイドの�
 
 st.markdown("---")
 
-# 監視エリア選択のラベル
+# 監視エリア選択のラベル ＆ 枠付きセレクトボックス
 st.markdown('<p class="custom-region-label">🌍 監視エリアを選択してください（地域を切り替えると各データが連動します）</p>', unsafe_allow_html=True)
 selected_region = st.selectbox("", list(REGION_CODES.keys()), index=2, key="region_selector", label_visibility="collapsed")
 
