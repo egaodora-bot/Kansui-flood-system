@@ -12,12 +12,12 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# 最初のデザインにあった「左側のカラーバー」「タイトルサイズ」「見出し」を綺麗に再現するカスタムCSS
+# タイトルは大きく、途中のカテゴリ見出し（h2/h3）は大きすぎずすっきりと収まるようにCSSを調整
 st.markdown("""
 <style>
-    /* メインタイトルを大きく目立たせる */
+    /* タイトルは大きく目立たせる */
     .custom-main-title {
-        font-size: 28px;
+        font-size: 32px;
         font-weight: bold;
         color: #ffffff;
         margin-bottom: 0px;
@@ -28,7 +28,22 @@ st.markdown("""
         margin-top: 4px;
         margin-bottom: 15px;
     }
-    /* ガイドボックスの左側に青・緑のアクセントラインを引くスタイリッシュなデザイン */
+    
+    /* 途中のカテゴリ見出し（h2, h3）のサイズを適切に小さく調整 */
+    h2 {
+        font-size: 19px !important;
+        font-weight: bold;
+        margin-top: 1rem;
+        margin-bottom: 0.5rem;
+    }
+    h3 {
+        font-size: 16px !important;
+        font-weight: bold;
+        margin-top: 0.8rem;
+        margin-bottom: 0.4rem;
+    }
+
+    /* ガイドボックスの左側アクセントライン */
     .guide-box-blue {
         border-left: 4px solid #60a5fa;
         background-color: rgba(96, 165, 250, 0.08);
@@ -276,11 +291,11 @@ def fetch_region_prefecture_weather(region_name):
             results.append({"prefecture": prefecture, "weather": "取得できず", "comment": "通信エラー", "max_temp": "--"})
     return results
 
-# 画面描画（タイトルとサブタイトル）
+# 画面描画（大きめのタイトル ＆ サブタイトル）
 st.markdown('<p class="custom-main-title">🛡️ 気象防災カルテ・インフラリアルリンクシステム</p>', unsafe_allow_html=True)
 st.markdown('<p class="custom-sub-title">災害時のリアルタイム気象状況・インフラ・地震・台風・キキクル（危険度分布）連動情報を一元管理します。</p>', unsafe_allow_html=True)
 
-# 操作ガイド（折りたたみ可能な展開表示 ＆ 左側の青いアクセントライン付きボックス）
+# 操作ガイド（折りたたみ表示 ＆ 左側の青色アクセントライン）
 with st.expander("📖 2軸表示システム設計仕様 & 操作ガイドのご案内", expanded=True):
     st.markdown("""
     <div class="guide-box-blue">
