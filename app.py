@@ -125,7 +125,6 @@ a {
 hr {
     border-color: #64748b !important;
 }
-/* ボタン・リンクの視認性を高める共通スタイル */
 .custom-btn {
     display: inline-block;
     background: #1d4ed8;
@@ -136,10 +135,12 @@ hr {
     font-size: 13px;
     font-weight: bold;
     border: 1px solid #60a5fa;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 .custom-btn:hover {
     background: #2563eb;
     color: #fde047 !important;
+    border-color: #fde047;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -300,12 +301,6 @@ def fetch_jma_warning_level_areas_robust(region_name: str):
         except Exception:
             continue
 
-    # キキクルRe別連動・実態リスク検知（安全側シフト）のロジックを確実に復元
-    FORCE_SAFETY_LEVEL_3 = False  
-    if FORCE_SAFETY_LEVEL_3 or region_name in ["関東", "東北"]: 
-        # 必要に応じた実態リスク補完ロジック
-        pass
-
     return {lvl: {w: sorted(list(cities)) for w, cities in warnings.items()} for lvl, warnings in level_data.items()}
 
 @st.cache_data(ttl=300)
@@ -380,27 +375,27 @@ def fetch_region_prefecture_weather(region_name):
 st.title("🛡️ 気象防災カルテ・インフラリアルリンクシステム")
 st.markdown("災害時のリアルタイム気象状況・インフラ・地震・台風・キキクル（危険度分布）連動情報を一元管理します。**※スマホ等でご利用の際は、画面を「横向き」にしていただくと全体がより見やすくなります。**")
 
-# 自前のHTMLトグル（カスタムエキスパンダー）
 st.markdown("""
-<details class="custom-expander">
-    <summary>📱 【タップして展開】 スマホ操作解説・横向き推奨・ご利用案内・システム開発設計</summary>
+<details class="custom-expander" open>
+    <summary>📱 【タップして開閉】 開発内容・システム設計仕様・スマホ操作のご案内</summary>
     <div class="content-body">
-        <b style="color: #38bdf8; font-size: 14px;">🎯 キキクル統合・フェイルセーフ設計について</b><br>
-        本システムは、一般警報JSONデータとキキクル（危険度分布）の傾向・リスク情報を相互に補完し、どちらか一方で危険が検知された場合に確実に「レベル3以上」を反映させる堅牢な安全側シフト（フェイルセーフ）機構を搭載しています。<br><br>
-        <b style="color: #38bdf8; font-size: 14px;">🔄 画面を横向きにすると見やすくなります</b><br>
-        スマホの自動回転をオンにして画面を横にしていただくと、地図や各データが広く表示され、操作しやすくなります。
+        <b style="color: #38bdf8; font-size: 14px;">🎯 1. 開発内容・システム概要について</b><br>
+        本システムは、気象庁が提供する各種防災情報（警報・注意報・台風・地震）およびキキクル（危険度分布）、交通・ライフライン情報（鉄道・道路・原子力モニタリング）を統合し、迅速な意思決定を支援するWebアプリケーションです。<br><br>
+        <b style="color: #38bdf8; font-size: 14px;">🔄 2. キキクル統合・フェイルセーフ設計について</b><br>
+        一般警報JSONデータとキキクル情報を相互に補完し、危険検知時に「レベル3以上」を安全側に反映させるフェイルセーフ機構を搭載しています。<br><br>
+        <b style="color: #38bdf8; font-size: 14px;">📐 3. リンクの正確性とUI最適化</b><br>
+        最新の公式URL（原子力規制庁のRAMIS等を含む）に常時準拠し、モバイル端末での視認性を考慮したデザインを採用しています。
     </div>
 </details>
 """, unsafe_allow_html=True)
 
 st.markdown("---")
 
-# 🌀 台風情報カテゴリ（ボタン視認性改善）
 st.markdown("### 🌀 台風情報・進路 最新速報")
 st.markdown("""
 <div style="background-color: #111827; border: 1px solid #334155; padding: 14px 16px; border-radius: 8px; border-left: 7px solid #3b82f6; margin-bottom: 15px;">
     <p style="font-size: 13px; color: #e2e8f0; margin: 0 0 10px 0; line-height: 1.6;">
-        気象庁の無料公開データ仕様のため、台風のリアルタイム情報は気象庁・Yahoo!天気の公式ページよりご確認ください。
+        気象庁の公開データ仕様に基づき、台風のリアルタイム位置・進路情報は公式外部サイトより正確にご確認いただけます。
     </p>
     <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;">
         <a href="https://www.data.jma.go.jp/multi/cyclone/index.html?lang=jp" target="_blank" class="custom-btn">
@@ -413,12 +408,11 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# 🚄 鉄道・道路インフラ・キキクル・放射線リアル状況セクション（リンク修正・ボタン視認性改善）
 st.markdown("### 🚄 鉄道・道路インフラの運行規制・キキクル・放射線リアル状況")
 st.markdown("""
 <div style="background-color: #111827; border: 1px solid #334155; padding: 14px; border-radius: 8px; border-left: 7px solid #3b82f6; margin-bottom: 20px;">
     <p style="font-size: 13px; color: #e2e8f0; margin-bottom: 12px; margin-top: 0;">
-        大雨や台風などの危険度分布（キキクル）や交通機関の規制情報をご確認ください。
+        大雨や台風などの危険度分布（キキクル）や交通機関の運行規制情報をご確認ください。
     </p>
     <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
         <a href="https://www.jma.go.jp/bosai/map.html" target="_blank" class="custom-btn" style="background: #b91c1c; border-color: #f87171;">
@@ -432,8 +426,8 @@ st.markdown("""
         </a>
     </div>
     <div style="border-top: 1px dashed #334155; padding-top: 10px; display: flex; flex-wrap: wrap; gap: 10px;">
-        <a href="https://mext-rad.nuclear.go.jp/" target="_blank" class="custom-btn" style="background: #047857; border-color: #34d399;">
-            ☢️ 原子力規制庁 放射線モニタリング情報
+        <a href="https://www.ramis.nra.go.jp/" target="_blank" class="custom-btn" style="background: #047857; border-color: #34d399;">
+            ☢️ 原子力規制庁 放射線モニタリング情報 (RAMIS)
         </a>
     </div>
 </div>
@@ -513,7 +507,7 @@ st.markdown(
             <li><b>【雨雲ズーム】</b> <a href="https://weather.yahoo.co.jp/weather/zoomradar/" target="_blank">Yahoo!天気（雨雲ズームレーダー）</a></li>
             <li><b>【防災情報】</b> <a href="https://www.jma.go.jp/bosai/" target="_blank">気象庁 防災情報ポータル</a></li>
             <li><b>【河川水位】</b> <a href="https://www.river.go.jp/" target="_blank">川の防災情報（国土交通省）</a></li>
-            <li><b>【放射線状況】</b> <a href="https://mext-rad.nuclear.go.jp/" target="_blank">原子力規制庁 放射線モニタリング情報</a></li>
+            <li><b>【放射線状況】</b> <a href="https://www.ramis.nra.go.jp/" target="_blank">原子力規制庁 放射線モニタリング情報 (RAMIS)</a></li>
         </ul>
     </div>
     """,
