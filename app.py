@@ -380,9 +380,10 @@ st.markdown("""
     <summary>📱 【タップして開閉】 開発内容・システム設計仕様・スマホ操作のご案内</summary>
     <div class="content-body">
         <b style="color: #38bdf8; font-size: 14px;">🎯 1. 開発内容・システム概要について</b><br>
-        本システムは、気象庁が提供する各種防災情報（警報・注意報・台風・地震）およびキキクル（危険度分布）、交通・ライフライン情報（鉄道・道路・原子力モニタリング）を統合し、迅速な意思決定を支援するWebアプリケーションです。<br><br>
+        本システムは、気象庁が提供する各種防災情報（警報・注意報・台風・地震）およびキキクル（危険度分布）、交通・ライフライン情報（鉄道・道路・原子力モニタリング）を統合し、迅速な意思決定を支援するWebアプリケーションです。<br>
+        <b>※スマートフォン等でご利用の際は、画面を「横向き」にしていただくと全体がより見やすくなります。</b><br><br>
         <b style="color: #38bdf8; font-size: 14px;">🔄 2. キキクル統合・フェイルセーフ設計について</b><br>
-        一般警報JSONデータとキキクル情報を相互に補完し、危険検知時に「レベル3以上」を安全側に反映させるフェイルセーフ機構を搭載しています。<br><br>
+        一般警報JSONデータとキキクル情報を相互に補完し、危険検知時に「レベル4以上（キキクル優先）」を安全側に反映させるフェイルセーフ機構を搭載しています。<br><br>
         <b style="color: #38bdf8; font-size: 14px;">📐 3. リンクの正確性とUI最適化</b><br>
         最新の公式URL（原子力規制庁のRAMIS等を含む）に常時準拠し、モバイル端末での視認性を考慮したデザインを採用しています。
     </div>
@@ -415,7 +416,7 @@ st.markdown("""
         大雨や台風などの危険度分布（キキクル）や交通機関の運行規制情報をご確認ください。
     </p>
     <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
-        <a href="https://www.jma.go.jp/bosai/map.html" target="_blank" class="custom-btn" style="background: #b91c1c; border-color: #f87171;">
+        <a href="https://www.jma.go.jp/bosai/map.html" target="_blank" class="custom-btn">
             🔴 気象庁 キキクル（危険度分布）
         </a>
         <a href="https://www.jorudan.co.jp/unk/" target="_blank" class="custom-btn">
@@ -453,19 +454,26 @@ else:
 
 st.markdown("---")
 
-selected_region = st.selectbox("🌍 監視エリアを選択してください（地域を切り替えると各データが連動します）", list(REGION_CODES.keys()), index=2)
+selected_region = st.selectbox("🌍 監視エリアを選択してください（地域を切り替えると各データが連動します）", list(REGION_CODES.keys()), index=2, key="region_selector")
 
 st.markdown("---")
 
-st.markdown(f"### ⚠️ {selected_region}エリアの緊急警戒レベル（レベル3〜5・キキクル統合判定）")
+st.markdown(f"### ⚠️ {selected_region}エリアの緊急警戒レベル（レベル4以上・キキクル優先判定）")
 warnings = fetch_jma_warning_level_areas_robust(selected_region)
 has_warn = False
-for lvl, color, title in [("Level5", "error", "🚨 【Level5】特別警報発令中（直ちに命を守る行動を）"), ("Level4", "error", "🟥 【Level4】危険警報発令中（危険な場所から全員避難）"), ("Level3", "warning", "🟧 【Level3】警報・キキクル安全側シフト発令中（高齢者等は避難準備）")]:
+for lvl, color, title in [("Level5", "error", "🚨 【Level5】特別警報発令中（直ちに命を守る行動を）"), ("Level4", "error", "🟥 【Level4】危険警報・キキクル優先発令中（危険な場所から全員避難）")]:
     if warnings.get(lvl):
         has_warn = True
         getattr(st, color)(title)
         for w_name, cities in warnings[lvl].items(): st.write(f"- **{w_name}**: {', '.join(cities)}")
-if not has_warn: st.success("🟢 現在、対象エリアに緊急警戒レベル（レベル3〜5）の警報およびキキクル安全側シフトの発表はありません。")
+if not has_warn: 
+    # レベル3以下も含めてアラートがあるか確認用に表示をクリーンアップ
+    level3_exist = warnings.get("Level3", {})
+    if level3_exist:
+        st.warning("🟧 【Level3】警報発表中（高齢者等は避難準備）")
+        for w_name, cities in level3_exist.items(): st.write(f"- **{w_name}**: {', '.join(cities)}")
+    else:
+        st.success(f"🟢 現在、{selected_region}エリアに対象となる緊急警戒レベル（レベル4以上）の発表はありません。")
 
 st.markdown("---")
 
