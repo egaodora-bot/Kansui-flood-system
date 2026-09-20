@@ -56,7 +56,7 @@ def main():
             <span style="color: #f87171 !important;">詳細なキキクル情報（危険度分布）を気象庁サイトで確認する</span>
         </button>
     </div>
-    """, unsafe_allow_html=Title := True) # type: ignore
+    """, unsafe_allow_html=True)
 
     # 対象エリアの指定
     region = "関東"
@@ -87,11 +87,11 @@ def main():
         st.info(f"🟢 現在、{region}エリアに緊急警戒レベル（レベル3〜5）の発表およびキキクル安全側シフトの発表はありません。")
 
     # ----------------------------------------------------
-    # 3. マップ表示エリア（Folium連携・修正箇所）
+    # 3. マップ表示エリア（Folium連携）
     # ----------------------------------------------------
     st.markdown("### 🗺️ リアルタイム位置・インフラ状況マップ")
     
-    # 【修正】APIキーが不要な標準の OpenStreetMap タイルに変更、または tiles を指定せずデフォルトを使用
+    # APIキー不要のOpenStreetMapタイルを使用
     m = folium.Map(location=[36.0, 139.5], zoom_start=8, tiles="OpenStreetMap")
     
     # マップの描画
