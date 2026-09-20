@@ -12,6 +12,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+# デザインと枠線を美しく表示するためのカスタムCSS
 st.markdown("""
 <style>
 html, body,
@@ -22,28 +23,19 @@ section[data-testid="stMain"] {
     background-color: #080d16 !important;
     color: #ffffff !important;
 }
-[data-testid="stAppViewContainer"] .main .block-container {
-    background-color: #080d16 !important;
-    color: #ffffff !important;
-}
 [data-testid="stAppViewContainer"] p,
 [data-testid="stAppViewContainer"] li,
 [data-testid="stAppViewContainer"] span {
     color: #ffffff !important;
 }
-[data-testid="stAppViewContainer"] h1 {
-    color: #ffffff !important;
-    font-size: 2.3rem !important;
-    font-weight: 900 !important;
-    line-height: 1.3 !important;
-}
+[data-testid="stAppViewContainer"] h1,
 [data-testid="stAppViewContainer"] h2,
 [data-testid="stAppViewContainer"] h3,
 [data-testid="stAppViewContainer"] h4 {
     color: #ffffff !important;
     font-weight: 900 !important;
 }
-.link-card {
+.custom-card {
     background-color: #111827 !important;
     border: 1px solid #334155 !important;
     border-left: 7px solid #10b981 !important;
@@ -52,58 +44,14 @@ section[data-testid="stMain"] {
     margin-top: 10px;
     margin-bottom: 20px;
 }
-div[data-testid="stExpander"] {
-    background-color: #111827 !important;
+.kikikuru-box {
+    background-color: #1e293b !important;
     border: 1px solid #475569 !important;
-    border-left: 7px solid #10b981 !important;
-    border-radius: 8px !important;
-    margin-bottom: 12px;
-}
-div[data-testid="stExpander"] summary p {
-    font-weight: 900 !important;
-    color: #60a5fa !important;
-    font-size: 15px !important;
-}
-div[data-testid="stSelectbox"] {
-    background-color: #080d16 !important;
-    border-left: 7px solid #ffe600;
-    padding-left: 10px;
-}
-div[data-testid="stSelectbox"] [data-baseweb="select"] > div {
-    background: #000000 !important;
-    background-color: #000000 !important;
-    border: 2px solid #64748b !important;
-    border-radius: 8px !important;
-    color: #ffffff !important;
-    min-height: 48px !important;
-}
-div[data-testid="stSelectbox"] [data-baseweb="select"] span {
-    color: #ffffff !important;
-    -webkit-text-fill-color: #ffffff !important;
-    font-weight: 900 !important;
-}
-div[data-baseweb="popover"],
-div[data-baseweb="menu"],
-div[role="listbox"] {
-    background-color: #111827 !important;
-    color: #ffffff !important;
-}
-div[role="option"] {
-    background-color: #111827 !important;
-    color: #ffffff !important;
-    font-weight: 700 !important;
-}
-div[role="option"]:hover {
-    background-color: #1e3a8a !important;
-    color: #ffffff !important;
-}
-a {
-    color: #60a5fa !important;
-    font-weight: 800 !important;
-    text-decoration: underline;
-}
-hr {
-    border-color: #64748b !important;
+    border-left: 7px solid #f59e0b !important;
+    padding: 16px;
+    border-radius: 8px;
+    margin-top: 10px;
+    margin-bottom: 20px;
 }
 .custom-btn {
     display: inline-block;
@@ -121,6 +69,14 @@ hr {
     background: #2563eb;
     color: #fde047 !important;
     border-color: #fde047;
+}
+.legend-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 12px;
+    margin-right: 6px;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -346,7 +302,7 @@ def fetch_region_prefecture_weather(region_name):
                     weathers = area.get("weathers", [])
                     if weathers and not weather: weather = str(weathers[0]).strip()
             wm = re.match(r"(晴|曇|雨|雪|雷|晴れ|曇り|雨時々曇|曇時々雨|雨一時曇|曇一時雨)", weather)
-            results.append({"prefecture": prefecture, "weather": wm.group(1) if wm else "気象情報", "comment": weather or "取得完了", "max_temp": max_t})
+            results.append({"prefecture": prefecture, "weather": wm.group(1) if wm else "気ショウ情報", "comment": weather or "取得完了", "max_temp": max_t})
         except Exception:
             results.append({"prefecture": prefecture, "weather": "取得できず", "comment": "通信エラー", "max_temp": "--"})
     return results
@@ -355,70 +311,100 @@ def fetch_region_prefecture_weather(region_name):
 st.title("🛡️ 気象防災カルテ・インフラリアルリンクシステム")
 st.markdown("災害時のリアルタイム気象状況・インフラ・地震・台風・キキクル（危険度分布）連動情報を一元管理します。")
 
-# Streamlit標準のst.expanderを使用して安全に枠内に収める
-with st.expander("📱 【タップして開閉】 開発内容・システム設計仕様・スマホ操作のご案内", expanded=True):
-    st.markdown("""
-    <b style="color: #38bdf8; font-size: 14px;">🎯 1. 開発内容・システム概要について</b><br>
-    本システムは、気象庁が提供する各種防災情報（警報・注意報・台風・地震）およびキキクル（危険度分布）、交通・ライフライン情報（鉄道・道路・原子力モニタリング）を統合し、迅速な意思決定を支援するWebアプリケーションです。<br>
-    <span style="color: #fde047; font-weight: bold;">※スマートフォンやタブレット等でご利用の際は、画面を「横向き」にしていただくと全体がより見やすくなります。ぜひ横向きモードでお試しください。</span><br><br>
-    <b style="color: #38bdf8; font-size: 14px;">🔄 2. キキクル統合・フェイルセーフ設計について</b><br>
-    一般警報JSONデータとキキクル情報を相互に補完し、危険検知時に「レベル4以上（キキクル優先）」を安全側に反映させるフェイルセーフ機構を搭載しています。<br><br>
-    <b style="color: #38bdf8; font-size: 14px;">📐 3. リンクの正確性とUI最適化</b><br>
-    最新の公式URL（原子力規制庁のRAMIS等を含む）に常時準拠し、モバイル端末での視認性を考慮したデザインを採用しています。
-    """, unsafe_allow_html=True)
-
-st.markdown("---")
-
-st.markdown("### 🌀 台風情報・進路 最新速報")
+# ガイドセクション
 st.markdown("""
-<div style="background-color: #111827; border: 1px solid #334155; padding: 14px 16px; border-radius: 8px; border-left: 7px solid #3b82f6; margin-bottom: 15px;">
-    <p style="font-size: 13px; color: #e2e8f0; margin: 0 0 10px 0; line-height: 1.6;">
-        気象庁の公開データ仕様に基づき、台風のリアルタイム位置・進路情報は公式外部サイトより正確にご確認いただけます。
-    </p>
-    <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px;">
-        <a href="https://www.data.jma.go.jp/multi/cyclone/index.html?lang=jp" target="_blank" class="custom-btn">
-            🗺️ 気象庁 台風情報（公式）
-        </a>
-        <a href="https://weathernews.jp/s/typhoon/" target="_blank" class="custom-btn">
-            🌀 ウェザーニュース 台風情報
-        </a>
-    </div>
+<div class="custom-card">
+    <b style="color: #38bdf8; font-size: 15px;">📱 2軸表示システム設計仕様のご案内</b><br><br>
+    <b style="color: #60a5fa; font-size: 13px;">🎯 1. 警報とキキクルの独立表示（2軸分離設計）について</b><br>
+    本システムでは、条件や発表ベースが異なる<b style="color: #fde047;">「市区町村単位の気象庁警報・注意報ベース」</b>と、<br>
+    実況・解析に基づく<b style="color: #fde047;">「キキクル（危険度分布）のメッシュ・現象別ベース」</b>を無理に統合せず、別々の項目として明確に並列表示します。<br><br>
+    <b style="color: #60a5fa; font-size: 13px;">📱 2. スマートフォン等でのご利用時の注意</b><br>
+    端末を「横向き」にしていただくと、地図および各詳細データやリンクがより一覧しやすくなります。ぜひお試しください。
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown("### 🚄 鉄道・道路インフラの運行規制・キキクル・放射線リアル状況")
-st.markdown("""
-<div style="background-color: #111827; border: 1px solid #334155; padding: 14px; border-radius: 8px; border-left: 7px solid #3b82f6; margin-bottom: 20px;">
-    <p style="font-size: 13px; color: #e2e8f0; margin-bottom: 12px; margin-top: 0;">
-        大雨や台風などの危険度分布（キキクル）や交通機関の運行規制情報をご確認ください。
+st.markdown("---")
+
+# 監視エリア選択
+selected_region = st.selectbox("🌍 監視エリアを選択してください（地域を切り替えると各データが連動します）", list(REGION_CODES.keys()), index=2, key="region_selector")
+
+st.markdown("---")
+
+# ==========================================
+# 軸1：市区町村単位の気象庁 警戒レベル情報
+# ==========================================
+st.markdown(f"### ⚠️ 1. 【市区町村単位】気象庁 警戒レベル情報 ({selected_region})")
+st.markdown("<p style='font-size:12px; color:#94a3b8; margin-top:-10px;'>市区町村ごとの警報・注意報の発表状況に基づくレベル判定です。</p>", unsafe_allow_html=True)
+
+warnings = fetch_jma_warning_level_areas_robust(selected_region)
+has_warn = False
+for lvl, color, title in [("Level5", "error", "🚨 【Level5相当】特別警報発令中（直ちに命を守る行動を）"), ("Level4", "error", "🟥 【Level4相当】危険警報等発表中（危険な場所から全員避難）")]:
+    if warnings.get(lvl):
+        has_warn = True
+        getattr(st, color)(title)
+        for w_name, cities in warnings[lvl].items(): st.write(f"- **{w_name}**: {', '.join(cities)}")
+
+if not has_warn: 
+    level3_exist = warnings.get("Level3", {})
+    if level3_exist:
+        st.warning("🟧 【Level3相当】警報発表中（高齢者等は避難準備）")
+        for w_name, cities in level3_exist.items(): st.write(f"- **{w_name}**: {', '.join(cities)}")
+    else:
+        st.success(f"🟢 現在、{selected_region}エリアの市区町村において対象となる警報ベースの緊急警戒レベル（レベル3以上）の発表はありません。")
+
+st.markdown("---")
+
+# ==========================================
+# 軸2：キキクル（危険度分布）リアルタイム情報
+# ==========================================
+st.markdown(f"### 🔴 2. 【メッシュ・実況ベース】キキクル 危険度分布 ({selected_region})")
+st.markdown("<p style='font-size:12px; color:#94a3b8; margin-top:-10px;'>降水の実況やレーダー解析に基づく、今まさに危険が高まっている現象別のリアルタイム評価です。</p>", unsafe_allow_html=True)
+
+st.markdown(f"""
+<div class="kikikuru-box">
+    <b style="color: #38bdf8; font-size: 14px;">🗺️ キキクル（危険度分布）の現象別リアルタイム確認</b><br>
+    <p style="font-size: 13px; color: #e2e8f0; margin: 8px 0 12px 0;">
+        警報の発表有無に関わらず、お住まいの地域や詳細なメッシュごとの危険度（土砂・浸水・洪水）は以下の気象庁公式マップで直接ご確認ください。
     </p>
     <div style="display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 12px;">
-        <a href="https://www.jma.go.jp/bosai/map.html" target="_blank" class="custom-btn">
-            🔴 気象庁 キキクル（危険度分布）
+        <a href="https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=warning" target="_blank" class="custom-btn" style="background: #b91c1c; border-color: #f87171;">
+            🔴 土砂キキクル（土砂災害）を確認
         </a>
-        <a href="https://www.jorudan.co.jp/unk/" target="_blank" class="custom-btn">
-            🚆 ジョルダン 運行情報
+        <a href="https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=inundation" target="_blank" class="custom-btn" style="background: #1d4ed8; border-color: #60a5fa;">
+            🔵 浸水キキクル（浸水害）を確認
         </a>
-        <a href="https://www.jartic.or.jp/" target="_blank" class="custom-btn">
-            🚗 JARTIC 道路交通情報
+        <a href="https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=flood" target="_blank" class="custom-btn" style="background: #047857; border-color: #34d399;">
+            🟢 洪水キキクル（洪水災害）を確認
         </a>
     </div>
-    <div style="border-top: 1px dashed #334155; padding-top: 10px; display: flex; flex-wrap: wrap; gap: 10px;">
-        <a href="https://www.ramis.nra.go.jp/" target="_blank" class="custom-btn" style="background: #047857; border-color: #34d399;">
-            ☢️ 原子力規制庁 放射線モニタリング情報 (RAMIS)
-        </a>
+    <div style="border-top: 1px dashed #475569; padding-top: 10px; font-size: 12px; color: #94a3b8;">
+        <b>💡 キキクルの色別の意味（凡例）：</b>
+        <span class="legend-badge" style="background: #7c2d12; color: #fca5a5;">紫: レベル5 (災害切迫)</span>
+        <span class="legend-badge" style="background: #991b1b; color: #fca5a5;">赤: レベル4 (極めて危険)</span>
+        <span class="legend-badge" style="background: #b45309; color: #fde68a;">黄: レベル3 (警戒)</span>
+        <span class="legend-badge" style="background: #1e3a8a; color: #93c5fd;">白/青: 注意・安全</span>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
 st.markdown("---")
 
-st.markdown("### 📳 直近の地震情報 ＆ 本日の履歴")
+# 地図表示セクション
+reg_info = REGION_CODES.get(selected_region, REGION_CODES["関東"])
+st.markdown(f"### 🗺️ {selected_region}エリアの中心地図（中心：{reg_info['center_name']}）")
+m = folium.Map(location=[reg_info["lat"], reg_info["lon"]], zoom_start=7, tiles="OpenStreetMap")
+folium.Marker([reg_info["lat"], reg_info["lon"]], popup=selected_region, icon=folium.Icon(color="red", icon="info-sign")).add_to(m)
+st_folium(m, width="100%", height=300, key=f"map_{selected_region}")
+
+st.markdown("---")
+
+# 気象情報・地震セクション
+st.markdown("### 📳 直近の地震情報 ＆ 気象状況")
 eq_data = fetch_jma_earthquake_info()
 if eq_data["success"] and eq_data["quakes"]:
     latest = eq_data["quakes"][0]
     st.markdown(f"""
-    <div style="background-color: #1e293b; border: 1px solid #475569; padding: 14px; border-radius: 8px; border-left: 7px solid #ef4444; margin-bottom: 12px;">
+    <div class="custom-card" style="border-left-color: #ef4444; background-color: #1e293b !important;">
         <div style="display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
             <div><b style="color: #ffffff;">最大震度:</b> <span style="color: #fde047; font-weight: 900; font-size: 1.1em;">{latest['max_scale']}</span></div>
             <div><b style="color: #ffffff;">発生日時:</b> <span style="color: #f8fafc;">{latest['time']}</span></div>
@@ -427,45 +413,12 @@ if eq_data["success"] and eq_data["quakes"]:
     </div>
     """, unsafe_allow_html=True)
 else:
-    st.markdown('<div style="background-color: #1e293b; border: 1px solid #475569; padding: 14px; border-radius: 8px; border-left: 7px solid #ef4444; color: #ffffff;">サーバー混雑中・自動再試行待機中</div>', unsafe_allow_html=True)
+    st.markdown('<div class="custom-card" style="border-left-color: #ef4444; background-color: #1e293b !important;">地震情報取得中...</div>', unsafe_allow_html=True)
 
-st.markdown("---")
-
-selected_region = st.selectbox("🌍 監視エリアを選択してください（地域を切り替えると各データが連動します）", list(REGION_CODES.keys()), index=2, key="region_selector")
-
-st.markdown("---")
-
-st.markdown(f"### ⚠️ {selected_region}エリアの緊急警戒レベル（レベル4以上・キキクル優先判定）")
-warnings = fetch_jma_warning_level_areas_robust(selected_region)
-has_warn = False
-for lvl, color, title in [("Level5", "error", "🚨 【Level5】特別警報発令中（直ちに命を守る行動を）"), ("Level4", "error", "🟥 【Level4】危険警報・キキクル優先発令中（危険な場所から全員避難）")]:
-    if warnings.get(lvl):
-        has_warn = True
-        getattr(st, color)(title)
-        for w_name, cities in warnings[lvl].items(): st.write(f"- **{w_name}**: {', '.join(cities)}")
-if not has_warn: 
-    level3_exist = warnings.get("Level3", {})
-    if level3_exist:
-        st.warning("🟧 【Level3】警報発表中（高齢者等は避難準備）")
-        for w_name, cities in level3_exist.items(): st.write(f"- **{w_name}**: {', '.join(cities)}")
-    else:
-        st.success(f"🟢 現在、{selected_region}エリアに対象となる緊急警戒レベル（レベル4以上）の発表はありません。")
-
-st.markdown("---")
-
-st.markdown(f"### 🌡️ 気象・温度状況 ({selected_region}エリア・地域平均値)")
-w_data = fetch_jma_realtime_data(selected_region)
 c1, c2 = st.columns(2)
+w_data = fetch_jma_realtime_data(selected_region)
 with c1: st.metric(label="エリア平均現在気温", value=f"{w_data['current_temp']}°C" if w_data['current_temp'] != "--" else "--")
 with c2: st.metric(label="エリア予想最高気温", value=f"{w_data['max_temp']}°C" if w_data['max_temp'] != "--" else "--")
-
-st.markdown("---")
-
-reg_info = REGION_CODES.get(selected_region, REGION_CODES["関東"])
-st.markdown(f"### 🗺️ {selected_region}エリアの中心地図（中心：{reg_info['center_name']}）")
-m = folium.Map(location=[reg_info["lat"], reg_info["lon"]], zoom_start=7, tiles="OpenStreetMap")
-folium.Marker([reg_info["lat"], reg_info["lon"]], popup=selected_region, icon=folium.Icon(color="red", icon="info-sign")).add_to(m)
-st_folium(m, width="100%", height=300, key=f"map_{selected_region}")
 
 st.markdown("---")
 
@@ -480,12 +433,13 @@ for pw in fetch_region_prefecture_weather(selected_region):
 
 st.markdown("---")
 
+# 各種インフラ・防災リンク集
 st.markdown(
     """
-    <div class="link-card">
-        <b>🔗 インフラ・交通・防災・キキクル・放射線関連リンク集（公式リアルタイム情報）</b><br>
+    <div class="custom-card">
+        <b>🔗 インフラ・交通・防災・キキクル・放射線関連リンク集（公式リアルタイム情報）</b><br><br>
         <ul>
-            <li><b>【キキクル】</b> <a href="https://www.jma.go.jp/bosai/map.html" target="_blank">気象庁 キキクル（危険度分布）</a></li>
+            <li><b>【キキクル総合】</b> <a href="https://www.jma.go.jp/bosai/map.html" target="_blank">気象庁 キキクル（危険度分布ポータル）</a></li>
             <li><b>【台風情報】</b> <a href="https://www.jma.go.jp/bosai/multi/cyclone/index.html?lang=jp" target="_blank">気象庁 台風情報ページ</a></li>
             <li><b>【道路規制】</b> <a href="https://www.jartic.or.jp/" target="_blank">JARTIC 日本道路交通情報センター</a></li>
             <li><b>【雨雲ズーム】</b> <a href="https://weather.yahoo.co.jp/weather/zoomradar/" target="_blank">Yahoo!天気（雨雲ズームレーダー）</a></li>
