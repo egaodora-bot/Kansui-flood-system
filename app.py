@@ -29,13 +29,14 @@ def main():
     
     st.title("鉄道・道路インフラの運行規制・キキクル・放射線リアル状況")
 
-    # 【改善】背景を透明（または黒）にし、青枠＋赤系の文字に変更
+    # 【根本的な修正】<a>タグではなく、クリックで別タブを開くボタン（HTML）を使用し、StreamlitのCSS干渉を完全に防ぐ
     st.markdown("""
     <div style="margin: 15px 0;">
-        <a href="https://www.jma.go.jp/bosai/map.html" target="_blank" 
-           style="background-color: transparent !important; color: #f87171 !important; padding: 10px 18px; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: bold; display: inline-block; border: 2px solid #3b82f6;">
-            🔴 <span style="color: #f87171 !important;">詳細なキキクル情報（危険度分布）を気象庁サイトで確認する</span>
-        </a>
+        <button onclick="window.open('https://www.jma.go.jp/bosai/map.html', '_blank')" 
+                style="background-color: transparent; color: #f87171; padding: 10px 18px; border-radius: 6px; font-size: 14px; font-weight: bold; cursor: pointer; border: 2px solid #3b82f6; display: inline-flex; align-items: center; gap: 8px;">
+            <span style="color: #ef4444;">🔴</span>
+            <span style="color: #f87171 !important;">詳細なキキクル情報（危険度分布）を気象庁サイトで確認する</span>
+        </button>
     </div>
     """, unsafe_allow_html=True)
 
