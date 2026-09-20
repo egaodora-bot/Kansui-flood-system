@@ -489,9 +489,9 @@ for pw in fetch_region_prefecture_weather(selected_region):
 
 st.markdown("---")
 
-# クイック交通・天気リンクボタン（追加部分）
+# クイック交通・天気・防災リンクボタン（充実版）
 st.markdown("### 🚀 クイック交通・天気・防災リンク（外部サービス）")
-st.caption("主要な交通運行状況や詳細な天気予報へ素早くアクセスできます。")
+st.caption("主要な交通運行状況、天気予報、道路・河川のリアルタイム情報へ素早くアクセスできます。")
 
 col_b1, col_b2, col_b3, col_b4 = st.columns(4)
 with col_b1:
@@ -502,6 +502,16 @@ with col_b3:
     st.link_button("🚗 JARTIC 道路交通情報", "https://www.jartic.or.jp/", use_container_width=True)
 with col_b4:
     st.link_button("🌊 川の防災情報", "https://www.river.go.jp/", use_container_width=True)
+
+col_b5, col_b6, col_b7, col_b8 = st.columns(4)
+with col_b5:
+    st.link_button("🌧️ Yahoo! 雨雲レーダー", "https://weather.yahoo.co.jp/weather/zoomradar/", use_container_width=True)
+with col_b6:
+    st.link_button("🌀 気象庁 台風情報", "https://www.jma.go.jp/bosai/multi/cyclone/index.html?lang=jp", use_container_width=True)
+with col_b7:
+    st.link_button("🛡️ 気象庁 防災ポータル", "https://www.jma.go.jp/bosai/", use_container_width=True)
+with col_b8:
+    st.link_button("☢️ 原子力規制庁 放射線", "https://www.ramis.nra.go.jp/", use_container_width=True)
 
 st.markdown("")
 
