@@ -256,7 +256,8 @@ def fetch_jma_earthquake_info():
         pass
     return {"success": False, "quakes": []}
 
-@st.cache_data(ttl=300)
+# キャッシュを完全にバイパス（ttl=0）して常に最新データを取得するように修正
+@st.cache_data(ttl=0)
 def fetch_jma_warning_level_areas(region_name):
     office_codes = REGION_WARNING_OFFICES.get(region_name, [REGION_CODES[region_name]["code"]])
     area_names = fetch_jma_area_names()
