@@ -12,47 +12,47 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# タイトルは控えめにしつつ、キキクルなどの小見出しや本文が小さくなりすぎないようバランスを調整
+# タイトル、セクション見出し、キキクルなどの文字サイズを適切に大きく調整
 st.markdown("""
 <style>
-    /* メインタイトルを小さめに調整 */
+    /* メインタイトル */
     .custom-main-title {
-        font-size: 20px;
+        font-size: 26px;
         font-weight: bold;
         color: #ffffff;
         margin-bottom: 0px;
     }
     .custom-sub-title {
-        font-size: 13px;
+        font-size: 14px;
         color: #cbd5e1;
-        margin-top: 2px;
-        margin-bottom: 10px;
+        margin-top: 4px;
+        margin-bottom: 12px;
     }
     
-    /* 途中のセクション見出しが小さくなりすぎないよう適切なサイズを確保 */
+    /* 途中のセクション見出し（h2, h3）をしっかり見やすい大きさに変更 */
     h2 {
+        font-size: 22px !important;
+        font-weight: bold;
+        margin-top: 1.2rem;
+        margin-bottom: 0.6rem;
+    }
+    h3 {
         font-size: 18px !important;
         font-weight: bold;
         margin-top: 1rem;
         margin-bottom: 0.5rem;
-    }
-    h3 {
-        font-size: 15px !important;
-        font-weight: bold;
-        margin-top: 0.8rem;
-        margin-bottom: 0.4rem;
     }
 
     /* ガイドボックスの左側アクセントライン */
     .guide-box-blue {
         border-left: 4px solid #60a5fa;
         background-color: rgba(96, 165, 250, 0.08);
-        padding: 10px 14px;
-        margin-bottom: 8px;
+        padding: 12px 16px;
+        margin-bottom: 10px;
         border-radius: 0 4px 4px 0;
     }
     .guide-title {
-        font-size: 13px;
+        font-size: 14px;
         font-weight: bold;
         color: #60a5fa;
         margin-bottom: 4px;
@@ -60,7 +60,7 @@ st.markdown("""
     .guide-text {
         font-size: 13px;
         color: #e2e8f0;
-        line-height: 1.5;
+        line-height: 1.6;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -291,7 +291,7 @@ def fetch_region_prefecture_weather(region_name):
             results.append({"prefecture": prefecture, "weather": "取得できず", "comment": "通信エラー", "max_temp": "--"})
     return results
 
-# 画面描画（小さめのタイトル ＆ サブタイトル）
+# 画面描画（タイトルを適度な大きさに調整）
 st.markdown('<p class="custom-main-title">🛡️ 気象防災カルテ・インフラリアルリンクシステム</p>', unsafe_allow_html=True)
 st.markdown('<p class="custom-sub-title">災害時のリアルタイム気象状況・インフラ・地震・台風・キキクル（危険度分布）連動情報を一元管理します。</p>', unsafe_allow_html=True)
 
