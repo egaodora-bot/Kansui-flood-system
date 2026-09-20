@@ -1,5 +1,8 @@
 import streamlit as st
 
+# ====================================================
+# 1. 統合判定・リスク管理ロジック
+# ====================================================
 def get_integrated_safety_level(region_name: str):
     level = 0
     is_kikikuru_triggered = False
@@ -26,12 +29,12 @@ def main():
     
     st.title("鉄道・道路インフラの運行規制・キキクル・放射線リアル状況")
 
-    # 【改善】HTMLタグを整理し、背景色（#1e3a8a）と白文字が確実に表示されるように修正
+    # 【改善】背景を透明（または黒）にし、青枠＋赤系の文字に変更
     st.markdown("""
     <div style="margin: 15px 0;">
         <a href="https://www.jma.go.jp/bosai/map.html" target="_blank" 
-           style="background-color: #1e3a8a !important; color: #ffffff !important; padding: 10px 18px; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: bold; display: inline-block; border: 1px solid #3b82f6;">
-            🔴 詳細なキキクル情報（危険度分布）を気象庁サイトで確認する
+           style="background-color: transparent !important; color: #f87171 !important; padding: 10px 18px; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: bold; display: inline-block; border: 2px solid #3b82f6;">
+            🔴 <span style="color: #f87171 !important;">詳細なキキクル情報（危険度分布）を気象庁サイトで確認する</span>
         </a>
     </div>
     """, unsafe_allow_html=True)
