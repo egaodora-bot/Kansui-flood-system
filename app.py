@@ -12,7 +12,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# スタイルの定義（各項目の枠線や文字色などを細かく設定）
+# スタイルの定義
 st.markdown("""
 <style>
     /* 1. メインタイトルをさらに大きく */
@@ -88,13 +88,14 @@ st.markdown("""
         line-height: 1.6;
     }
 
-    /* 各項目の枠線デザイン（青枠・緑枠など） */
+    /* 各項目の枠線デザイン（文字がはみ出さないよう調整） */
     .box-blue-border {
         border: 2px solid #3b82f6;
         padding: 16px;
         border-radius: 8px;
         background-color: rgba(59, 130, 246, 0.03);
         margin-bottom: 10px;
+        color: #e2e8f0;
     }
     .box-green-border {
         border: 2px solid #10b981;
@@ -102,6 +103,7 @@ st.markdown("""
         border-radius: 8px;
         background-color: rgba(16, 185, 129, 0.03);
         margin-bottom: 10px;
+        color: #e2e8f0;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -363,7 +365,7 @@ selected_region = st.selectbox("", list(REGION_CODES.keys()), index=2, key="regi
 
 st.markdown("---")
 
-# 2軸並列ダッシュボード（青枠コンテナで囲む）
+# 2軸並列ダッシュボード
 st.markdown(f"## 📊 【{selected_region}エリア】 2軸リアルタイム警戒ダッシュボード")
 st.markdown("警報レベルと危険度レベルの基準判定レベルが違うため、選択されたエリアに対応する「気象庁の警報レベル」と「キキクルの危険度」を並列で確認できます。")
 
@@ -394,29 +396,33 @@ with col_axis1:
         else:
             warning_texts.append(f"🟢 {selected_region}エリアの市区町村においてレベル3以上の警報発表はありません。")
 
-    # 青枠付きコンテナ
-    st.markdown('<div class="box-blue-border">', unsafe_allow_html=True)
+    # 青枠の内側にテキストを完全に収めるため、HTML文字列を組み立てて1回で描画
+    box1_html = '<div class="box-blue-border">'
     for line in warning_texts:
-        st.markdown(line)
-    st.markdown('</div>', unsafe_allow_html=True)
+        # Markdownの太字(**)などを簡単なHTMLタグに変換、またはそのまま記述
+        formatted_line = line.replace('**', '<b>').replace('</b>', '<b>', 1) # マークダウンの太字簡易対応
+        box1_html += f"<p style='margin: 4px 0;'>{line}</p>"
+    box1_html += '</div>'
+    st.markdown(box1_html, unsafe_allow_html=True)
 
 # 軸2：キキクル（危険度分布）の連動エリア評価
 with col_axis2:
     st.markdown("### 🔴 2. キキクル危険度")
     st.caption("メッシュ・実況解析ベース（現象別）")
     
-    # 緑枠付きコンテナ
-    st.markdown('<div class="box-green-border">', unsafe_allow_html=True)
-    st.markdown("**【キキクル解説】**")
-    st.markdown("選択したエリアにおける大雨時の災害発生危険度をメッシュ単位で評価した気象庁の危険度分布です。")
-    # 4. 「リンクを開いた後〜」の注意書きを青文字に設定
-    st.markdown(f'<span class="custom-blue-text">※リンクを開いた後、地図上の都道府県や地域をクリックして詳細なレベル内容をご確認ください。</span>', unsafe_allow_html=True)
-    st.markdown(f"**{selected_region}のキキクル実況確認：**")
-    
-    st.markdown("[🔴 土砂キキクル（土砂災害）を開く](https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=warning)")
-    st.markdown("[🔴 浸水キキクル（浸水害）を開く](https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=inundation)")
-    st.markdown("[🔴 洪水キキクル（洪水災害）を開く](https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=flood)")
-    st.markdown('</div>', unsafe_allow_html=True)
+    # 緑枠の内側にテキストを完全に収めるため、HTML文字列を組み立てて1回で描画
+    box2_html = f"""
+    <div class="box-green-border">
+        <p style='margin: 0 0 8px 0;'><b>【キキクル解説】</b></p>
+        <p style='margin: 0 0 8px 0;'>選択したエリアにおける大雨時の災害発生危険度をメッシュ単位で評価した気象庁の危険度分布です。</p>
+        <p style='margin: 0 0 8px 0;'><span class="custom-blue-text">※リンクを開いた後、地図上の都道府県や地域をクリックして詳細なレベル内容をご確認ください。</span></p>
+        <p style='margin: 0 0 8px 0;'><b>{selected_region}のキキクル実況確認：</b></p>
+        <p style='margin: 4px 0;'><a href="https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=warning" target="_blank" style="color: #38bdf8;">🔴 土砂キキクル（土砂災害）を開く</a></p>
+        <p style='margin: 4px 0;'><a href="https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=inundation" target="_blank" style="color: #38bdf8;">🔴 浸水キキクル（浸水害）を開く</a></p>
+        <p style='margin: 4px 0;'><a href="https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=flood" target="_blank" style="color: #38bdf8;">🔴 洪水キキクル（洪水災害）を開く</a></p>
+    </div>
+    """
+    st.markdown(box2_html, unsafe_allow_html=True)
 
 # 共通凡例ガイド
 with st.container(border=True):
