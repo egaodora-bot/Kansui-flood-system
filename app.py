@@ -12,21 +12,27 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# スタイルの定義
+# スタイルの定義（タイトルをさらに強力に目立たせるスタイル）
 st.markdown("""
 <style>
-    /* 1. メインタイトルをさらに大きく */
+    /* 最重要：メインタイトルを極太・特大化し、視覚的インパクトを最大化 */
     .custom-main-title {
-        font-size: 32px;
-        font-weight: bold;
+        font-size: 38px;
+        font-weight: 900;
         color: #ffffff;
-        margin-bottom: 0px;
+        background: linear-gradient(90deg, #ef4444, #f59e0b, #3b82f6);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 2px;
+        line-height: 1.2;
+        letter-spacing: -0.5px;
     }
     .custom-sub-title {
-        font-size: 15px;
-        color: #cbd5e1;
+        font-size: 16px;
+        font-weight: bold;
+        color: #94a3b8;
         margin-top: 4px;
-        margin-bottom: 12px;
+        margin-bottom: 16px;
     }
     
     /* 2. 監視エリア選択ラベルの赤文字 */
@@ -88,7 +94,7 @@ st.markdown("""
         line-height: 1.6;
     }
 
-    /* 各項目の枠線デザイン（文字がはみ出さないよう調整） */
+    /* 各項目の枠線デザイン */
     .box-blue-border {
         border: 2px solid #3b82f6;
         padding: 16px;
@@ -334,7 +340,7 @@ def fetch_region_prefecture_weather(region_name):
             results.append({"prefecture": prefecture, "weather": "取得できず", "comment": "通信エラー", "max_temp": "--"})
     return results
 
-# 1. メインタイトルを大きく表示
+# 最重要タイトルをグラデーション＆特大サイズで配置
 st.markdown('<p class="custom-main-title">🛡️ 気象防災カルテ・インフラリアルリンクシステム</p>', unsafe_allow_html=True)
 st.markdown('<p class="custom-sub-title">災害時のリアルタイム気象状況・インフラ・地震・台風・キキクル（危険度分布）連動情報を一元管理します。</p>', unsafe_allow_html=True)
 
@@ -396,11 +402,8 @@ with col_axis1:
         else:
             warning_texts.append(f"🟢 {selected_region}エリアの市区町村においてレベル3以上の警報発表はありません。")
 
-    # 青枠の内側にテキストを完全に収めるため、HTML文字列を組み立てて1回で描画
     box1_html = '<div class="box-blue-border">'
     for line in warning_texts:
-        # Markdownの太字(**)などを簡単なHTMLタグに変換、またはそのまま記述
-        formatted_line = line.replace('**', '<b>').replace('</b>', '<b>', 1) # マークダウンの太字簡易対応
         box1_html += f"<p style='margin: 4px 0;'>{line}</p>"
     box1_html += '</div>'
     st.markdown(box1_html, unsafe_allow_html=True)
@@ -410,7 +413,6 @@ with col_axis2:
     st.markdown("### 🔴 2. キキクル危険度")
     st.caption("メッシュ・実況解析ベース（現象別）")
     
-    # 緑枠の内側にテキストを完全に収めるため、HTML文字列を組み立てて1回で描画
     box2_html = f"""
     <div class="box-green-border">
         <p style='margin: 0 0 8px 0;'><b>【キキクル解説】</b></p>
