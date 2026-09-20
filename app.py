@@ -355,7 +355,7 @@ with st.expander("📖 2軸表示システム設計仕様 & 操作ガイドの�
     st.markdown("""
     <div class="guide-box-blue">
         <div class="custom-guide-title-red">🛡️ 1. 警報とキキクルの独立同時表示（2軸並列設計）</div>
-        <div class="guide-text">監視エリアを選択すると、「市区町村単位の気象庁警報・注意報ベース」と、実況・解析に基づく「キキクル（危険度分布）の現象別リアルタイム評価」の両方を同時に切り替え連動して表示します。</div>
+        <div class="guide-text">監視エリアを選択すると、「市区町村単位の気象庁警報・注意報ベース」と、実況・解析に基づく<br>「キキクル（危険度分布）の現象別リアルタイム評価」の両方を同時に切り替え連動して表示します。</div>
     </div>
     
     <div class="guide-box-blue">
@@ -368,6 +368,38 @@ with st.expander("📖 2軸表示システム設計仕様 & 操作ガイドの�
         <div class="guide-text">端末を「横向き」にしていただくと、地図および各詳細データやリンクがより一覧しやすくなります。ぜひお試しください。</div>
     </div>
     """, unsafe_allow_html=True)
+
+# クイックリンク（説明書きのすぐ下に配置・交通と天気防災を区分）
+st.markdown("### 🚀 クイックリンク（外部サービス）")
+st.caption("主要な交通運行状況、天気予報、および防災・放射線情報のリアルタイム確認にご活用ください。")
+
+st.markdown("#### 🚆 交通関係リンク")
+col_t1, col_t2, col_t3 = st.columns(3)
+with col_t1:
+    st.link_button("🚆 ジョルダン 運行情報", "https://www.jorudan.co.jp/unkou/", use_container_width=True)
+with col_t2:
+    st.link_button("🚗 JARTIC 道路交通情報", "https://www.jartic.or.jp/", use_container_width=True)
+with col_t3:
+    st.link_button("🚄 JR運行情報 (各社)", "https://www.jreast.co.jp/unko/", use_container_width=True)
+
+st.markdown("#### 🌤️ 天気・防災関係リンク")
+col_w1, col_w2, col_w3, col_w4 = st.columns(4)
+with col_w1:
+    st.link_button("☀️ ウェザーニュース", "https://weathernews.jp/", use_container_width=True)
+with col_w2:
+    st.link_button("🌐 Yahoo! 天気・災害", "https://weather.yahoo.co.jp/", use_container_width=True)
+with col_w3:
+    st.link_button("🌧️ Yahoo! 雨雲レーダー", "https://weather.yahoo.co.jp/weather/zoomradar/", use_container_width=True)
+with col_w4:
+    st.link_button("🌀 気象庁 台風情報", "https://www.jma.go.jp/bosai/multi/cyclone/index.html?lang=jp", use_container_width=True)
+
+col_w5, col_w6, col_w7 = st.columns(3)
+with col_w5:
+    st.link_button("🌊 川の防災情報", "https://www.river.go.jp/", use_container_width=True)
+with col_w6:
+    st.link_button("🛡️ 気象庁 防災ポータル", "https://www.jma.go.jp/bosai/", use_container_width=True)
+with col_w7:
+    st.link_button("☢️ 放射線モニタリング(RAMIS)", "https://www.ramis.nra.go.jp/", use_container_width=True)
 
 st.markdown("---")
 
@@ -488,30 +520,6 @@ for pw in fetch_region_prefecture_weather(selected_region):
     st.markdown(f"- **{pw['prefecture']}** (最高: {pw['max_temp']}°C) └ {pw['comment']}")
 
 st.markdown("---")
-
-# クイックリンク（説明書きの下に配置し、交通関係と天気・防災関係に区分）
-st.markdown("### 🚀 クイックリンク（外部サービス）")
-st.caption("主要な交通・運行状況、および天気・防災情報のリアルタイム確認にご活用ください。")
-
-st.markdown("#### 🚆 交通関係リンク")
-col_t1, col_t2 = st.columns(2)
-with col_t1:
-    st.link_button("🚆 ジョルダン 運行情報", "https://www.jorudan.co.jp/unkou/", use_container_width=True)
-with col_t2:
-    st.link_button("🚗 JARTIC 道路交通情報", "https://www.jartic.or.jp/", use_container_width=True)
-
-st.markdown("#### 🌤️ 天気・防災関係リンク")
-col_w1, col_w2, col_w3, col_w4 = st.columns(4)
-with col_w1:
-    st.link_button("🌐 Yahoo! 天気・災害", "https://weather.yahoo.co.jp/", use_container_width=True)
-with col_w2:
-    st.link_button("🌧️ Yahoo! 雨雲レーダー", "https://weather.yahoo.co.jp/weather/zoomradar/", use_container_width=True)
-with col_w3:
-    st.link_button("🌀 気象庁 台風情報", "https://www.jma.go.jp/bosai/multi/cyclone/index.html?lang=jp", use_container_width=True)
-with col_w4:
-    st.link_button("🌊 川の防災情報", "https://www.river.go.jp/", use_container_width=True)
-
-st.markdown("")
 
 # インフラ・防災リンク集
 with st.container(border=True):
