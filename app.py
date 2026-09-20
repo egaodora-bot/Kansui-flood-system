@@ -12,7 +12,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# スタイルの定義（セレクトボックスの赤枠を確実に表示・強調）
+# スタイルの定義（セレクトボックスの背景を常に薄赤色にして一目で分かるようにする）
 st.markdown("""
 <style>
     /* メインタイトル */
@@ -38,14 +38,10 @@ st.markdown("""
         margin-bottom: 6px;
     }
 
-    /* セレクトボックス本体に確実に赤枠と背景色を適用 */
-    div.stSelectbox div[data-baseweb="select"] {
-        border: 2px solid #ef4444 !important;
+    /* セレクトボックス全体を最初から目立つ薄赤の背景色＆角丸で強調 */
+    div.stSelectbox > div > div {
+        background-color: rgba(239, 68, 68, 0.25) !important;
         border-radius: 8px !important;
-        background-color: rgba(239, 68, 68, 0.08) !important;
-    }
-    div.stSelectbox div[data-baseweb="select"]:hover {
-        border-color: #f87171 !important;
     }
     /* セレクトボックス内の文字をくっきり白字にする */
     div.stSelectbox div[data-baseweb="select"] span {
@@ -375,7 +371,7 @@ with st.expander("📖 2軸表示システム設計仕様 & 操作ガイドの�
 
 st.markdown("---")
 
-# 監視エリア選択のラベル ＆ 強力な赤枠付きセレクトボックス
+# 監視エリア選択のラベル ＆ 薄赤背景で常時目立たせたセレクトボックス
 st.markdown('<p class="custom-region-label">🌍 監視エリアを選択してください（地域を切り替えると各データが連動します）</p>', unsafe_allow_html=True)
 selected_region = st.selectbox("", list(REGION_CODES.keys()), index=2, key="region_selector", label_visibility="collapsed")
 
