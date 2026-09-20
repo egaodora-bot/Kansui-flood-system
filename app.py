@@ -258,10 +258,6 @@ def fetch_jma_earthquake_info():
 
 @st.cache_data(ttl=0)
 def fetch_jma_warning_level_areas_robust(region_name: str):
-    """
-    一般警報データと、キキクル等による実態リスク（安全側への強制シフト・フェイルセーフ）を
-    統合して判定する堅牢な関数。
-    """
     office_codes = REGION_WARNING_OFFICES.get(region_name, [REGION_CODES[region_name]["code"]])
     area_names = fetch_jma_area_names()
     level_data = {"Level5": {}, "Level4": {}, "Level3": {}}
@@ -286,14 +282,6 @@ def fetch_jma_warning_level_areas_robust(region_name: str):
                             level_data[lvl].setdefault(w_name, set()).add(name)
         except Exception:
             continue
-
-    # ==========================================
-    # 🔒 【重要】キキクル等との整合・安全側強制シフト（フェイルセーフ）
-    # ==========================================
-    FORCE_SAFETY_LEVEL_3 = False  # ← 実際のキキクル検知APIやフラグに応じてTrueに切り替わる想定
-    
-    if FORCE_SAFETY_LEVEL_3:
-        level_data["Level3"].setdefault("※キキクル危険度分布連動（安全側シフト）", set()).add(f"{region_name}全域（実態リスク検知）")
 
     return {lvl: {w: sorted(list(cities)) for w, cities in warnings.items()} for lvl, warnings in level_data.items()}
 
@@ -452,7 +440,6 @@ selected_region = st.selectbox("🌍 監視エリアを選択してください�
 
 st.markdown("---")
 
-# 🔒 キキクル連動・フェイルセーフ判定の適用
 st.markdown(f"### ⚠️ {selected_region}エリアの緊急警戒レベル（レベル3〜5・キキクル統合判定）")
 warnings = fetch_jma_warning_level_areas_robust(selected_region)
 has_warn = False
