@@ -12,7 +12,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# デザインと枠線を美しく表示するためのカスタムCSS
+# デザインとスマホ表示時の改行崩れ（word-break）を綺麗にするためのカスタムCSS
 st.markdown("""
 <style>
 html, body,
@@ -43,6 +43,8 @@ section[data-testid="stMain"] {
     border-radius: 8px;
     margin-top: 10px;
     margin-bottom: 20px;
+    word-break: auto-phrase;
+    overflow-wrap: break-word;
 }
 .kikikuru-dual-box {
     background-color: #1e293b !important;
@@ -52,6 +54,8 @@ section[data-testid="stMain"] {
     border-radius: 8px;
     margin-top: 10px;
     margin-bottom: 20px;
+    word-break: auto-phrase;
+    overflow-wrap: break-word;
 }
 .custom-btn {
     display: inline-block;
@@ -77,6 +81,7 @@ section[data-testid="stMain"] {
     font-weight: bold;
     font-size: 12px;
     margin-right: 6px;
+    margin-bottom: 4px;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -311,17 +316,25 @@ def fetch_region_prefecture_weather(region_name):
 st.title("🛡️ 気象防災カルテ・インフラリアルリンクシステム")
 st.markdown("災害時のリアルタイム気象状況・インフラ・地震・台風・キキクル（危険度分布）連動情報を一元管理します。")
 
-# ガイドセクション（操作方法をより明確に記載）
+# ガイドセクション（スマートフォンでの改行崩れを防ぐため、文章の折り返し指定を最適化）
 st.markdown("""
 <div class="custom-card">
-    <b style="color: #38bdf8; font-size: 15px;">📱 2軸表示システム設計仕様 & 操作ガイドのご案内</b><br><br>
-    <b style="color: #60a5fa; font-size: 13px;">🎯 1. 警報とキキクルの独立同時表示（2軸並列設計）</b><br>
-    本システムでは、監視エリアを選択すると、<b style="color: #fde047;">「市区町村単位の気象庁警報・注意報ベース」</b>と、<br>
-    実況・解析に基づく<b style="color: #fde047;">「キキクル（危険度分布）の現象別リアルタイム評価」</b>の<span style="color: #38bdf8; font-weight: bold;">両方を同時に切り替え連動して表示</span>します。<br><br>
-    <b style="color: #60a5fa; font-size: 13px;">🗺️ 2. 地図およびエリア連動の操作方法について</b><br>
-    上のセレクトボックスでエリアを選択するか、あるいは<b style="color: #fde047;">地図上の各地域や都道府県を選択・クリックしていただくことで、連動して下部の詳細な防災データや機器ステータスが切り替わります。</b>地図単体ではなく、選択操作によって地域ごとの詳細情報を確認できる仕様となっています。<br><br>
-    <b style="color: #60a5fa; font-size: 13px;">📱 3. スマートフォン等でのご利用時の注意</b><br>
-    端末を「横向き」にしていただくと、地図および各詳細データやリンクがより一覧しやすくなります。ぜひお試しください。
+    <div style="font-size: 15px; font-weight: bold; color: #38bdf8; margin-bottom: 8px;">📱 2軸表示システム設計仕様 & 操作ガイドのご案内</div>
+    
+    <div style="font-size: 13px; font-weight: bold; color: #60a5fa; margin-top: 10px;">🎯 1. 警報とキキクルの独立同時表示（2軸並列設計）</div>
+    <div style="font-size: 13px; color: #ffffff; line-height: 1.6; margin-top: 2px;">
+        本システムでは、監視エリアを選択すると、<span style="color: #fde047;">「市区町村単位の気象庁警報・注意報ベース」</span>と、実況・解析に基づく<span style="color: #fde047;">「キキクル（危険度分布）の現象別リアルタイム評価」</span>の両方を同時に切り替え連動して表示します。
+    </div>
+    
+    <div style="font-size: 13px; font-weight: bold; color: #60a5fa; margin-top: 12px;">🗺️ 2. 地図およびエリア連動の操作方法について</div>
+    <div style="font-size: 13px; color: #ffffff; line-height: 1.6; margin-top: 2px;">
+        上のセレクトボックスでエリアを選択するか、あるいは<span style="color: #fde047;">地図上の各地域や都道府県を選択・クリックしていただくことで、連動して下部の詳細な防災データや機器ステータスが切り替わります。</span>地図単体ではなく、選択操作によって地域ごとの詳細情報を確認できる仕様となっています。
+    </div>
+    
+    <div style="font-size: 13px; font-weight: bold; color: #60a5fa; margin-top: 12px;">📱 3. スマートフォン等でのご利用時の注意</div>
+    <div style="font-size: 13px; color: #ffffff; line-height: 1.6; margin-top: 2px;">
+        端末を「横向き」にしていただくと、地図および各詳細データやリンクがより一覧しやすくなります。ぜひお試しください。
+    </div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -366,7 +379,7 @@ with col_axis1:
             warning_card_content += f"<span style='color:#10b981;'>🟢 {selected_region}エリアの市区町村においてレベル3以上の警報発表はありません。</span>"
 
     st.markdown(f"""
-    <div style="background-color: #111827; border: 1px solid #334155; border-left: 6px solid #3b82f6; padding: 14px; border-radius: 6px; min-height: 180px;">
+    <div style="background-color: #111827; border: 1px solid #334155; border-left: 6px solid #3b82f6; padding: 14px; border-radius: 6px; min-height: 180px; word-break: auto-phrase; overflow-wrap: break-word;">
         <div style="font-size: 13px; line-height: 1.6;">{warning_card_content}</div>
     </div>
     """, unsafe_allow_html=True)
@@ -377,8 +390,12 @@ with col_axis2:
     st.markdown("<p style='font-size:11px; color:#94a3b8;'>メッシュ・実況解析ベース（現象別）</p>", unsafe_allow_html=True)
     
     st.markdown(f"""
-    <div style="background-color: #111827; border: 1px solid #334155; border-left: 6px solid #f59e0b; padding: 14px; border-radius: 6px; min-height: 180px;">
-        <div style="font-size: 12px; color: #e2e8f0; margin-bottom: 8px;">
+    <div style="background-color: #111827; border: 1px solid #334155; border-left: 6px solid #f59e0b; padding: 14px; border-radius: 6px; min-height: 180px; word-break: auto-phrase; overflow-wrap: break-word;">
+        <div style="font-size: 12px; color: #cbd5e1; margin-bottom: 8px; line-height: 1.5;">
+            <b>【キキクル解説】</b><br>
+            選択したエリアにおける大雨時の災害発生危険度を、メッシュ（約1km四方）単位でリアルタイムに評価した気象庁の危険度分布です。以下のボタンから各現象ごとの詳細マップを確認できます。
+        </div>
+        <div style="font-size: 12px; color: #e2e8f0; margin-bottom: 6px; margin-top: 8px;">
             <b>{selected_region}エリアの各キキクル実況確認：</b>
         </div>
         <div style="display: flex; flex-direction: column; gap: 8px;">
