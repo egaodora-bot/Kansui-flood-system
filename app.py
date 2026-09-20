@@ -12,7 +12,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# スタイルの定義
+# スタイルの定義（リンクボタンの幅統一・左寄せ・明るい青/緑の枠線デザイン）
 st.markdown("""
 <style>
     /* メインタイトル */
@@ -43,7 +43,6 @@ st.markdown("""
         background-color: rgba(239, 68, 68, 0.25) !important;
         border-radius: 8px !important;
     }
-    /* セレクトボックス内の文字をくっきり白字にする */
     div.stSelectbox div[data-baseweb="select"] span {
         color: #ffffff !important;
         font-weight: bold;
@@ -100,7 +99,7 @@ st.markdown("""
         line-height: 1.6;
     }
 
-    /* 各項目の枠線デザイン */
+    /* ダッシュボード等の枠線デザイン */
     .box-blue-border {
         border: 2px solid #3b82f6;
         padding: 16px;
@@ -116,6 +115,36 @@ st.markdown("""
         background-color: rgba(16, 185, 129, 0.03);
         margin-bottom: 10px;
         color: #e2e8f0;
+    }
+
+    /* クイックリンクボタンを同じ幅に固定し、明るい青・緑の枠線で左寄せ表示 */
+    .stLinkButton > a {
+        width: 100% !important;
+        text-align: center !important;
+        border-radius: 8px !important;
+        font-weight: bold !important;
+        padding: 10px 14px !important;
+        box-sizing: border-box !important;
+    }
+    /* 交通関係リンクのボタン（明るい青枠） */
+    .traffic-link-section .stLinkButton > a {
+        border: 2px solid #38bdf8 !important;
+        background-color: rgba(56, 189, 248, 0.06) !important;
+        color: #38bdf8 !important;
+    }
+    .traffic-link-section .stLinkButton > a:hover {
+        background-color: rgba(56, 189, 248, 0.2) !important;
+        color: #ffffff !important;
+    }
+    /* 天気・防災関係リンクのボタン（明るい緑枠） */
+    .weather-link-section .stLinkButton > a {
+        border: 2px solid #34d399 !important;
+        background-color: rgba(52, 211, 153, 0.06) !important;
+        color: #34d399 !important;
+    }
+    .weather-link-section .stLinkButton > a:hover {
+        background-color: rgba(52, 211, 153, 0.2) !important;
+        color: #ffffff !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -369,37 +398,49 @@ with st.expander("📖 2軸表示システム設計仕様 & 操作ガイドの�
     </div>
     """, unsafe_allow_html=True)
 
-# クイックリンク（説明書きのすぐ下に配置・交通と天気防災を区分）
+# クイックリンク（説明書きのすぐ下に配置・左寄せ & 4列構成で同じ幅に均等配置）
 st.markdown("### 🚀 クイックリンク（外部サービス）")
 st.caption("主要な交通運行状況、天気予報、および防災・放射線情報のリアルタイム確認にご活用ください。")
 
+# 交通関係リンク
 st.markdown("#### 🚆 交通関係リンク")
-col_t1, col_t2, col_t3 = st.columns(3)
-with col_t1:
-    st.link_button("🚆 ジョルダン 運行情報", "https://www.jorudan.co.jp/unkou/", use_container_width=True)
-with col_t2:
-    st.link_button("🚗 JARTIC 道路交通情報", "https://www.jartic.or.jp/", use_container_width=True)
-with col_t3:
-    st.link_button("🚄 JR運行情報 (各社)", "https://www.jreast.co.jp/unko/", use_container_width=True)
+with st.container():
+    st.markdown('<div class="traffic-link-section">', unsafe_allow_html=True)
+    col_t1, col_t2, col_t3, col_t4 = st.columns(4)
+    with col_t1:
+        st.link_button("🚆 ジョルダン 運行情報", "https://www.jorudan.co.jp/unkou/", use_container_width=True)
+    with col_t2:
+        st.link_button("🚗 JARTIC 道路交通情報", "https://www.jartic.or.jp/", use_container_width=True)
+    with col_t3:
+        st.link_button("🚄 JR運行情報 (各社)", "https://www.jreast.co.jp/unko/", use_container_width=True)
+    with col_t4:
+        st.empty() # 4列バランス調整用
+    st.markdown('</div>', unsafe_allow_html=True)
 
+# 天気・防災関係リンク
 st.markdown("#### 🌤️ 天気・防災関係リンク")
-col_w1, col_w2, col_w3, col_w4 = st.columns(4)
-with col_w1:
-    st.link_button("☀️ ウェザーニュース", "https://weathernews.jp/", use_container_width=True)
-with col_w2:
-    st.link_button("🌐 Yahoo! 天気・災害", "https://weather.yahoo.co.jp/", use_container_width=True)
-with col_w3:
-    st.link_button("🌧️ Yahoo! 雨雲レーダー", "https://weather.yahoo.co.jp/weather/zoomradar/", use_container_width=True)
-with col_w4:
-    st.link_button("🌀 気象庁 台風情報", "https://www.jma.go.jp/bosai/multi/cyclone/index.html?lang=jp", use_container_width=True)
+with st.container():
+    st.markdown('<div class="weather-link-section">', unsafe_allow_html=True)
+    col_w1, col_w2, col_w3, col_w4 = st.columns(4)
+    with col_w1:
+        st.link_button("☀️ ウェザーニュース", "https://weathernews.jp/", use_container_width=True)
+    with col_w2:
+        st.link_button("🌐 Yahoo! 天気・災害", "https://weather.yahoo.co.jp/", use_container_width=True)
+    with col_w3:
+        st.link_button("🌧️ Yahoo! 雨雲レーダー", "https://weather.yahoo.co.jp/weather/zoomradar/", use_container_width=True)
+    with col_w4:
+        st.link_button("🌀 気象庁 台風情報", "https://www.jma.go.jp/bosai/multi/cyclone/index.html?lang=jp", use_container_width=True)
 
-col_w5, col_w6, col_w7 = st.columns(3)
-with col_w5:
-    st.link_button("🌊 川の防災情報", "https://www.river.go.jp/", use_container_width=True)
-with col_w6:
-    st.link_button("🛡️ 気象庁 防災ポータル", "https://www.jma.go.jp/bosai/", use_container_width=True)
-with col_w7:
-    st.link_button("☢️ 放射線モニタリング(RAMIS)", "https://www.ramis.nra.go.jp/", use_container_width=True)
+    col_w5, col_w6, col_w7, col_w8 = st.columns(4)
+    with col_w5:
+        st.link_button("🌊 川の防災情報", "https://www.river.go.jp/", use_container_width=True)
+    with col_w6:
+        st.link_button("🛡️ 気象庁 防災ポータル", "https://www.jma.go.jp/bosai/", use_container_width=True)
+    with col_w7:
+        st.link_button("☢️ 放射線モニタリング(RAMIS)", "https://www.ramis.nra.go.jp/", use_container_width=True)
+    with col_w8:
+        st.empty() # 4列バランス調整用
+    st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown("---")
 
