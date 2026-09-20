@@ -364,6 +364,7 @@ with col_axis2:
     with st.container(border=True):
         st.markdown("**【キキクル解説】**")
         st.markdown("選択したエリアにおける大雨時の災害発生危険度をメッシュ単位で評価した気象庁の危険度分布です。")
+        st.markdown("※リンクを開いた後、**地図上の都道府県や地域をクリックして詳細なレベル内容をご確認ください**。")
         st.markdown(f"**{selected_region}のキキクル実況確認：**")
         
         st.markdown("[🔴 土砂キキクル（土砂災害）を開く](https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=warning)")
