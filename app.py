@@ -12,26 +12,40 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# スタイリッシュなデザインを適用するためのカスタムCSS
+# 最初のデザインにあった「左側のカラーバー」「タイトルサイズ」「見出し」を綺麗に再現するカスタムCSS
 st.markdown("""
 <style>
-    .main-title {
-        color: #60a5fa;
-        font-weight: 700;
-        font-size: 2.2rem;
+    /* メインタイトルを大きく目立たせる */
+    .custom-main-title {
+        font-size: 28px;
+        font-weight: bold;
+        color: #ffffff;
         margin-bottom: 0px;
     }
-    .section-header {
-        color: #38bdf8;
-        font-weight: 600;
-        border-bottom: 2px solid #38bdf8;
-        padding-bottom: 5px;
-        margin-top: 20px;
-        margin-bottom: 10px;
+    .custom-sub-title {
+        font-size: 14px;
+        color: #cbd5e1;
+        margin-top: 4px;
+        margin-bottom: 15px;
     }
-    .sub-heading {
-        color: #818cf8;
+    /* ガイドボックスの左側に青・緑のアクセントラインを引くスタイリッシュなデザイン */
+    .guide-box-blue {
+        border-left: 4px solid #60a5fa;
+        background-color: rgba(96, 165, 250, 0.08);
+        padding: 12px 16px;
+        margin-bottom: 10px;
+        border-radius: 0 4px 4px 0;
+    }
+    .guide-title {
+        font-size: 13px;
         font-weight: bold;
+        color: #60a5fa;
+        margin-bottom: 4px;
+    }
+    .guide-text {
+        font-size: 13px;
+        color: #e2e8f0;
+        line-height: 1.6;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -262,20 +276,27 @@ def fetch_region_prefecture_weather(region_name):
             results.append({"prefecture": prefecture, "weather": "取得できず", "comment": "通信エラー", "max_temp": "--"})
     return results
 
-# 画面描画
-st.markdown('<p class="main-title">🛡️ 気象防災カルテ・インフラリアルリンクシステム</p>', unsafe_allow_html=True)
-st.markdown("災害時のリアルタイム気象状況・インフラ・地震・台風・キキクル（危険度分布）連動情報を一元管理します。")
+# 画面描画（タイトルとサブタイトル）
+st.markdown('<p class="custom-main-title">🛡️ 気象防災カルテ・インフラリアルリンクシステム</p>', unsafe_allow_html=True)
+st.markdown('<p class="custom-sub-title">災害時のリアルタイム気象状況・インフラ・地震・台風・キキクル（危険度分布）連動情報を一元管理します。</p>', unsafe_allow_html=True)
 
-# 操作ガイド
-with st.container():
-    st.info("📱 **2軸表示システム設計仕様 & 操作ガイドのご案内**")
+# 操作ガイド（折りたたみ可能な展開表示 ＆ 左側の青いアクセントライン付きボックス）
+with st.expander("📖 2軸表示システム設計仕様 & 操作ガイドのご案内", expanded=True):
     st.markdown("""
-    * <span style="color: #60a5fa; font-weight: bold;">1. 警報とキキクルの独立同時表示（2軸並列設計）</span><br>
-      監視エリアを選択すると、「市区町村単位の気象庁警報・注意報ベース」と、実況・解析に基づく「キキクル（危険度分布）の現象別リアルタイム評価」の両方を同時に切り替え連動して表示します。
-    * <span style="color: #60a5fa; font-weight: bold;">2. 地図およびエリア連動の操作方法について</span><br>
-      上のセレクトボックスでエリアを選択するか、あるいは地図上の各地域や都道府県を選択・クリックしていただくことで、連動して下部の詳細な防災データや機器ステータスが切り替わります。
-    * <span style="color: #60a5fa; font-weight: bold;">3. スマートフォン等でのご利用時の注意</span><br>
-      端末を「横向き」にしていただくと、地図および各詳細データやリンクがより一覧しやすくなります。ぜひお試しください。
+    <div class="guide-box-blue">
+        <div class="guide-title">🛡️ 1. 警報とキキクルの独立同時表示（2軸並列設計）</div>
+        <div class="guide-text">監視エリアを選択すると、「市区町村単位の気象庁警報・注意報ベース」と、実況・解析に基づく「キキクル（危険度分布）の現象別リアルタイム評価」の両方を同時に切り替え連動して表示します。</div>
+    </div>
+    
+    <div class="guide-box-blue">
+        <div class="guide-title">🗺️ 2. 地図およびエリア連動の操作方法について</div>
+        <div class="guide-text">上のセレクトボックスでエリアを選択するか、あるいは地図上の各地域や都道府県を選択・クリックしていただくことで、連動して下部の詳細な防災データや機器ステータスが切り替わります。</div>
+    </div>
+    
+    <div class="guide-box-blue">
+        <div class="guide-title">📱 3. スマートフォン等でのご利用時の注意</div>
+        <div class="guide-text">端末を「横向き」にしていただくと、地図および各詳細データやリンクがより一覧しやすくなります。ぜひお試しください。</div>
+    </div>
     """, unsafe_allow_html=True)
 
 st.markdown("---")
@@ -338,11 +359,11 @@ with col_axis2:
 with st.container(border=True):
     st.markdown("**💡 警戒レベルおよびキキクルの色別の意味（共通凡例）：**")
     st.markdown("""
-    * <span style="color: #c084fc; font-weight: bold;">紫 (レベル5):</span> 命の危険・緊急安全確保
-    * <span style="color: #f87171; font-weight: bold;">赤 (Level4):</span> 極めて危険・避難指示
-    * <span style="color: #fbbf24; font-weight: bold;">黄 (Level3):</span> 警戒・高齢者等避難
-    * <span style="color: #38bdf8; font-weight: bold;">青/白:</span> 注意・安全
-    """, unsafe_allow_html=True)
+    * **🟣 紫 (レベル5):** 命の危険・緊急安全確保
+    * **🔴 赤 (Level4):** 極めて危険・避難指示
+    * **🟡 黄 (Level3):** 警戒・高齢者等避難
+    * **🔵 青/白:** 注意・安全
+    """)
 
 st.markdown("---")
 
