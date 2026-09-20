@@ -12,7 +12,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# スタイルの定義（セレクトボックスに常時美しい枠線を適用）
+# スタイルの定義（セレクトボックスの赤枠を確実に表示・強調）
 st.markdown("""
 <style>
     /* メインタイトル */
@@ -30,7 +30,7 @@ st.markdown("""
         margin-bottom: 12px;
     }
     
-    /* 2. 監視エリア選択ラベルの赤文字 */
+    /* 監視エリア選択ラベルの赤文字 */
     .custom-region-label {
         font-size: 18px;
         font-weight: bold;
@@ -38,17 +38,22 @@ st.markdown("""
         margin-bottom: 6px;
     }
 
-    /* セレクトボックスを最初から赤枠で強力に目立たせるスタイル */
-    [data-testid="stSelectbox"] div[data-baseweb="select"] {
+    /* セレクトボックス本体に確実に赤枠と背景色を適用 */
+    div.stSelectbox div[data-baseweb="select"] {
         border: 2px solid #ef4444 !important;
         border-radius: 8px !important;
-        background-color: rgba(239, 68, 68, 0.05) !important;
+        background-color: rgba(239, 68, 68, 0.08) !important;
     }
-    [data-testid="stSelectbox"] div[data-baseweb="select"]:hover {
+    div.stSelectbox div[data-baseweb="select"]:hover {
         border-color: #f87171 !important;
     }
+    /* セレクトボックス内の文字をくっきり白字にする */
+    div.stSelectbox div[data-baseweb="select"] span {
+        color: #ffffff !important;
+        font-weight: bold;
+    }
 
-    /* 3. ガイドタイトルの赤文字 */
+    /* ガイドタイトルの赤文字 */
     .custom-guide-title-red {
         font-size: 15px;
         font-weight: bold;
@@ -56,13 +61,13 @@ st.markdown("""
         margin-bottom: 4px;
     }
 
-    /* 4. 青文字の注意書き用スタイル */
+    /* 青文字の注意書き用スタイル */
     .custom-blue-text {
         color: #38bdf8;
         font-weight: bold;
     }
 
-    /* 5. 地方気象解説タイトルの下線 */
+    /* 地方気象解説タイトルの下線 */
     .custom-underline-title {
         font-size: 20px;
         font-weight: bold;
@@ -370,7 +375,7 @@ with st.expander("📖 2軸表示システム設計仕様 & 操作ガイドの�
 
 st.markdown("---")
 
-# 監視エリア選択のラベル ＆ 枠付きセレクトボックス
+# 監視エリア選択のラベル ＆ 強力な赤枠付きセレクトボックス
 st.markdown('<p class="custom-region-label">🌍 監視エリアを選択してください（地域を切り替えると各データが連動します）</p>', unsafe_allow_html=True)
 selected_region = st.selectbox("", list(REGION_CODES.keys()), index=2, key="region_selector", label_visibility="collapsed")
 
