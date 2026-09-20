@@ -13,9 +13,7 @@ def get_integrated_safety_level(region_name: str):
     
     # --- 通常の一般警報データの取得・判定処理 ---
     try:
-        # ※ここに既存の一般警報取得ロジックが入ります
         general_warning_detected = False # サンプル用の初期値
-        
         if general_warning_detected:
             level = 3
     except Exception as e:
@@ -23,19 +21,14 @@ def get_integrated_safety_level(region_name: str):
 
     # --- キキクル（危険度分布）の優先判定・実態リスク統合 ---
     try:
-        # ※ここにキキクルAPIやメッシュデータから危険度を取得する処理を記述
-        # 通信エラーやデータ不整合が起きてもアプリ全体が落ちないようtry-exceptで完全防御
-        
         # サンプルとして「キキクル側で危険（レベル3相当以上）が検知された」状態を想定
         kikikuru_danger_detected = True  # ← 実際のキキクル判定結果（True/False）に置き換えてください
         
         if kikikuru_danger_detected:
-            # キキクル優先でレベルを最低でも3以上に引き上げ、フラグをONにする
             level = max(level, 3)
             is_kikikuru_triggered = True
             
     except Exception as e:
-        # キキクル連携部分でエラーが起きても、通常の一般警報判定を維持してアプリを継続
         print(f"キキクル連携データ取得エラー（フォールバックします）: {e}")
 
     return level, is_kikikuru_triggered
@@ -49,10 +42,10 @@ def main():
     
     st.title("鉄道・道路インフラの運行規制・キキクル・放射線リアル状況")
 
-    # リンクボタン（視認性を高めつつ、クリックで詳細を確認できる導線）
+    # 【改善】ボタン背景をブルー系（#1e3a8a）にし、文字を白（#ffffff）にしてコントラストを確保
     st.markdown("""
     <div style="margin: 15px 0;">
-        <a href="https://www.jma.go.jp/bosai/map.html" target="_blank" style="background: #991b1b; color: #ffffff !important; padding: 10px 16px; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: bold; display: inline-block;">
+        <a href="https://www.jma.go.jp/bosai/map.html" target="_blank" style="background: #1e3a8a; color: #ffffff !important; padding: 10px 16px; border-radius: 6px; text-decoration: none; font-size: 14px; font-weight: bold; display: inline-block;">
             🔴 詳細なキキクル情報（危険度分布）を気象庁サイトで確認する
         </a>
     </div>
@@ -69,9 +62,9 @@ def main():
     # 状態に応じたアラート・メッセージの切り替え表示
     if current_level >= 3:
         if kikikuru_triggered:
-            # キキクルによって危険度が高まったことを明確に伝える表示
+            # 【改善】streamlit標準の st.error を利用することで、ダークテーマでも文字が潰れず視認性が向上します
             st.error(f"""
-            ⚠️ **【キキクル検知】対象エリアで実態リスクが高まっています（レベル{current_level}相当）**
+            **【キキクル検知】対象エリアで実態リスクが高まっています（レベル{current_level}相当）**
             
             * 気象庁キキクル（危険度分布）の優先判定により、警戒レベルが引き上げられています。
             * 上記のボタンから詳細な危険度マップをご確認ください。
