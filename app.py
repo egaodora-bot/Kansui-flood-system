@@ -12,7 +12,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# スタイルの定義（セレクトボックスの背景を常に薄赤色にして一目で分かるようにする）
+# スタイルの定義
 st.markdown("""
 <style>
     /* メインタイトル */
@@ -488,6 +488,22 @@ for pw in fetch_region_prefecture_weather(selected_region):
     st.markdown(f"- **{pw['prefecture']}** (最高: {pw['max_temp']}°C) └ {pw['comment']}")
 
 st.markdown("---")
+
+# クイック交通・天気リンクボタン（追加部分）
+st.markdown("### 🚀 クイック交通・天気・防災リンク（外部サービス）")
+st.caption("主要な交通運行状況や詳細な天気予報へ素早くアクセスできます。")
+
+col_b1, col_b2, col_b3, col_b4 = st.columns(4)
+with col_b1:
+    st.link_button("🌐 Yahoo! 天気・災害", "https://weather.yahoo.co.jp/", use_container_width=True)
+with col_b2:
+    st.link_button("🚆 ジョルダン 運行情報", "https://www.jorudan.co.jp/unkou/", use_container_width=True)
+with col_b3:
+    st.link_button("🚗 JARTIC 道路交通情報", "https://www.jartic.or.jp/", use_container_width=True)
+with col_b4:
+    st.link_button("🌊 川の防災情報", "https://www.river.go.jp/", use_container_width=True)
+
+st.markdown("")
 
 # インフラ・防災リンク集
 with st.container(border=True):
