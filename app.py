@@ -12,7 +12,7 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# デザインとスマホ表示時の改行崩れ（word-break）を綺麗にするためのカスタムCSS
+# 改行・スマホ表示崩れを完全に防ぐためのカスタムCSS
 st.markdown("""
 <style>
 html, body,
@@ -43,7 +43,7 @@ section[data-testid="stMain"] {
     border-radius: 8px;
     margin-top: 10px;
     margin-bottom: 20px;
-    word-break: auto-phrase;
+    word-break: break-all;
     overflow-wrap: break-word;
 }
 .kikikuru-dual-box {
@@ -54,20 +54,24 @@ section[data-testid="stMain"] {
     border-radius: 8px;
     margin-top: 10px;
     margin-bottom: 20px;
-    word-break: auto-phrase;
+    word-break: break-all;
     overflow-wrap: break-word;
 }
 .custom-btn {
-    display: inline-block;
+    display: block;
+    width: 100%;
     background: #1d4ed8;
     color: #ffffff !important;
-    padding: 10px 16px;
+    padding: 10px 12px;
     border-radius: 6px;
     text-decoration: none;
     font-size: 13px;
     font-weight: bold;
     border: 1px solid #60a5fa;
     box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    text-align: center;
+    box-sizing: border-box;
+    margin-top: 6px;
 }
 .custom-btn:hover {
     background: #2563eb;
@@ -76,12 +80,12 @@ section[data-testid="stMain"] {
 }
 .legend-badge {
     display: inline-block;
-    padding: 2px 8px;
+    padding: 3px 8px;
     border-radius: 4px;
     font-weight: bold;
-    font-size: 12px;
-    margin-right: 6px;
-    margin-bottom: 4px;
+    font-size: 11px;
+    margin-right: 4px;
+    margin-bottom: 6px;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -283,8 +287,8 @@ def fetch_jma_realtime_data(region_name):
                 for area in series.get("areas", []):
                     weathers = area.get("weathers", [])
                     if weathers:
-                        w_text = re.sub(r'([雨曇晴雷])', r' &nbsp; \1 &nbsp; ', weathers[0])
-                        weather_forecasts.append(f"【{area.get('area', {}).get('name', region_name)}】 &nbsp; {w_text}")
+                        w_text = re.sub(r'([雨曇晴雷])', r' \1 ', weathers[0])
+                        weather_forecasts.append(f"【{area.get('area', {}).get('name', region_name)}】 {w_text}")
             return {"success": True, "office": office, "forecasts": weather_forecasts[:4], "current_temp": current_temp, "max_temp": max_temp}
     except Exception:
         return {"success": False, "office": "気象庁（オフライン）", "forecasts": [f"【{region_name}】 接続確認中"], "current_temp": "--", "max_temp": "--"}
@@ -307,7 +311,7 @@ def fetch_region_prefecture_weather(region_name):
                     weathers = area.get("weathers", [])
                     if weathers and not weather: weather = str(weathers[0]).strip()
             wm = re.match(r"(晴|曇|雨|雪|雷|晴れ|曇り|雨時々曇|曇時々雨|雨一時曇|曇一時雨)", weather)
-            results.append({"prefecture": prefecture, "weather": wm.group(1) if wm else "気ショウ情報", "comment": weather or "取得完了", "max_temp": max_t})
+            results.append({"prefecture": prefecture, "weather": wm.group(1) if wm else "気象情報", "comment": weather or "取得完了", "max_temp": max_t})
         except Exception:
             results.append({"prefecture": prefecture, "weather": "取得できず", "comment": "通信エラー", "max_temp": "--"})
     return results
@@ -316,23 +320,31 @@ def fetch_region_prefecture_weather(region_name):
 st.title("🛡️ 気象防災カルテ・インフラリアルリンクシステム")
 st.markdown("災害時のリアルタイム気象状況・インフラ・地震・台風・キキクル（危険度分布）連動情報を一元管理します。")
 
-# ガイドセクション
+# 操作ガイド（分かりやすい見出しと段落構成）
 st.markdown(
     """
     <div class="custom-card">
-        <div style="font-size: 15px; font-weight: bold; color: #38bdf8; margin-bottom: 8px;">📱 2軸表示システム設計仕様 & 操作ガイドのご案内</div>
-        
-        <div style="font-size: 13px; font-weight: bold; color: #60a5fa; margin-top: 10px;">🎯 1. 警報とキキクルの独立同時表示（2軸並列設計）</div>
-        <div style="font-size: 13px; color: #ffffff; line-height: 1.6; margin-top: 2px;">
-            本システムでは、監視エリアを選択すると、<span style="color: #fde047;">「市区町村単位の気象庁警報・注意報ベース」</span>と、実況・解析に基づく<span style="color: #fde047;">「キキクル（危険度分布）の現象別リアルタイム評価」</span>の両方を同時に切り替え連動して表示します。
+        <div style="font-size: 15px; font-weight: bold; color: #38bdf8; margin-bottom: 8px;">
+            📱 2軸表示システム設計仕様 &amp; 操作ガイドのご案内
         </div>
         
-        <div style="font-size: 13px; font-weight: bold; color: #60a5fa; margin-top: 12px;">🗺️ 2. 地図およびエリア連動の操作方法について</div>
+        <div style="font-size: 13px; font-weight: bold; color: #60a5fa; margin-top: 10px;">
+            🎯 1. 警報とキキクルの独立同時表示（2軸並列設計）
+        </div>
         <div style="font-size: 13px; color: #ffffff; line-height: 1.6; margin-top: 2px;">
-            上のセレクトボックスでエリアを選択するか、あるいは<span style="color: #fde047;">地図上の各地域や都道府県を選択・クリックしていただくことで、連動して下部の詳細な防災データや機器ステータスが切り替わります。</span>地図単体ではなく、選択操作によって地域ごとの詳細情報を確認できる仕様となっています。
+            監視エリアを選択すると、「市区町村単位の気象庁警報・注意報ベース」と、実況・解析に基づく「キキクル（危険度分布）の現象別リアルタイム評価」の両方を同時に切り替え連動して表示します。
         </div>
         
-        <div style="font-size: 13px; font-weight: bold; color: #60a5fa; margin-top: 12px;">📱 3. スマートフォン等でのご利用時の注意</div>
+        <div style="font-size: 13px; font-weight: bold; color: #60a5fa; margin-top: 12px;">
+            🗺️ 2. 地図およびエリア連動の操作方法について
+        </div>
+        <div style="font-size: 13px; color: #ffffff; line-height: 1.6; margin-top: 2px;">
+            上のセレクトボックスでエリアを選択するか、あるいは地図上の各地域や都道府県を選択・クリックしていただくことで、連動して下部の詳細な防災データや機器ステータスが切り替わります。
+        </div>
+        
+        <div style="font-size: 13px; font-weight: bold; color: #60a5fa; margin-top: 12px;">
+            📱 3. スマートフォン等でのご利用時の注意
+        </div>
         <div style="font-size: 13px; color: #ffffff; line-height: 1.6; margin-top: 2px;">
             端末を「横向き」にしていただくと、地図および各詳細データやリンクがより一覧しやすくなります。ぜひお試しください。
         </div>
@@ -348,9 +360,7 @@ selected_region = st.selectbox("🌍 監視エリアを選択してください�
 
 st.markdown("---")
 
-# =========================================================================
-# 監視エリア連動：両方の軸（気象庁レベル ＆ キキクルレベル）を並列表示
-# =========================================================================
+# 2軸並列ダッシュボード
 st.markdown(f"## 📊 【{selected_region}エリア】 2軸リアルタイム警戒ダッシュボード")
 st.markdown("<p style='font-size:13px; color:#94a3b8; margin-top:-10px;'>選択されたエリアに対応する「気象庁の警報レベル」と「キキクルの危険度」を並列で確認できます。</p>", unsafe_allow_html=True)
 
@@ -382,7 +392,7 @@ with col_axis1:
             warning_card_content += f"<span style='color:#10b981;'>🟢 {selected_region}エリアの市区町村においてレベル3以上の警報発表はありません。</span>"
 
     st.markdown(f"""
-    <div style="background-color: #111827; border: 1px solid #334155; border-left: 6px solid #3b82f6; padding: 14px; border-radius: 6px; min-height: 180px; word-break: auto-phrase; overflow-wrap: break-word;">
+    <div style="background-color: #111827; border: 1px solid #334155; border-left: 6px solid #3b82f6; padding: 14px; border-radius: 6px; min-height: 200px; word-break: break-all; overflow-wrap: break-word;">
         <div style="font-size: 13px; line-height: 1.6;">{warning_card_content}</div>
     </div>
     """, unsafe_allow_html=True)
@@ -393,27 +403,24 @@ with col_axis2:
     st.markdown("<p style='font-size:11px; color:#94a3b8;'>メッシュ・実況解析ベース（現象別）</p>", unsafe_allow_html=True)
     
     st.markdown(f"""
-    <div style="background-color: #111827; border: 1px solid #334155; border-left: 6px solid #f59e0b; padding: 14px; border-radius: 6px; min-height: 180px; word-break: auto-phrase; overflow-wrap: break-word;">
+    <div style="background-color: #111827; border: 1px solid #334155; border-left: 6px solid #f59e0b; padding: 14px; border-radius: 6px; min-height: 200px; word-break: break-all; overflow-wrap: break-word;">
         <div style="font-size: 12px; color: #cbd5e1; margin-bottom: 8px; line-height: 1.5;">
             <b>【キキクル解説】</b><br>
-            選択したエリアにおける大雨時の災害発生危険度を、メッシュ（約1km四方）単位でリアルタイムに評価した気象庁の危険度分布です。以下のボタンから各現象ごとの詳細マップを確認できます。
+            選択したエリアにおける大雨時の災害発生危険度をメッシュ単位で評価した気象庁の危険度分布です。
         </div>
         <div style="font-size: 12px; color: #e2e8f0; margin-bottom: 6px; margin-top: 8px;">
-            <b>{selected_region}エリアの各キキクル実況確認：</b>
+            <b>{selected_region}のキキクル実況確認：</b>
         </div>
-        <div style="display: flex; flex-direction: column; gap: 8px;">
-            <a href="https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=warning" target="_blank" class="custom-btn" style="background: #991b1b; padding: 6px 10px; text-align: center; font-size: 12px;">
+        <div>
+            <a href="https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=warning" target="_blank" class="custom-btn" style="background: #991b1b;">
                 🔴 土砂キキクル（土砂災害）を開く
             </a>
-            <a href="https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=inundation" target="_blank" class="custom-btn" style="background: #1d4ed8; padding: 6px 10px; text-align: center; font-size: 12px;">
+            <a href="https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=inundation" target="_blank" class="custom-btn" style="background: #1d4ed8;">
                 🔵 浸水キキクル（浸水害）を開く
             </a>
-            <a href="https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=flood" target="_blank" class="custom-btn" style="background: #047857; padding: 6px 10px; text-align: center; font-size: 12px;">
+            <a href="https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=flood" target="_blank" class="custom-btn" style="background: #047857;">
                 🟢 洪水キキクル（洪水災害）を開く
             </a>
-        </div>
-        <div style="margin-top: 8px; font-size: 11px; color: #94a3b8;">
-            ※エリア内の詳細なメッシュごとの色（紫・赤・黄）を公式マップで直接ご確認ください。
         </div>
     </div>
     """, unsafe_allow_html=True)
@@ -421,7 +428,7 @@ with col_axis2:
 # 共通凡例ガイド
 st.markdown("""
 <div class="kikikuru-dual-box" style="margin-top: 15px;">
-    <div style="font-size: 12px; color: #cbd5e1;">
+    <div style="font-size: 12px; color: #cbd5e1; line-height: 1.6;">
         <b>💡 警戒レベルおよびキキクルの色別の意味（共通凡例）：</b><br>
         <span class="legend-badge" style="background: #7c2d12; color: #fca5a5;">紫 (レベル5): 命の危険・緊急安全確保</span>
         <span class="legend-badge" style="background: #991b1b; color: #fca5a5;">赤 (Level4): 極めて危険・避難指示</span>
@@ -478,7 +485,7 @@ for pw in fetch_region_prefecture_weather(selected_region):
 
 st.markdown("---")
 
-# 各種インフラ・防災リンク集
+# インフラ・防災リンク集
 st.markdown(
     """
     <div class="custom-card">
