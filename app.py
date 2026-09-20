@@ -12,24 +12,56 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# タイトル、セクション見出し、キキクルなどの文字サイズを適切に大きく調整
+# スタイルの定義（ご要望の文字サイズ・色・下線などを反映）
 st.markdown("""
 <style>
-    /* メインタイトル */
+    /* 1. メインタイトルをさらに大きく */
     .custom-main-title {
-        font-size: 26px;
+        font-size: 32px;
         font-weight: bold;
         color: #ffffff;
         margin-bottom: 0px;
     }
     .custom-sub-title {
-        font-size: 14px;
+        font-size: 15px;
         color: #cbd5e1;
         margin-top: 4px;
         margin-bottom: 12px;
     }
     
-    /* 途中のセクション見出し（h2, h3）をしっかり見やすい大きさに変更 */
+    /* 2. 監視エリア選択ラベルの赤文字 */
+    .custom-region-label {
+        font-size: 18px;
+        font-weight: bold;
+        color: #ef4444;
+        margin-bottom: 6px;
+    }
+
+    /* 3. ガイドタイトルの赤文字 */
+    .custom-guide-title-red {
+        font-size: 15px;
+        font-weight: bold;
+        color: #ef4444;
+        margin-bottom: 4px;
+    }
+
+    /* 4. 青文字の注意書き用スタイル */
+    .custom-blue-text {
+        color: #38bdf8;
+        font-weight: bold;
+    }
+
+    /* 5. 地方気象解説タイトルの下線 */
+    .custom-underline-title {
+        font-size: 20px;
+        font-weight: bold;
+        text-decoration: underline;
+        text-decoration-color: #38bdf8;
+        text-underline-offset: 6px;
+        margin-top: 1rem;
+        margin-bottom: 0.5rem;
+    }
+    
     h2 {
         font-size: 22px !important;
         font-weight: bold;
@@ -43,19 +75,12 @@ st.markdown("""
         margin-bottom: 0.5rem;
     }
 
-    /* ガイドボックスの左側アクセントライン */
     .guide-box-blue {
         border-left: 4px solid #60a5fa;
         background-color: rgba(96, 165, 250, 0.08);
         padding: 12px 16px;
         margin-bottom: 10px;
         border-radius: 0 4px 4px 0;
-    }
-    .guide-title {
-        font-size: 14px;
-        font-weight: bold;
-        color: #60a5fa;
-        margin-bottom: 4px;
     }
     .guide-text {
         font-size: 13px;
@@ -291,33 +316,34 @@ def fetch_region_prefecture_weather(region_name):
             results.append({"prefecture": prefecture, "weather": "取得できず", "comment": "通信エラー", "max_temp": "--"})
     return results
 
-# 画面描画
+# 1. メインタイトルを大きく表示
 st.markdown('<p class="custom-main-title">🛡️ 気象防災カルテ・インフラリアルリンクシステム</p>', unsafe_allow_html=True)
 st.markdown('<p class="custom-sub-title">災害時のリアルタイム気象状況・インフラ・地震・台風・キキクル（危険度分布）連動情報を一元管理します。</p>', unsafe_allow_html=True)
 
-# 操作ガイド
+# 3. 操作ガイドの見出しを赤文字に設定
 with st.expander("📖 2軸表示システム設計仕様 & 操作ガイドのご案内", expanded=True):
     st.markdown("""
     <div class="guide-box-blue">
-        <div class="guide-title">🛡️ 1. 警報とキキクルの独立同時表示（2軸並列設計）</div>
+        <div class="custom-guide-title-red">🛡️ 1. 警報とキキクルの独立同時表示（2軸並列設計）</div>
         <div class="guide-text">監視エリアを選択すると、「市区町村単位の気象庁警報・注意報ベース」と、実況・解析に基づく「キキクル（危険度分布）の現象別リアルタイム評価」の両方を同時に切り替え連動して表示します。</div>
     </div>
     
     <div class="guide-box-blue">
-        <div class="guide-title">🗺️ 2. 地図およびエリア連動の操作方法について</div>
+        <div class="custom-guide-title-red">🗺️ 2. 地図およびエリア連動の操作方法について</div>
         <div class="guide-text">上のセレクトボックスでエリアを選択するか、あるいは地図上の各地域や都道府県を選択・クリックしていただくことで、連動して下部の詳細な防災データや機器ステータスが切り替わります。</div>
     </div>
     
     <div class="guide-box-blue">
-        <div class="guide-title">📱 3. スマートフォン等でのご利用時の注意</div>
+        <div class="custom-guide-title-red">📱 3. スマートフォン等でのご利用時の注意</div>
         <div class="guide-text">端末を「横向き」にしていただくと、地図および各詳細データやリンクがより一覧しやすくなります。ぜひお試しください。</div>
     </div>
     """, unsafe_allow_html=True)
 
 st.markdown("---")
 
-# 監視エリア選択
-selected_region = st.selectbox("🌍 監視エリアを選択してください（地域を切り替えると各データが連動します）", list(REGION_CODES.keys()), index=2, key="region_selector")
+# 2. 監視エリア選択のラベルを赤文字に設定
+st.markdown('<p class="custom-region-label">🌍 監視エリアを選択してください（地域を切り替えると各データが連動します）</p>', unsafe_allow_html=True)
+selected_region = st.selectbox("", list(REGION_CODES.keys()), index=2, key="region_selector", label_visibility="collapsed")
 
 st.markdown("---")
 
@@ -356,7 +382,7 @@ with col_axis1:
         for line in warning_texts:
             st.markdown(line)
 
-# 軸2：キキクル（危険度分布）の連動エリア評価（アイコンを赤色に統一）
+# 軸2：キキクル（危険度分布）の連動エリア評価
 with col_axis2:
     st.markdown("### 🔴 2. キキクル危険度")
     st.caption("メッシュ・実況解析ベース（現象別）")
@@ -364,10 +390,10 @@ with col_axis2:
     with st.container(border=True):
         st.markdown("**【キキクル解説】**")
         st.markdown("選択したエリアにおける大雨時の災害発生危険度をメッシュ単位で評価した気象庁の危険度分布です。")
-        st.markdown("※リンクを開いた後、**地図上の都道府県や地域をクリックして詳細なレベル内容をご確認ください**。")
+        # 4. 「リンクを開いた後〜」の注意書きを青文字に設定
+        st.markdown(f'<span class="custom-blue-text">※リンクを開いた後、地図上の都道府県や地域をクリックして詳細なレベル内容をご確認ください。</span>', unsafe_allow_html=True)
         st.markdown(f"**{selected_region}のキキクル実況確認：**")
         
-        # すべて赤色の丸（🔴）に統一してレベルと誤認するのを防止
         st.markdown("[🔴 土砂キキクル（土砂災害）を開く](https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=warning)")
         st.markdown("[🔴 浸水キキクル（浸水害）を開く](https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=inundation)")
         st.markdown("[🔴 洪水キキクル（洪水災害）を開く](https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=flood)")
@@ -417,7 +443,8 @@ with c2: st.metric(label="エリア予想最高気温", value=f"{w_data['max_tem
 
 st.markdown("---")
 
-st.markdown(f"### 📡 {selected_region}地方の気象解説 ({w_data['office']})")
+# 5. 気象解説のタイトルに下線を追加（selected_regionが正しく反映されるように修正済み）
+st.markdown(f'<p class="custom-underline-title">📡 {selected_region}地方の気象解説 ({w_data["office"]})</p>', unsafe_allow_html=True)
 for fc in w_data["forecasts"]: st.markdown(f"- {fc}")
 
 st.markdown("---")
