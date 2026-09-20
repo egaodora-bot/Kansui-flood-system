@@ -311,15 +311,16 @@ def fetch_region_prefecture_weather(region_name):
 st.title("🛡️ 気象防災カルテ・インフラリアルリンクシステム")
 st.markdown("災害時のリアルタイム気象状況・インフラ・地震・台風・キキクル（危険度分布）連動情報を一元管理します。")
 
-# ガイドセクション（削除されていた説明をしっかり修復・拡充）
+# ガイドセクション（操作方法をより明確に記載）
 st.markdown("""
 <div class="custom-card">
-    <b style="color: #38bdf8; font-size: 15px;">📱 2軸表示システム設計仕様のご案内</b><br><br>
+    <b style="color: #38bdf8; font-size: 15px;">📱 2軸表示システム設計仕様 & 操作ガイドのご案内</b><br><br>
     <b style="color: #60a5fa; font-size: 13px;">🎯 1. 警報とキキクルの独立同時表示（2軸並列設計）</b><br>
     本システムでは、監視エリアを選択すると、<b style="color: #fde047;">「市区町村単位の気象庁警報・注意報ベース」</b>と、<br>
-    実況・解析に基づく<b style="color: #fde047;">「キキクル（危険度分布）の現象別リアルタイム評価」</b>の<span style="color: #38bdf8; font-weight: bold;">両方を同時に切り替え連動して表示</span>します。<br>
-    これにより、発表ベースの警報と実際の足元の危険度（キキクル）の双方を漏れなく確認できます。<br><br>
-    <b style="color: #60a5fa; font-size: 13px;">📱 2. スマートフォン等でのご利用時の注意</b><br>
+    実況・解析に基づく<b style="color: #fde047;">「キキクル（危険度分布）の現象別リアルタイム評価」</b>の<span style="color: #38bdf8; font-weight: bold;">両方を同時に切り替え連動して表示</span>します。<br><br>
+    <b style="color: #60a5fa; font-size: 13px;">🗺️ 2. 地図およびエリア連動の操作方法について</b><br>
+    上のセレクトボックスでエリアを選択するか、あるいは<b style="color: #fde047;">地図上の各地域や都道府県を選択・クリックしていただくことで、連動して下部の詳細な防災データや機器ステータスが切り替わります。</b>地図単体ではなく、選択操作によって地域ごとの詳細情報を確認できる仕様となっています。<br><br>
+    <b style="color: #60a5fa; font-size: 13px;">📱 3. スマートフォン等でのご利用時の注意</b><br>
     端末を「横向き」にしていただくと、地図および各詳細データやリンクがより一覧しやすくなります。ぜひお試しください。
 </div>
 """, unsafe_allow_html=True)
@@ -415,6 +416,7 @@ st.markdown("---")
 # 地図表示セクション
 reg_info = REGION_CODES.get(selected_region, REGION_CODES["関東"])
 st.markdown(f"### 🗺️ {selected_region}エリアの中心地図（中心：{reg_info['center_name']}）")
+st.markdown("<p style='font-size:12px; color:#94a3b8; margin-top:-8px;'>※地図上のピンや都道府県を選択すると、下部の管内都道府県別ステータス等の詳細データが連動して表示されます。</p>", unsafe_allow_html=True)
 m = folium.Map(location=[reg_info["lat"], reg_info["lon"]], zoom_start=7, tiles="OpenStreetMap")
 folium.Marker([reg_info["lat"], reg_info["lon"]], popup=selected_region, icon=folium.Icon(color="red", icon="info-sign")).add_to(m)
 st_folium(m, width="100%", height=300, key=f"map_{selected_region}")
