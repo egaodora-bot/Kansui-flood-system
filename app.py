@@ -12,6 +12,30 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+# スタイリッシュなデザインを適用するためのカスタムCSS
+st.markdown("""
+<style>
+    .main-title {
+        color: #60a5fa;
+        font-weight: 700;
+        font-size: 2.2rem;
+        margin-bottom: 0px;
+    }
+    .section-header {
+        color: #38bdf8;
+        font-weight: 600;
+        border-bottom: 2px solid #38bdf8;
+        padding-bottom: 5px;
+        margin-top: 20px;
+        margin-bottom: 10px;
+    }
+    .sub-heading {
+        color: #818cf8;
+        font-weight: bold;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 REGION_CODES = {
     "北海道": {"code": "016000", "lat": 43.0642, "lon": 141.3469, "center_name": "札幌（北海道中心）"},
     "東北": {"code": "040000", "lat": 38.2688, "lon": 140.8721, "center_name": "仙台（東北中心）"},
@@ -239,20 +263,20 @@ def fetch_region_prefecture_weather(region_name):
     return results
 
 # 画面描画
-st.title("🛡️ 気象防災カルテ・インフラリアルリンクシステム")
+st.markdown('<p class="main-title">🛡️ 気象防災カルテ・インフラリアルリンクシステム</p>', unsafe_allow_html=True)
 st.markdown("災害時のリアルタイム気象状況・インフラ・地震・台風・キキクル（危険度分布）連動情報を一元管理します。")
 
-# 操作ガイド（HTMLタグを廃止し、標準の st.info や Markdown を使用）
+# 操作ガイド
 with st.container():
     st.info("📱 **2軸表示システム設計仕様 & 操作ガイドのご案内**")
     st.markdown("""
-    * **1. 警報とキキクルの独立同時表示（2軸並列設計）**  
+    * <span style="color: #60a5fa; font-weight: bold;">1. 警報とキキクルの独立同時表示（2軸並列設計）</span><br>
       監視エリアを選択すると、「市区町村単位の気象庁警報・注意報ベース」と、実況・解析に基づく「キキクル（危険度分布）の現象別リアルタイム評価」の両方を同時に切り替え連動して表示します。
-    * **2. 地図およびエリア連動の操作方法について**  
+    * <span style="color: #60a5fa; font-weight: bold;">2. 地図およびエリア連動の操作方法について</span><br>
       上のセレクトボックスでエリアを選択するか、あるいは地図上の各地域や都道府県を選択・クリックしていただくことで、連動して下部の詳細な防災データや機器ステータスが切り替わります。
-    * **3. スマートフォン等でのご利用時の注意**  
+    * <span style="color: #60a5fa; font-weight: bold;">3. スマートフォン等でのご利用時の注意</span><br>
       端末を「横向き」にしていただくと、地図および各詳細データやリンクがより一覧しやすくなります。ぜひお試しください。
-    """)
+    """, unsafe_allow_html=True)
 
 st.markdown("---")
 
@@ -314,11 +338,11 @@ with col_axis2:
 with st.container(border=True):
     st.markdown("**💡 警戒レベルおよびキキクルの色別の意味（共通凡例）：**")
     st.markdown("""
-    * **紫 (レベル5):** 命の危険・緊急安全確保
-    * **赤 (Level4):** 極めて危険・避難指示
-    * **黄 (Level3):** 警戒・高齢者等避難
-    * **青/白:** 注意・安全
-    """)
+    * <span style="color: #c084fc; font-weight: bold;">紫 (レベル5):</span> 命の危険・緊急安全確保
+    * <span style="color: #f87171; font-weight: bold;">赤 (Level4):</span> 極めて危険・避難指示
+    * <span style="color: #fbbf24; font-weight: bold;">黄 (Level3):</span> 警戒・高齢者等避難
+    * <span style="color: #38bdf8; font-weight: bold;">青/白:</span> 注意・安全
+    """, unsafe_allow_html=True)
 
 st.markdown("---")
 
