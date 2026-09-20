@@ -12,32 +12,32 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# タイトルは大きく、途中のカテゴリ見出し（h2/h3）は大きすぎずすっきりと収まるようにCSSを調整
+# タイトルは控えめにしつつ、キキクルなどの小見出しや本文が小さくなりすぎないようバランスを調整
 st.markdown("""
 <style>
-    /* タイトルは大きく目立たせる */
+    /* メインタイトルを小さめに調整 */
     .custom-main-title {
-        font-size: 32px;
+        font-size: 20px;
         font-weight: bold;
         color: #ffffff;
         margin-bottom: 0px;
     }
     .custom-sub-title {
-        font-size: 14px;
+        font-size: 13px;
         color: #cbd5e1;
-        margin-top: 4px;
-        margin-bottom: 15px;
+        margin-top: 2px;
+        margin-bottom: 10px;
     }
     
-    /* 途中のカテゴリ見出し（h2, h3）のサイズを適切に小さく調整 */
+    /* 途中のセクション見出しが小さくなりすぎないよう適切なサイズを確保 */
     h2 {
-        font-size: 19px !important;
+        font-size: 18px !important;
         font-weight: bold;
         margin-top: 1rem;
         margin-bottom: 0.5rem;
     }
     h3 {
-        font-size: 16px !important;
+        font-size: 15px !important;
         font-weight: bold;
         margin-top: 0.8rem;
         margin-bottom: 0.4rem;
@@ -47,8 +47,8 @@ st.markdown("""
     .guide-box-blue {
         border-left: 4px solid #60a5fa;
         background-color: rgba(96, 165, 250, 0.08);
-        padding: 12px 16px;
-        margin-bottom: 10px;
+        padding: 10px 14px;
+        margin-bottom: 8px;
         border-radius: 0 4px 4px 0;
     }
     .guide-title {
@@ -60,7 +60,7 @@ st.markdown("""
     .guide-text {
         font-size: 13px;
         color: #e2e8f0;
-        line-height: 1.6;
+        line-height: 1.5;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -291,7 +291,7 @@ def fetch_region_prefecture_weather(region_name):
             results.append({"prefecture": prefecture, "weather": "取得できず", "comment": "通信エラー", "max_temp": "--"})
     return results
 
-# 画面描画（大きめのタイトル ＆ サブタイトル）
+# 画面描画（小さめのタイトル ＆ サブタイトル）
 st.markdown('<p class="custom-main-title">🛡️ 気象防災カルテ・インフラリアルリンクシステム</p>', unsafe_allow_html=True)
 st.markdown('<p class="custom-sub-title">災害時のリアルタイム気象状況・インフラ・地震・台風・キキクル（危険度分布）連動情報を一元管理します。</p>', unsafe_allow_html=True)
 
