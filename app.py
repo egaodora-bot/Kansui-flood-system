@@ -291,11 +291,11 @@ def fetch_region_prefecture_weather(region_name):
             results.append({"prefecture": prefecture, "weather": "取得できず", "comment": "通信エラー", "max_temp": "--"})
     return results
 
-# 画面描画（タイトルを適度な大きさに調整）
+# 画面描画
 st.markdown('<p class="custom-main-title">🛡️ 気象防災カルテ・インフラリアルリンクシステム</p>', unsafe_allow_html=True)
 st.markdown('<p class="custom-sub-title">災害時のリアルタイム気象状況・インフラ・地震・台風・キキクル（危険度分布）連動情報を一元管理します。</p>', unsafe_allow_html=True)
 
-# 操作ガイド（折りたたみ表示 ＆ 左側の青色アクセントライン）
+# 操作ガイド
 with st.expander("📖 2軸表示システム設計仕様 & 操作ガイドのご案内", expanded=True):
     st.markdown("""
     <div class="guide-box-blue">
@@ -356,7 +356,7 @@ with col_axis1:
         for line in warning_texts:
             st.markdown(line)
 
-# 軸2：キキクル（危険度分布）の連動エリア評価
+# 軸2：キキクル（危険度分布）の連動エリア評価（アイコンを赤色に統一）
 with col_axis2:
     st.markdown("### 🔴 2. キキクル危険度")
     st.caption("メッシュ・実況解析ベース（現象別）")
@@ -367,9 +367,10 @@ with col_axis2:
         st.markdown("※リンクを開いた後、**地図上の都道府県や地域をクリックして詳細なレベル内容をご確認ください**。")
         st.markdown(f"**{selected_region}のキキクル実況確認：**")
         
+        # すべて赤色の丸（🔴）に統一してレベルと誤認するのを防止
         st.markdown("[🔴 土砂キキクル（土砂災害）を開く](https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=warning)")
-        st.markdown("[🔵 浸水キキクル（浸水害）を開く](https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=inundation)")
-        st.markdown("[🟢 洪水キキクル（洪水災害）を開く](https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=flood)")
+        st.markdown("[🔴 浸水キキクル（浸水害）を開く](https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=inundation)")
+        st.markdown("[🔴 洪水キキクル（洪水災害）を開く](https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=flood)")
 
 # 共通凡例ガイド
 with st.container(border=True):
