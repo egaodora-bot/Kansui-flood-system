@@ -1,4 +1,9 @@
 import streamlit as st
+import folium
+from streamlit_folium import st_folium
+import urllib.request
+import json
+import re
 
 # ====================================================
 # 1. 統合判定・リスク管理ロジック（フェイルセーフ対応）
@@ -10,11 +15,11 @@ def get_integrated_safety_level(region_name: str):
     万が一のエラー時もアプリが落ちないようtry-exceptで完全保護します。
     """
     level = 0
-    is_kikikuru_triggered = experimental_kikikuru_triggered = False
+    is_kikikuru_triggered = False
     
     # --- 通常の一般警報データの取得・判定処理 ---
     try:
-        # ※ここに既存の一般警報取得ロジックが入ります
+        # ※ここに一般警報取得ロジック（JMA API等）が入ります
         general_warning_detected = False  # サンプル用の初期値
         
         if general_warning_detected:
@@ -41,14 +46,16 @@ def get_integrated_safety_level(region_name: str):
 
 
 # ====================================================
-# 2. 画面レイアウト・描画部分 (UI)
+# 2. メイン処理・画面レイアウト (UI)
 # ====================================================
 def main():
+    # ページ全体の設定
     st.set_page_config(page_title="運行規制・キキクルリアル状況", layout="wide")
     
+    # タイトル表示
     st.title("鉄道・道路インフラの運行規制・キキクル・放射線リアル状況")
 
-    # 【UI改善】青枠＋赤系文字のカスタムボタン（別タブで詳細キキクルへ遷移）
+    # 【UI】青枠＋赤系文字のカスタムボタン（別タブで詳細キキクルへ遷移）
     st.markdown("""
     <div style="margin: 15px 0;">
         <button onclick="window.open('https://www.jma.go.jp/bosai/map.html', '_blank')" 
@@ -65,6 +72,7 @@ def main():
     # 統合レベルおよびキキクル検知フラグの取得
     current_level, kikikuru_triggered = get_integrated_safety_level(region)
 
+    # サブタイトルと判定結果の表示
     st.subheader(f"⚠️ {region}エリアの緊急警戒レベル（レベル3〜5・キキクル統合判定）")
 
     # 状態に応じたアラート・メッセージの切り替え表示
@@ -86,6 +94,17 @@ def main():
             st.warning(f"⚠️ 対象エリアに緊急警戒レベル（レベル{current_level}）の警戒情報が検出されています。")
     else:
         st.info(f"🟢 現在、{region}エリアに緊急警戒レベル（レベル3〜5）の発表およびキキクル安全側シフトの発表はありません。")
+
+    # ----------------------------------------------------
+    # 3. マップ表示エリア（Folium連携）
+    # ----------------------------------------------------
+    st.markdown("### 🗺️ リアルタイム位置・インフラ状況マップ")
+    
+    # サンプルとして関東周辺を中心にしたFoliumマップを生成
+    m = folium.Map(location=[36.0, 139.5], zoom_start=8, tiles="CartoDB dark_matter")
+    
+    # マップの描画
+    st_folium(m, width="100%", height=400)
 
 if __name__ == "__main__":
     main()
