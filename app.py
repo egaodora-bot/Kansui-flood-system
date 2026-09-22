@@ -12,20 +12,20 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# スタイルの定義（リンクボタンの幅統一・左寄せ・明るい青/緑の枠線デザイン）
+# スタイルの定義（ライトテーマでも文字がはっきりと見えるようにコントラストを調整）
 st.markdown("""
 <style>
     /* メインタイトル */
     .custom-main-title {
         font-size: 22px !important;
         font-weight: bold;
-        color: #ffffff;
+        color: #1e293b;
         margin-bottom: 0px;
         margin-top: 0px;
     }
     .custom-sub-title {
         font-size: 14px;
-        color: #94a3b8;
+        color: #64748b;
         margin-top: 2px;
         margin-bottom: 12px;
     }
@@ -34,17 +34,18 @@ st.markdown("""
     .custom-region-label {
         font-size: 18px;
         font-weight: bold;
-        color: #ef4444;
+        color: #dc2626;
         margin-bottom: 6px;
     }
 
-    /* セレクトボックス全体を最初から目立つ薄赤の背景色＆角丸で強調 */
+    /* セレクトボックス全体を薄赤の背景色＆角丸で強調 */
     div.stSelectbox > div > div {
-        background-color: rgba(239, 68, 68, 0.25) !important;
+        background-color: rgba(239, 68, 68, 0.12) !important;
+        border: 1px solid #ef4444 !important;
         border-radius: 8px !important;
     }
     div.stSelectbox div[data-baseweb="select"] span {
-        color: #ffffff !important;
+        color: #1e293b !important;
         font-weight: bold;
     }
 
@@ -52,13 +53,13 @@ st.markdown("""
     .custom-guide-title-red {
         font-size: 15px;
         font-weight: bold;
-        color: #ef4444;
+        color: #dc2626;
         margin-bottom: 4px;
     }
 
     /* 青文字の注意書き用スタイル */
     .custom-blue-text {
-        color: #38bdf8;
+        color: #0284c7;
         font-weight: bold;
     }
 
@@ -67,10 +68,11 @@ st.markdown("""
         font-size: 20px;
         font-weight: bold;
         text-decoration: underline;
-        text-decoration-color: #38bdf8;
+        text-decoration-color: #0284c7;
         text-underline-offset: 6px;
         margin-top: 1rem;
         margin-bottom: 0.5rem;
+        color: #1e293b;
     }
     
     h2 {
@@ -78,24 +80,29 @@ st.markdown("""
         font-weight: bold;
         margin-top: 1.2rem;
         margin-bottom: 0.6rem;
+        color: #1e293b !important;
     }
     h3 {
         font-size: 18px !important;
         font-weight: bold;
         margin-top: 1rem;
         margin-bottom: 0.5rem;
+        color: #1e293b !important;
+    }
+    h4 {
+        color: #1e293b !important;
     }
 
     .guide-box-blue {
-        border-left: 4px solid #60a5fa;
-        background-color: rgba(96, 165, 250, 0.08);
+        border-left: 4px solid #3b82f6;
+        background-color: rgba(59, 130, 246, 0.06);
         padding: 12px 16px;
         margin-bottom: 10px;
         border-radius: 0 4px 4px 0;
     }
     .guide-text {
         font-size: 13px;
-        color: #e2e8f0;
+        color: #334155;
         line-height: 1.6;
     }
 
@@ -104,20 +111,20 @@ st.markdown("""
         border: 2px solid #3b82f6;
         padding: 16px;
         border-radius: 8px;
-        background-color: rgba(59, 130, 246, 0.03);
+        background-color: rgba(59, 130, 246, 0.02);
         margin-bottom: 10px;
-        color: #e2e8f0;
+        color: #1e293b;
     }
     .box-green-border {
         border: 2px solid #10b981;
         padding: 16px;
         border-radius: 8px;
-        background-color: rgba(16, 185, 129, 0.03);
+        background-color: rgba(16, 185, 129, 0.02);
         margin-bottom: 10px;
-        color: #e2e8f0;
+        color: #1e293b;
     }
 
-    /* クイックリンクボタンを同じ幅に固定し、明るい青・緑の枠線で左寄せ表示 */
+    /* クイックリンクボタンのスタイル調整 */
     .stLinkButton > a {
         width: 100% !important;
         text-align: center !important;
@@ -126,25 +133,23 @@ st.markdown("""
         padding: 10px 14px !important;
         box-sizing: border-box !important;
     }
-    /* 交通関係リンクのボタン（明るい青枠） */
     .traffic-link-section .stLinkButton > a {
-        border: 2px solid #38bdf8 !important;
-        background-color: rgba(56, 189, 248, 0.06) !important;
-        color: #38bdf8 !important;
+        border: 2px solid #0284c7 !important;
+        background-color: rgba(2, 132, 199, 0.05) !important;
+        color: #0369a1 !important;
     }
     .traffic-link-section .stLinkButton > a:hover {
-        background-color: rgba(56, 189, 248, 0.2) !important;
-        color: #ffffff !important;
+        background-color: rgba(2, 132, 199, 0.15) !important;
+        color: #0f172a !important;
     }
-    /* 天気・防災関係リンクのボタン（明るい緑枠） */
     .weather-link-section .stLinkButton > a {
-        border: 2px solid #34d399 !important;
-        background-color: rgba(52, 211, 153, 0.06) !important;
-        color: #34d399 !important;
+        border: 2px solid #059669 !important;
+        background-color: rgba(5, 150, 105, 0.05) !important;
+        color: #047857 !important;
     }
     .weather-link-section .stLinkButton > a:hover {
-        background-color: rgba(52, 211, 153, 0.2) !important;
-        color: #ffffff !important;
+        background-color: rgba(5, 150, 105, 0.15) !important;
+        color: #0f172a !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -398,7 +403,7 @@ with st.expander("📖 2軸表示システム設計仕様 & 操作ガイドの�
     </div>
     """, unsafe_allow_html=True)
 
-# クイックリンク（説明書きのすぐ下に配置・左寄せ & 4列構成で同じ幅に均等配置）
+# クイックリンク（説明書きのすぐ下に配置・交通と天気防災を区分）
 st.markdown("### 🚀 クイックリンク（外部サービス）")
 st.caption("主要な交通運行状況、天気予報、および防災・放射線情報のリアルタイム確認にご活用ください。")
 
@@ -414,7 +419,7 @@ with st.container():
     with col_t3:
         st.link_button("🚄 JR運行情報 (各社)", "https://www.jreast.co.jp/unko/", use_container_width=True)
     with col_t4:
-        st.empty() # 4列バランス調整用
+        st.empty()
     st.markdown('</div>', unsafe_allow_html=True)
 
 # 天気・防災関係リンク
@@ -439,7 +444,7 @@ with st.container():
     with col_w7:
         st.link_button("☢️ 放射線モニタリング(RAMIS)", "https://www.ramis.nra.go.jp/", use_container_width=True)
     with col_w8:
-        st.empty() # 4列バランス調整用
+        st.empty()
     st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown("---")
@@ -498,9 +503,9 @@ with col_axis2:
         <p style='margin: 0 0 8px 0;'>選択したエリアにおける大雨時の災害発生危険度をメッシュ単位で評価した気象庁の危険度分布です。</p>
         <p style='margin: 0 0 8px 0;'><span class="custom-blue-text">※リンクを開いた後、地図上の都道府県や地域をクリックして詳細なレベル内容をご確認ください。</span></p>
         <p style='margin: 0 0 8px 0;'><b>{selected_region}のキキクル実況確認：</b></p>
-        <p style='margin: 4px 0;'><a href="https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=warning" target="_blank" style="color: #38bdf8;">🔴 土砂キキクル（土砂災害）を開く</a></p>
-        <p style='margin: 4px 0;'><a href="https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=inundation" target="_blank" style="color: #38bdf8;">🔴 浸水キキクル（浸水害）を開く</a></p>
-        <p style='margin: 4px 0;'><a href="https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=flood" target="_blank" style="color: #38bdf8;">🔴 洪水キキクル（洪水災害）を開く</a></p>
+        <p style='margin: 4px 0;'><a href="https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=warning" target="_blank" style="color: #0284c7;">🔴 土砂キキクル（土砂災害）を開く</a></p>
+        <p style='margin: 4px 0;'><a href="https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=inundation" target="_blank" style="color: #0284c7;">🔴 浸水キキクル（浸水害）を開く</a></p>
+        <p style='margin: 4px 0;'><a href="https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=flood" target="_blank" style="color: #0284c7;">🔴 洪水キキクル（洪水災害）を開く</a></p>
     </div>
     """
     st.markdown(box2_html, unsafe_allow_html=True)
@@ -578,7 +583,7 @@ with st.container(border=True):
 st.markdown("---")
 st.markdown(
     """
-    <div style="text-align: center; color: #94a3b8; font-size: 12px; padding: 10px 0;">
+    <div style="text-align: center; color: #64748b; font-size: 12px; padding: 10px 0;">
         <p style="margin: 0;"><b>💻 システム開発・運営:</b> 気象防災カルテ・インフラリアルリンクシステム開発プロジェクトチーム</p>
         <p style="margin: 4px 0 0 0;">© 2026 Meteorological Disaster Prevention & Infrastructure Real-Link System. All Rights Reserved.</p>
     </div>
