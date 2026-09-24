@@ -390,22 +390,22 @@ with st.expander("📖 2軸表示システム設計仕様 & 操作ガイドの�
 st.markdown("### 🚀 クイックリンク（外部サービス）")
 st.caption("主要な交通運行状況、天気予報、および防災・放射線情報のリアルタイム確認にご活用ください。")
 
-# 交通関係リンク
+# 交通関係リンク（正しいURLに修正）
 st.markdown("#### 🚆 交通関係リンク")
 with st.container():
     st.markdown('<div class="traffic-link-section">', unsafe_allow_html=True)
     col_t1, col_t2, col_t3, col_t4 = st.columns(4)
     with col_t1:
-        st.link_button("🚆 ジョルダン 運行情報", "https://www.jorudan.co.jp/unkou/", use_container_width=True)
+        st.link_button("🚆 ジョルダン 運行情報", "https://www.jorudan.co.jp/unkou/train_chubu.html", use_container_width=True)
     with col_t2:
         st.link_button("🚗 JARTIC 道路交通情報", "https://www.jartic.or.jp/", use_container_width=True)
     with col_t3:
-        st.link_button("🚄 JR運行情報 (各社)", "https://www.jreast.co.jp/unko/", use_container_width=True)
+        st.link_button("🚄 JR東日本 列車運行情報", "https://traininfo.jreast.co.jp/train_info/line.aspx?gid=1", use_container_width=True)
     with col_t4:
         st.empty()
     st.markdown('</div>', unsafe_allow_html=True)
 
-# 天気・防災関係リンク
+# 天気・防災関係リンク（正しいURLに修正）
 st.markdown("#### 🌤️ 天気・防災関係リンク")
 with st.container():
     st.markdown('<div class="weather-link-section">', unsafe_allow_html=True)
@@ -413,11 +413,11 @@ with st.container():
     with col_w1:
         st.link_button("☀️ ウェザーニュース", "https://weathernews.jp/", use_container_width=True)
     with col_w2:
-        st.link_button("🌐 Yahoo! 天気・災害", "https://weather.yahoo.co.jp/", use_container_width=True)
+        st.link_button("🌐 Yahoo! 天気・災害", "https://weather.yahoo.co.jp/weather/", use_container_width=True)
     with col_w3:
         st.link_button("🌧️ Yahoo! 雨雲レーダー", "https://weather.yahoo.co.jp/weather/zoomradar/", use_container_width=True)
     with col_w4:
-        st.link_button("🌀 気象庁 台風情報", "https://www.jma.go.jp/bosai/multi/cyclone/index.html?lang=jp", use_container_width=True)
+        st.link_button("🌀 気象庁 台風情報", "https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=typhoon", use_container_width=True)
 
     col_w5, col_w6, col_w7, col_w8 = st.columns(4)
     with col_w5:
