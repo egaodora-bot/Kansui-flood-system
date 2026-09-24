@@ -390,13 +390,13 @@ with st.expander("📖 2軸表示システム設計仕様 & 操作ガイドの�
 st.markdown("### 🚀 クイックリンク（外部サービス）")
 st.caption("主要な交通運行状況、天気予報、および防災・放射線情報のリアルタイム確認にご活用ください。")
 
-# 交通関係リンク（修正済み公式URL）
+# 交通関係リンク（ジョルダンの正しい運行情報URLに修正）
 st.markdown("#### 🚆 交通関係リンク")
 with st.container():
     st.markdown('<div class="traffic-link-section">', unsafe_allow_html=True)
     col_t1, col_t2, col_t3, col_t4 = st.columns(4)
     with col_t1:
-        st.link_button("🚆 ジョルダン 運行情報", "https://www.jorudan.co.jp/unkou/", use_container_width=True)
+        st.link_button("🚆 ジョルダン 運行情報", "https://www.jorudan.co.jp/unk/", use_container_width=True)
     with col_t2:
         st.link_button("🚗 JARTIC 道路交通情報", "https://www.jartic.or.jp/", use_container_width=True)
     with col_t3:
@@ -405,7 +405,7 @@ with st.container():
         st.empty()
     st.markdown('</div>', unsafe_allow_html=True)
 
-# 天気・防災関係リンク（修正済み公式URL）
+# 天気・防災関係リンク
 st.markdown("#### 🌤️ 天気・防災関係リンク")
 with st.container():
     st.markdown('<div class="weather-link-section">', unsafe_allow_html=True)
