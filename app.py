@@ -12,20 +12,18 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# スタイルの定義（ライトテーマでも文字がはっきりと見えるようにコントラストを調整）
+# スタイルの定義（ライト・ダークどちらのモードでも文字や枠線がくっきり見えるように調整）
 st.markdown("""
 <style>
     /* メインタイトル */
     .custom-main-title {
         font-size: 22px !important;
         font-weight: bold;
-        color: #1e293b;
         margin-bottom: 0px;
         margin-top: 0px;
     }
     .custom-sub-title {
         font-size: 14px;
-        color: #64748b;
         margin-top: 2px;
         margin-bottom: 12px;
     }
@@ -34,32 +32,28 @@ st.markdown("""
     .custom-region-label {
         font-size: 18px;
         font-weight: bold;
-        color: #dc2626;
+        color: #ef4444;
         margin-bottom: 6px;
     }
 
     /* セレクトボックス全体を薄赤の背景色＆角丸で強調 */
     div.stSelectbox > div > div {
-        background-color: rgba(239, 68, 68, 0.12) !important;
-        border: 1px solid #ef4444 !important;
+        background-color: rgba(239, 68, 68, 0.15) !important;
+        border: 2px solid #ef4444 !important;
         border-radius: 8px !important;
-    }
-    div.stSelectbox div[data-baseweb="select"] span {
-        color: #1e293b !important;
-        font-weight: bold;
     }
 
     /* ガイドタイトルの赤文字 */
     .custom-guide-title-red {
         font-size: 15px;
         font-weight: bold;
-        color: #dc2626;
+        color: #ef4444;
         margin-bottom: 4px;
     }
 
     /* 青文字の注意書き用スタイル */
     .custom-blue-text {
-        color: #0284c7;
+        color: #38bdf8;
         font-weight: bold;
     }
 
@@ -68,11 +62,10 @@ st.markdown("""
         font-size: 20px;
         font-weight: bold;
         text-decoration: underline;
-        text-decoration-color: #0284c7;
+        text-decoration-color: #38bdf8;
         text-underline-offset: 6px;
         margin-top: 1rem;
         margin-bottom: 0.5rem;
-        color: #1e293b;
     }
     
     h2 {
@@ -80,29 +73,23 @@ st.markdown("""
         font-weight: bold;
         margin-top: 1.2rem;
         margin-bottom: 0.6rem;
-        color: #1e293b !important;
     }
     h3 {
         font-size: 18px !important;
         font-weight: bold;
         margin-top: 1rem;
         margin-bottom: 0.5rem;
-        color: #1e293b !important;
-    }
-    h4 {
-        color: #1e293b !important;
     }
 
     .guide-box-blue {
-        border-left: 4px solid #3b82f6;
-        background-color: rgba(59, 130, 246, 0.06);
+        border-left: 4px solid #60a5fa;
+        background-color: rgba(96, 165, 250, 0.12);
         padding: 12px 16px;
         margin-bottom: 10px;
         border-radius: 0 4px 4px 0;
     }
     .guide-text {
         font-size: 13px;
-        color: #334155;
         line-height: 1.6;
     }
 
@@ -111,17 +98,15 @@ st.markdown("""
         border: 2px solid #3b82f6;
         padding: 16px;
         border-radius: 8px;
-        background-color: rgba(59, 130, 246, 0.02);
+        background-color: rgba(59, 130, 246, 0.05);
         margin-bottom: 10px;
-        color: #1e293b;
     }
     .box-green-border {
         border: 2px solid #10b981;
         padding: 16px;
         border-radius: 8px;
-        background-color: rgba(16, 185, 129, 0.02);
+        background-color: rgba(16, 185, 129, 0.05);
         margin-bottom: 10px;
-        color: #1e293b;
     }
 
     /* クイックリンクボタンのスタイル調整 */
@@ -134,22 +119,20 @@ st.markdown("""
         box-sizing: border-box !important;
     }
     .traffic-link-section .stLinkButton > a {
-        border: 2px solid #0284c7 !important;
-        background-color: rgba(2, 132, 199, 0.05) !important;
-        color: #0369a1 !important;
+        border: 2px solid #38bdf8 !important;
+        background-color: rgba(56, 189, 248, 0.1) !important;
+        color: #38bdf8 !important;
     }
     .traffic-link-section .stLinkButton > a:hover {
-        background-color: rgba(2, 132, 199, 0.15) !important;
-        color: #0f172a !important;
+        background-color: rgba(56, 189, 248, 0.25) !important;
     }
     .weather-link-section .stLinkButton > a {
-        border: 2px solid #059669 !important;
-        background-color: rgba(5, 150, 105, 0.05) !important;
-        color: #047857 !important;
+        border: 2px solid #34d399 !important;
+        background-color: rgba(52, 211, 153, 0.1) !important;
+        color: #34d399 !important;
     }
     .weather-link-section .stLinkButton > a:hover {
-        background-color: rgba(5, 150, 105, 0.15) !important;
-        color: #0f172a !important;
+        background-color: rgba(52, 211, 153, 0.25) !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -503,9 +486,9 @@ with col_axis2:
         <p style='margin: 0 0 8px 0;'>選択したエリアにおける大雨時の災害発生危険度をメッシュ単位で評価した気象庁の危険度分布です。</p>
         <p style='margin: 0 0 8px 0;'><span class="custom-blue-text">※リンクを開いた後、地図上の都道府県や地域をクリックして詳細なレベル内容をご確認ください。</span></p>
         <p style='margin: 0 0 8px 0;'><b>{selected_region}のキキクル実況確認：</b></p>
-        <p style='margin: 4px 0;'><a href="https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=warning" target="_blank" style="color: #0284c7;">🔴 土砂キキクル（土砂災害）を開く</a></p>
-        <p style='margin: 4px 0;'><a href="https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=inundation" target="_blank" style="color: #0284c7;">🔴 浸水キキクル（浸水害）を開く</a></p>
-        <p style='margin: 4px 0;'><a href="https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=flood" target="_blank" style="color: #0284c7;">🔴 洪水キキクル（洪水災害）を開く</a></p>
+        <p style='margin: 4px 0;'><a href="https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=warning" target="_blank" style="color: #38bdf8;">🔴 土砂キキクル（土砂災害）を開く</a></p>
+        <p style='margin: 4px 0;'><a href="https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=inundation" target="_blank" style="color: #38bdf8;">🔴 浸水キキクル（浸水害）を開く</a></p>
+        <p style='margin: 4px 0;'><a href="https://www.jma.go.jp/bosai/map.html#6/35.252/136.245/&elem=flood" target="_blank" style="color: #38bdf8;">🔴 洪水キキクル（洪水災害）を開く</a></p>
     </div>
     """
     st.markdown(box2_html, unsafe_allow_html=True)
@@ -561,12 +544,6 @@ for fc in w_data["forecasts"]: st.markdown(f"- {fc}")
 
 st.markdown("---")
 
-st.markdown(f"### 📋 {selected_region}管内 都道府県別ステータス")
-for pw in fetch_region_prefecture_weather(selected_region):
-    st.markdown(f"- **{pw['prefecture']}** (最高: {pw['max_temp']}°C) └ {pw['comment']}")
-
-st.markdown("---")
-
 # インフラ・防災リンク集
 with st.container(border=True):
     st.markdown("**🔗 インフラ・交通・防災・キキクル・放射線関連リンク集（公式リアルタイム情報）**")
@@ -583,7 +560,7 @@ with st.container(border=True):
 st.markdown("---")
 st.markdown(
     """
-    <div style="text-align: center; color: #64748b; font-size: 12px; padding: 10px 0;">
+    <div style="text-align: center; color: #94a3b8; font-size: 12px; padding: 10px 0;">
         <p style="margin: 0;"><b>💻 システム開発・運営:</b> 気象防災カルテ・インフラリアルリンクシステム開発プロジェクトチーム</p>
         <p style="margin: 4px 0 0 0;">© 2026 Meteorological Disaster Prevention & Infrastructure Real-Link System. All Rights Reserved.</p>
     </div>
