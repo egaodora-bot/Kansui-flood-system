@@ -497,9 +497,9 @@ with col_axis2:
 with st.container(border=True):
     st.markdown("**💡 警戒レベルおよびキキクルの色別の意味（共通凡例）：**")
     st.markdown("""
-    * **🟣 紫 (レベル5):** 命の危険・緊急安全確保
-    * **🔴 赤 (Level4):** 極めて危険・避難指示
-    * **🟡 黄 (Level3):** 警戒・高齢者等避難
+    * **🟣 紫 (Level 5):** 命の危険・緊急安全確保
+    * **🔴 赤 (Level 4):** 極めて危険・避難指示
+    * **🟡 黄 (Level 3):** 警戒・高齢者等避難
     * **🔵 青/白:** 注意・安全
     """)
 
@@ -541,6 +541,12 @@ st.markdown("---")
 # 気象解説
 st.markdown(f'<p class="custom-underline-title">📡 {selected_region}地方の気象解説 ({w_data["office"]})</p>', unsafe_allow_html=True)
 for fc in w_data["forecasts"]: st.markdown(f"- {fc}")
+
+st.markdown("---")
+
+st.markdown(f"### 📋 {selected_region}管内 都道府県別ステータス")
+for pw in fetch_region_prefecture_weather(selected_region):
+    st.markdown(f"- **{pw['prefecture']}** (最高: {pw['max_temp']}°C) └ {pw['comment']}")
 
 st.markdown("---")
 
