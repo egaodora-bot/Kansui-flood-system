@@ -12,10 +12,9 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# スタイルの定義（ライト・ダークどちらのモードでも文字や枠線がくっきり見えるように調整）
+# スタイルの定義
 st.markdown("""
 <style>
-    /* メインタイトル */
     .custom-main-title {
         font-size: 22px !important;
         font-weight: bold;
@@ -28,7 +27,6 @@ st.markdown("""
         margin-bottom: 12px;
     }
     
-    /* 監視エリア選択ラベルの赤文字 */
     .custom-region-label {
         font-size: 18px;
         font-weight: bold;
@@ -36,14 +34,12 @@ st.markdown("""
         margin-bottom: 6px;
     }
 
-    /* セレクトボックス全体を薄赤の背景色＆角丸で強調 */
     div.stSelectbox > div > div {
         background-color: rgba(239, 68, 68, 0.15) !important;
         border: 2px solid #ef4444 !important;
         border-radius: 8px !important;
     }
 
-    /* ガイドタイトルの赤文字 */
     .custom-guide-title-red {
         font-size: 15px;
         font-weight: bold;
@@ -51,13 +47,11 @@ st.markdown("""
         margin-bottom: 4px;
     }
 
-    /* 青文字の注意書き用スタイル */
     .custom-blue-text {
         color: #38bdf8;
         font-weight: bold;
     }
 
-    /* 地方気象解説タイトルの下線 */
     .custom-underline-title {
         font-size: 20px;
         font-weight: bold;
@@ -93,7 +87,6 @@ st.markdown("""
         line-height: 1.6;
     }
 
-    /* ダッシュボード等の枠線デザイン */
     .box-blue-border {
         border: 2px solid #3b82f6;
         padding: 16px;
@@ -108,8 +101,15 @@ st.markdown("""
         background-color: rgba(16, 185, 129, 0.05);
         margin-bottom: 10px;
     }
+    /* 緊急地震速報用アラートボックス */
+    .box-eew-alert {
+        border: 3px solid #ef4444;
+        padding: 16px;
+        border-radius: 8px;
+        background-color: rgba(239, 68, 68, 0.1);
+        margin-bottom: 15px;
+    }
 
-    /* クイックリンクボタンのスタイル調整 */
     .stLinkButton > a {
         width: 100% !important;
         text-align: center !important;
@@ -236,35 +236,46 @@ def fetch_jma_area_names():
     except Exception:
         return {}
 
-@st.cache_data(ttl=60)
-def fetch_jma_earthquake_info():
-    p2p_url = "https://api.p2pquake.net/v2/history?codes=551&limit=15"
+@st.cache_data(ttl=30)
+def fetch_p2p_earthquake_and_eew():
+    # 履歴コード 551(地震波及情報), 556(緊急地震速報) を同時に取得
+    p2p_url = "https://api.p2pquake.net/v2/history?codes=551,556&limit=10"
     try:
         req = urllib.request.Request(p2p_url, headers={'User-Agent': 'Mozilla/5.0'})
         with urllib.request.urlopen(req, timeout=5) as response:
             p2p_data = json.loads(response.read().decode('utf-8'))
         
-        if p2p_data and isinstance(p2p_data, list):
-            quake_list = []
-            p2p_scale_map = {
-                10: "震度1", 20: "震度2", 30: "震度3", 40: "震度4",
-                45: "震度5弱", 50: "震度5強", 55: "震度6弱", 60: "震度6強", 70: "震度7"
-            }
-            for item in p2p_data:
+        quakes = []
+        eew_alerts = []
+        p2p_scale_map = {
+            10: "震度1", 20: "震度2", 30: "震度3", 40: "震度4",
+            45: "震度5弱", 50: "震度5強", 55: "震度6弱", 60: "震度6強", 70: "震度7"
+        }
+        
+        for item in p2p_data:
+            code = item.get("code")
+            if code == 556:
+                # 緊急地震速報データ
+                eew_alerts.append({
+                    "time": item.get("time", "日時不明"),
+                    "canceled": item.get("cancelled", False),
+                    "message": item.get("issue", {}).get("type", "緊急地震速報発表")
+                })
+            elif code == 551:
                 eq = item.get("earthquake", {})
                 hypo = eq.get("hypocenter", {})
                 scale = eq.get("maxScale", -1)
-                quake_list.append({
+                quakes.append({
                     "time": eq.get("time", "日時不明"),
                     "hypocenter": hypo.get("name", "震源地不明"),
                     "max_scale": p2p_scale_map.get(scale, "不明"),
                     "magnitude": eq.get("magnitude", "--"),
                     "depth": hypo.get("depth", "--")
                 })
-            return {"success": True, "quakes": quake_list}
+        return {"success": True, "quakes": quakes, "eew": eew_alerts}
     except Exception:
         pass
-    return {"success": False, "quakes": []}
+    return {"success": False, "quakes": [], "eew": []}
 
 @st.cache_data(ttl=0)
 def fetch_jma_warning_level_areas_robust(region_name: str):
@@ -386,11 +397,10 @@ with st.expander("📖 2軸表示システム設計仕様 & 操作ガイドの�
     </div>
     """, unsafe_allow_html=True)
 
-# クイックリンク（説明書きのすぐ下に配置・交通と天気防災を区分）
+# クイックリンク
 st.markdown("### 🚀 クイックリンク（外部サービス）")
 st.caption("主要な交通運行状況、天気予報、および防災・放射線情報のリアルタイム確認にご活用ください。")
 
-# 交通関係リンク（ジョルダンの正しい運行情報URLに修正）
 st.markdown("#### 🚆 交通関係リンク")
 with st.container():
     st.markdown('<div class="traffic-link-section">', unsafe_allow_html=True)
@@ -400,12 +410,11 @@ with st.container():
     with col_t2:
         st.link_button("🚗 JARTIC 道路交通情報", "https://www.jartic.or.jp/", use_container_width=True)
     with col_t3:
-        st.link_button("🚄 JR東日本 列車運行情報", "https://www.jreast.co.jp/t_i/", use_container_width=True)
+        st.link_button("🚄 JR東日本 列車運行情報", "https://www.jreast.co.jp/", use_container_width=True)
     with col_t4:
         st.empty()
     st.markdown('</div>', unsafe_allow_html=True)
 
-# 天気・防災関係リンク
 st.markdown("#### 🌤️ 天気・防災関係リンク")
 with st.container():
     st.markdown('<div class="weather-link-section">', unsafe_allow_html=True)
@@ -432,7 +441,7 @@ with st.container():
 
 st.markdown("---")
 
-# 監視エリア選択のラベル ＆ 薄赤背景で常時目立たせたセレクトボックス
+# 監視エリア選択
 st.markdown('<p class="custom-region-label">🌍 監視エリアを選択してください（地域を切り替えると各データが連動します）</p>', unsafe_allow_html=True)
 selected_region = st.selectbox("", list(REGION_CODES.keys()), index=2, key="region_selector", label_visibility="collapsed")
 
@@ -444,7 +453,6 @@ st.markdown("警報レベルと危険度レベルの基準判定レベルが違�
 
 col_axis1, col_axis2 = st.columns(2, gap="medium")
 
-# 軸1：市区町村単位の気象庁 警戒レベル情報
 with col_axis1:
     st.markdown("### ⚠️ 1. 気象庁 警戒レベル")
     st.caption("市区町村ごとの警報・注意報ベース")
@@ -475,7 +483,6 @@ with col_axis1:
     box1_html += '</div>'
     st.markdown(box1_html, unsafe_allow_html=True)
 
-# 軸2：キキクル（危険度分布）の連動エリア評価
 with col_axis2:
     st.markdown("### 🔴 2. キキクル危険度")
     st.caption("メッシュ・実況解析ベース（現象別）")
@@ -493,7 +500,6 @@ with col_axis2:
     """
     st.markdown(box2_html, unsafe_allow_html=True)
 
-# 共通凡例ガイド
 with st.container(border=True):
     st.markdown("**💡 警戒レベルおよびキキクルの色別の意味（共通凡例）：**")
     st.markdown("""
@@ -505,7 +511,7 @@ with st.container(border=True):
 
 st.markdown("---")
 
-# 地図表示セクション
+# 地図表示
 reg_info = REGION_CODES.get(selected_region, REGION_CODES["関東"])
 st.markdown(f"### 🗺️ {selected_region}エリアの中心地図（中心：{reg_info['center_name']}）")
 st.caption("※地図上のピンや都道府県を選択すると、下部の管内都道府県別ステータス等の詳細データが連動して表示されます。")
@@ -515,9 +521,26 @@ st_folium(m, width="100%", height=300, key=f"map_{selected_region}")
 
 st.markdown("---")
 
-# 気象情報・地震セクション
-st.markdown("### 📳 直近の地震情報 ＆ 気象状況")
-eq_data = fetch_jma_earthquake_info()
+# 緊急地震速報 ＆ 地震情報セクション
+st.markdown("### 🚨 緊急地震速報 ＆ 直近の地震情報")
+
+eq_data = fetch_p2p_earthquake_and_eew()
+
+# 緊急地震速報（EEW）のアラート表示
+if eq_data["success"] and eq_data["eew"]:
+    latest_eew = eq_data["eew"][0]
+    eew_html = f"""
+    <div class="box-eew-alert">
+        <p style='margin: 0 0 4px 0; color: #ef4444; font-weight: bold; font-size: 16px;'>🚨 【緊急地震速報 検知】</p>
+        <p style='margin: 2px 0;'>発表日時: {latest_eew['time']}</p>
+        <p style='margin: 2px 0;'>状態: {'キャンセル報' if latest_eew['canceled'] else '速報発表中 (強い揺れに警戒してください)'}</p>
+    </div>
+    """
+    st.markdown(eew_html, unsafe_allow_html=True)
+else:
+    st.info("現在、緊急地震速報の発表はありません（常時監視中）。")
+
+# 直近の地震履歴
 if eq_data["success"] and eq_data["quakes"]:
     latest = eq_data["quakes"][0]
     with st.container(border=True):
@@ -528,8 +551,6 @@ if eq_data["success"] and eq_data["quakes"]:
         with col_e2:
             st.markdown(f"**発生日時:** {latest['time']}")
             st.markdown(f"**規模:** M{latest['magnitude']} / 深さ:{latest['depth']}km")
-else:
-    st.info("地震情報取得中...")
 
 c1, c2 = st.columns(2)
 w_data = fetch_jma_realtime_data(selected_region)
