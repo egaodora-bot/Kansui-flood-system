@@ -134,6 +134,14 @@ st.markdown("""
     .weather-link-section .stLinkButton > a:hover {
         background-color: rgba(52, 211, 153, 0.25) !important;
     }
+    .windy-link-section .stLinkButton > a {
+        border: 2px solid #f97316 !important;
+        background-color: rgba(249, 115, 22, 0.1) !important;
+        color: #f97316 !important;
+    }
+    .windy-link-section .stLinkButton > a:hover {
+        background-color: rgba(249, 115, 22, 0.25) !important;
+    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -238,7 +246,6 @@ def fetch_jma_area_names():
 
 @st.cache_data(ttl=30)
 def fetch_p2p_earthquake_and_eew():
-    # 履歴コード 551(地震波及情報), 556(緊急地震速報) を同時に取得
     p2p_url = "https://api.p2pquake.net/v2/history?codes=551,556&limit=10"
     try:
         req = urllib.request.Request(p2p_url, headers={'User-Agent': 'Mozilla/5.0'})
@@ -255,7 +262,6 @@ def fetch_p2p_earthquake_and_eew():
         for item in p2p_data:
             code = item.get("code")
             if code == 556:
-                # 緊急地震速報データ
                 eew_alerts.append({
                     "time": item.get("time", "日時不明"),
                     "canceled": item.get("cancelled", False),
@@ -376,7 +382,7 @@ def fetch_region_prefecture_weather(region_name):
 
 # メインタイトル
 st.markdown('<p class="custom-main-title">🛡️ 気象防災カルテ・インフラリアルリンクシステム</p>', unsafe_allow_html=True)
-st.markdown('<p class="custom-sub-title">災害時のリアルタイム気象状況・インフラ・地震・台風・キキクル（危険度分布）連動情報を一元管理します。</p>', unsafe_allow_html=True)
+st.markdown('<p class="custom-sub-title">災害時のリアルタイム気象状況・インフラ・地震・台風・Windyビジュアル・キキクル連動情報を一元管理します。</p>', unsafe_allow_html=True)
 
 # 操作ガイドの見出し
 with st.expander("📖 2軸表示システム設計仕様 & 操作ガイドのご案内", expanded=True):
@@ -413,6 +419,20 @@ with st.container():
         st.link_button("🚄 JR東日本 列車運行情報", "https://www.jreast.co.jp/", use_container_width=True)
     with col_t4:
         st.empty()
+    st.markdown('</div>', unsafe_allow_html=True)
+
+st.markdown("#### 🌍 Windy（高精度ビジュアル気象・台風）リンク")
+with st.container():
+    st.markdown('<div class="windy-link-section">', unsafe_allow_html=True)
+    col_wn1, col_wn2, col_wn3, col_wn4 = st.columns(4)
+    with col_wn1:
+        st.link_button("💨 Windy（風・気圧リアルタイム）", "https://www.windy.com/", use_container_width=True)
+    with col_wn2:
+        st.link_button("🌧️ Windy（雨量・雷レーダー）", "https://www.windy.com/-Rain-thunder-rain", use_container_width=True)
+    with col_wn3:
+        st.link_button("🌀 Windy（台風トラッカー）", "https://www.windy.com/-Typhoon-tracker", use_container_width=True)
+    with col_wn4:
+        st.link_button("🌡️ Windy（気温・湿度マップ）", "https://www.windy.com/-Temp-temperature", use_container_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown("#### 🌤️ 天気・防災関係リンク")
