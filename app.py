@@ -6,7 +6,7 @@ import json
 import re
 
 st.set_page_config(
-    page_title="気象防災カルテ・インフラリアルリンクシステム", 
+    page_title="冠水情報・防災監視システム", 
     page_icon="🛡️", 
     layout="wide",
     initial_sidebar_state="collapsed"
@@ -245,14 +245,14 @@ def fetch_jma_area_names():
 
 @st.cache_data(ttl=15)
 def fetch_p2p_earthquake_and_eew():
-    # 正しいクエリパラメータ「codes=551」と「limit=5」を指定して安全に取得
-    p2p_url = "https://api.p2pquake.net/v2/history?codes=551&limit=5"
+    p2p_url = "https://api.p2pquake.net/v2/history?codes=551&limit=15"
     try:
         req = urllib.request.Request(p2p_url, headers={'User-Agent': 'Mozilla/5.0'})
         with urllib.request.urlopen(req, timeout=5) as response:
             p2p_data = json.loads(response.read().decode('utf-8'))
         
         quakes = []
+        seen_keys = set()
         eew_alerts = []
         p2p_scale_map = {
             10: "震度1", 20: "震度2", 30: "震度3", 40: "震度4",
@@ -264,13 +264,27 @@ def fetch_p2p_earthquake_and_eew():
                 eq = item.get("earthquake", {})
                 hypo = eq.get("hypocenter", {})
                 scale = eq.get("maxScale", -1)
+                
+                time_str = eq.get("time", "日時不明")
+                hypo_name = hypo.get("name", "震源地不明")
+                
+                # 発生日時と震源地が一致するものを重複として除外
+                unique_key = (time_str, hypo_name)
+                if unique_key in seen_keys:
+                    continue
+                seen_keys.add(unique_key)
+                
                 quakes.append({
-                    "time": eq.get("time", "日時不明"),
-                    "hypocenter": hypo.get("name", "震源地不明"),
+                    "time": time_str,
+                    "hypocenter": hypo_name,
                     "max_scale": p2p_scale_map.get(scale, f"不明(scale:{scale})"),
                     "magnitude": eq.get("magnitude", "--"),
                     "depth": hypo.get("depth", "--")
                 })
+                
+                if len(quakes) >= 5:
+                    break
+                    
         return {"success": True, "quakes": quakes, "eew": eew_alerts}
     except Exception as e:
         return {"success": False, "quakes": [], "eew": [], "error": str(e)}
@@ -373,8 +387,8 @@ def fetch_region_prefecture_weather(region_name):
     return results
 
 # メインタイトル
-st.markdown('<p class="custom-main-title">🛡️ 気象防災カルテ・インフラリアルリンクシステム</p>', unsafe_allow_html=True)
-st.markdown('<p class="custom-sub-title">災害時のリアルタイム気象状況・インフラ・地震・台風・Windyビジュアル・キキクル連動情報を一元管理します。</p>', unsafe_allow_html=True)
+st.markdown('<p class="custom-main-title">🛡️ 冠水情報・防災監視システム</p>', unsafe_allow_html=True)
+st.markdown('<p class="custom-sub-title">地域の冠水状況およびリアルタイムの地震発生履歴を確認できます。</p>', unsafe_allow_html=True)
 
 with st.expander("📖 2軸表示システム設計仕様 & 操作ガイドのご案内", expanded=True):
     st.markdown("""
@@ -513,7 +527,7 @@ st_folium(m, width="100%", height=300, key=f"map_{selected_region}")
 st.markdown("---")
 
 # ==================== 地震情報 ＆ 緊急地震速報 セクション ====================
-st.markdown("### 🚨 緊急地震速報 ＆ 直近の地震情報")
+st.markdown("### 🚨 直近の地震発生履歴情報")
 
 eq_data = fetch_p2p_earthquake_and_eew()
 
@@ -527,20 +541,17 @@ if eq_data["success"] and eq_data["eew"]:
     </div>
     """
     st.markdown(eew_html, unsafe_allow_html=True)
-else:
-    st.info("現在、緊急地震速報の発表はありません（常時監視中）。")
 
 if eq_data["success"] and eq_data["quakes"]:
-    st.markdown("#### 📍 直近の地震活動履歴")
+    st.success(f"地震データを正常に取得しました (件数:{len(eq_data['quakes'])}件)")
     for idx, q in enumerate(eq_data["quakes"]):
         with st.container(border=True):
             col_eq1, col_eq2 = st.columns(2)
             with col_eq1:
-                st.markdown(f"**最大震度:** :red[**{q['max_scale']}**]")
                 st.markdown(f"**震源地:** {q['hypocenter']}")
+                st.markdown(f"🕒 発生日時: {q['time']} | マグニチュード(M): {q['magnitude']} | 深さ: {q['depth']}km")
             with col_eq2:
-                st.markdown(f"**発生日時:** {q['time']}")
-                st.markdown(f"**規模:** M{q['magnitude']} / 深さ: {q['depth']}km")
+                st.markdown(f"<div style='text-align: right;'><b>最大震度: <span style='color: #ef4444;'>{q['max_scale']}</span></b></div>", unsafe_allow_html=True)
 else:
     if not eq_data["success"]:
         st.info("ℹ️ 現在、地震情報サーバーからのデータ取得を待機中または平常時です。")
@@ -583,7 +594,7 @@ st.markdown("---")
 st.markdown(
     """
     <div style="text-align: center; color: #94a3b8; font-size: 12px; padding: 10px 0;">
-        <p style="margin: 0;"><b>💻 システム開発・運営:</b> 気象防災カルテ・インフラリアルリンクシステム開発プロジェクトチーム</p>
+        <p style="margin: 0;"><b>💻 システム開発・運営:</b> 冠水情報・防災監視システム開発プロジェクトチーム</p>
         <p style="margin: 4px 0 0 0;">© 2026 Meteorological Disaster Prevention & Infrastructure Real-Link System. All Rights Reserved.</p>
     </div>
     """,
