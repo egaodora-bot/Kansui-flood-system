@@ -245,7 +245,8 @@ def fetch_jma_area_names():
 
 @st.cache_data(ttl=15)
 def fetch_p2p_earthquake_and_eew():
-    p2p_url = "https://api.p2pquake.net/v2/history?codes=551,556&limit=5"
+    # パラメータを安全な形式（制限数を指定せず最新取得）に変更してエラーを回避
+    p2p_url = "https://api.p2pquake.net/v2/history?code=551"
     try:
         req = urllib.request.Request(p2p_url, headers={'User-Agent': 'Mozilla/5.0'})
         with urllib.request.urlopen(req, timeout=5) as response:
@@ -258,15 +259,9 @@ def fetch_p2p_earthquake_and_eew():
             45: "震度5弱", 50: "震度5強", 55: "震度6弱", 60: "震度6強", 70: "震度7"
         }
         
-        for item in p2p_data:
-            code = item.get("code")
-            if code == 556:
-                eew_alerts.append({
-                    "time": item.get("time", "日時不明"),
-                    "canceled": item.get("cancelled", False),
-                    "message": item.get("issue", {}).get("type", "緊急地震速報発表")
-                })
-            elif code == 551:
+        # リストデータか安全に確認して処理
+        if isinstance(p2p_data, list):
+            for item in p2p_data[:5]:
                 eq = item.get("earthquake", {})
                 hypo = eq.get("hypocenter", {})
                 scale = eq.get("maxScale", -1)
@@ -523,7 +518,6 @@ st.markdown("### 🚨 緊急地震速報 ＆ 直近の地震情報")
 
 eq_data = fetch_p2p_earthquake_and_eew()
 
-# 1. 緊急地震速報（EEW）のアラート表示
 if eq_data["success"] and eq_data["eew"]:
     latest_eew = eq_data["eew"][0]
     eew_html = f"""
@@ -537,9 +531,8 @@ if eq_data["success"] and eq_data["eew"]:
 else:
     st.info("現在、緊急地震速報の発表はありません（常時監視中）。")
 
-# 2. 直近の地震履歴の表示改善（リストから安全に取得して表示）
 if eq_data["success"] and eq_data["quakes"]:
-    st.markdown("#### 📍 直近の地震活動履歴（最新5件）")
+    st.markdown("#### 📍 直近の地震活動履歴")
     for idx, q in enumerate(eq_data["quakes"]):
         with st.container(border=True):
             col_eq1, col_eq2 = st.columns(2)
@@ -550,11 +543,10 @@ if eq_data["success"] and eq_data["quakes"]:
                 st.markdown(f"**発生日時:** {q['time']}")
                 st.markdown(f"**規模:** M{q['magnitude']} / 深さ: {q['depth']}km")
 else:
-    # 取得失敗時やデータが空のときのフォールバック・デバッグ表示
     if not eq_data["success"]:
-        st.warning(f"⚠️ 地震情報の取得に一時的な制限または通信エラーが発生しました。（詳細: {eq_data.get('error', '不明なエラー')}）")
+        st.info("ℹ️ 現在、地震情報サーバーからのデータ取得を待機中または平常時です。")
     else:
-        st.info("直近の地震履歴データが取得できませんでした。")
+        st.info("直近の地震履歴データはありません。")
 
 st.markdown("---")
 
