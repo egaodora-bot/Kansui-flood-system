@@ -23,10 +23,11 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- P2P地震情報APIからデータ取得（キャッシュ無効化・常に最新を取得） ---
+# --- P2P地震情報APIからデータ取得（パラメータ修正版） ---
 @st.cache_data(ttl=0)
 def fetch_p2p_earthquake_and_eew():
-    p2p_url = "https://api.p2pquake.net/v2/history?codes=551,556&limit=10"
+    # パラメータを修正（codesではなく、通常の履歴取得エンドポイントを利用）
+    p2p_url = "https://api.p2pquake.net/v2/history?limit=10"
     try:
         req = urllib.request.Request(p2p_url, headers={'User-Agent': 'Mozilla/5.0'})
         with urllib.request.urlopen(req, timeout=5) as response:
@@ -41,6 +42,7 @@ def fetch_p2p_earthquake_and_eew():
         
         for item in p2p_data:
             code = item.get("code")
+            # 556: 緊急地震速報, 551: 地震情報
             if code == 556:
                 eew_alerts.append({
                     "time": item.get("time", "日時不明"),
@@ -99,7 +101,7 @@ if eq_data["success"] and eq_data["quakes"]:
                 <span>📍 震源地: {eq['hypocenter']}</span>
                 <span style="color: {border_color};">最大震度: {eq['max_scale']}</span>
             </div>
-            <div style="font-size: 13px; color: #555;">
+            <div style="font-size: 13px; color: #cbd5e1;">
                 <span>🕒 発生日時: {eq['time']}</span> | 
                 <span>マグニチュード(M): {eq['magnitude']}</span> | 
                 <span>深さ: {eq['depth']}km</span>
