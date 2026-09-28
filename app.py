@@ -245,8 +245,8 @@ def fetch_jma_area_names():
 
 @st.cache_data(ttl=15)
 def fetch_p2p_earthquake_and_eew():
-    # パラメータを安全な形式（制限数を指定せず最新取得）に変更してエラーを回避
-    p2p_url = "https://api.p2pquake.net/v2/history?code=551"
+    # 正しいクエリパラメータ「codes=551」と「limit=5」を指定して安全に取得
+    p2p_url = "https://api.p2pquake.net/v2/history?codes=551&limit=5"
     try:
         req = urllib.request.Request(p2p_url, headers={'User-Agent': 'Mozilla/5.0'})
         with urllib.request.urlopen(req, timeout=5) as response:
@@ -259,9 +259,8 @@ def fetch_p2p_earthquake_and_eew():
             45: "震度5弱", 50: "震度5強", 55: "震度6弱", 60: "震度6強", 70: "震度7"
         }
         
-        # リストデータか安全に確認して処理
         if isinstance(p2p_data, list):
-            for item in p2p_data[:5]:
+            for item in p2p_data:
                 eq = item.get("earthquake", {})
                 hypo = eq.get("hypocenter", {})
                 scale = eq.get("maxScale", -1)
@@ -523,8 +522,8 @@ if eq_data["success"] and eq_data["eew"]:
     eew_html = f"""
     <div class="box-eew-alert">
         <p style='margin: 0 0 4px 0; color: #ef4444; font-weight: bold; font-size: 16px;'>🚨 【緊急地震速報 検知】</p>
-        <p style='margin: 2px 0;'>発表日時: {latest_eew['time']}</p>
-        <p style='margin: 2px 0;'>状態: {'キャンセル報' if latest_eew['cancelled'] else '速報発表中 (強い揺れに警戒してください)'}</p>
+        <p style='margin: 2px 0;'>発表日時: {latest_eew.get('time', '不明')}</p>
+        <p style='margin: 2px 0;'>状態: {'キャンセル報' if latest_eew.get('cancelled') else '速報発表中 (強い揺れに警戒してください)'}</p>
     </div>
     """
     st.markdown(eew_html, unsafe_allow_html=True)
