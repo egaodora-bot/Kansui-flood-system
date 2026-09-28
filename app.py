@@ -101,7 +101,6 @@ st.markdown("""
         background-color: rgba(16, 185, 129, 0.05);
         margin-bottom: 10px;
     }
-    /* 緊急地震速報用アラートボックス */
     .box-eew-alert {
         border: 3px solid #ef4444;
         padding: 16px;
@@ -244,9 +243,9 @@ def fetch_jma_area_names():
     except Exception:
         return {}
 
-@st.cache_data(ttl=30)
+@st.cache_data(ttl=15)
 def fetch_p2p_earthquake_and_eew():
-    p2p_url = "https://api.p2pquake.net/v2/history?codes=551,556&limit=10"
+    p2p_url = "https://api.p2pquake.net/v2/history?codes=551,556&limit=5"
     try:
         req = urllib.request.Request(p2p_url, headers={'User-Agent': 'Mozilla/5.0'})
         with urllib.request.urlopen(req, timeout=5) as response:
@@ -274,14 +273,13 @@ def fetch_p2p_earthquake_and_eew():
                 quakes.append({
                     "time": eq.get("time", "日時不明"),
                     "hypocenter": hypo.get("name", "震源地不明"),
-                    "max_scale": p2p_scale_map.get(scale, "不明"),
+                    "max_scale": p2p_scale_map.get(scale, f"不明(scale:{scale})"),
                     "magnitude": eq.get("magnitude", "--"),
                     "depth": hypo.get("depth", "--")
                 })
         return {"success": True, "quakes": quakes, "eew": eew_alerts}
-    except Exception:
-        pass
-    return {"success": False, "quakes": [], "eew": []}
+    except Exception as e:
+        return {"success": False, "quakes": [], "eew": [], "error": str(e)}
 
 @st.cache_data(ttl=0)
 def fetch_jma_warning_level_areas_robust(region_name: str):
@@ -384,7 +382,6 @@ def fetch_region_prefecture_weather(region_name):
 st.markdown('<p class="custom-main-title">🛡️ 気象防災カルテ・インフラリアルリンクシステム</p>', unsafe_allow_html=True)
 st.markdown('<p class="custom-sub-title">災害時のリアルタイム気象状況・インフラ・地震・台風・Windyビジュアル・キキクル連動情報を一元管理します。</p>', unsafe_allow_html=True)
 
-# 操作ガイドの見出し
 with st.expander("📖 2軸表示システム設計仕様 & 操作ガイドのご案内", expanded=True):
     st.markdown("""
     <div class="guide-box-blue">
@@ -403,7 +400,6 @@ with st.expander("📖 2軸表示システム設計仕様 & 操作ガイドの�
     </div>
     """, unsafe_allow_html=True)
 
-# クイックリンク
 st.markdown("### 🚀 クイックリンク（外部サービス）")
 st.caption("主要な交通運行状況、天気予報、および防災・放射線情報のリアルタイム確認にご活用ください。")
 
@@ -411,63 +407,45 @@ st.markdown("#### 🚆 交通関係リンク")
 with st.container():
     st.markdown('<div class="traffic-link-section">', unsafe_allow_html=True)
     col_t1, col_t2, col_t3, col_t4 = st.columns(4)
-    with col_t1:
-        st.link_button("🚆 ジョルダン 運行情報", "https://www.jorudan.co.jp/unk/", use_container_width=True)
-    with col_t2:
-        st.link_button("🚗 JARTIC 道路交通情報", "https://www.jartic.or.jp/", use_container_width=True)
-    with col_t3:
-        st.link_button("🚄 JR東日本 列車運行情報", "https://www.jreast.co.jp/", use_container_width=True)
-    with col_t4:
-        st.empty()
+    with col_t1: st.link_button("🚆 ジョルダン 運行情報", "https://www.jorudan.co.jp/unk/", use_container_width=True)
+    with col_t2: st.link_button("🚗 JARTIC 道路交通情報", "https://www.jartic.or.jp/", use_container_width=True)
+    with col_t3: st.link_button("🚄 JR東日本 列車運行情報", "https://www.jreast.co.jp/", use_container_width=True)
+    with col_t4: st.empty()
     st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown("#### 🌍 Windy（高精度ビジュアル気象・台風）リンク")
 with st.container():
     st.markdown('<div class="windy-link-section">', unsafe_allow_html=True)
     col_wn1, col_wn2, col_wn3, col_wn4 = st.columns(4)
-    with col_wn1:
-        st.link_button("💨 Windy（風・気圧リアルタイム）", "https://www.windy.com/", use_container_width=True)
-    with col_wn2:
-        st.link_button("🌧️ Windy（雨量・雷レーダー）", "https://www.windy.com/-Rain-thunder-rain", use_container_width=True)
-    with col_wn3:
-        st.link_button("🌀 Windy（台風トラッカー）", "https://www.windy.com/-Typhoon-tracker", use_container_width=True)
-    with col_wn4:
-        st.link_button("🌡️ Windy（気温・湿度マップ）", "https://www.windy.com/-Temp-temperature", use_container_width=True)
+    with col_wn1: st.link_button("💨 Windy（風・気圧リアルタイム）", "https://www.windy.com/", use_container_width=True)
+    with col_wn2: st.link_button("🌧️ Windy（雨量・雷レーダー）", "https://www.windy.com/-Rain-thunder-rain", use_container_width=True)
+    with col_wn3: st.link_button("🌀 Windy（台風トラッカー）", "https://www.windy.com/-Typhoon-tracker", use_container_width=True)
+    with col_wn4: st.link_button("🌡️ Windy（気温・湿度マップ）", "https://www.windy.com/-Temp-temperature", use_container_width=True)
     st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown("#### 🌤️ 天気・防災関係リンク")
 with st.container():
     st.markdown('<div class="weather-link-section">', unsafe_allow_html=True)
     col_w1, col_w2, col_w3, col_w4 = st.columns(4)
-    with col_w1:
-        st.link_button("☀️ ウェザーニュース", "https://weathernews.jp/", use_container_width=True)
-    with col_w2:
-        st.link_button("🌐 Yahoo! 天気・災害", "https://weather.yahoo.co.jp/weather/", use_container_width=True)
-    with col_w3:
-        st.link_button("🌧️ Yahoo! 雨雲レーダー", "https://weather.yahoo.co.jp/weather/zoomradar/", use_container_width=True)
-    with col_w4:
-        st.link_button("🌀 気象庁 防災ポータル", "https://www.jma.go.jp/bosai/", use_container_width=True)
+    with col_w1: st.link_button("☀️ ウェザーニュース", "https://weathernews.jp/", use_container_width=True)
+    with col_w2: st.link_button("🌐 Yahoo! 天気・災害", "https://weather.yahoo.co.jp/weather/", use_container_width=True)
+    with col_w3: st.link_button("🌧️ Yahoo! 雨雲レーダー", "https://weather.yahoo.co.jp/weather/zoomradar/", use_container_width=True)
+    with col_w4: st.link_button("🌀 気象庁 防災ポータル", "https://www.jma.go.jp/bosai/", use_container_width=True)
 
     col_w5, col_w6, col_w7, col_w8 = st.columns(4)
-    with col_w5:
-        st.link_button("🌊 川の防災情報", "https://www.river.go.jp/", use_container_width=True)
-    with col_w6:
-        st.link_button("🗺️ 気象庁 キキクル", "https://www.jma.go.jp/bosai/map.html", use_container_width=True)
-    with col_w7:
-        st.link_button("☢️ 放射線モニタリング(RAMIS)", "https://www.ramis.nra.go.jp/", use_container_width=True)
-    with col_w8:
-        st.empty()
+    with col_w5: st.link_button("🌊 川の防災情報", "https://www.river.go.jp/", use_container_width=True)
+    with col_w6: st.link_button("🗺️ 気象庁 キキクル", "https://www.jma.go.jp/bosai/map.html", use_container_width=True)
+    with col_w7: st.link_button("☢️ 放射線モニタリング(RAMIS)", "https://www.ramis.nra.go.jp/", use_container_width=True)
+    with col_w8: st.empty()
     st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown("---")
 
-# 監視エリア選択
 st.markdown('<p class="custom-region-label">🌍 監視エリアを選択してください（地域を切り替えると各データが連動します）</p>', unsafe_allow_html=True)
 selected_region = st.selectbox("", list(REGION_CODES.keys()), index=2, key="region_selector", label_visibility="collapsed")
 
 st.markdown("---")
 
-# 2軸並列ダッシュボード
 st.markdown(f"## 📊 【{selected_region}エリア】 2軸リアルタイム警戒ダッシュボード")
 st.markdown("警報レベルと危険度レベルの基準判定レベルが違うため、選択されたエリアに対応する「気象庁の警報レベル」と「キキクルの危険度」を並列で確認できます。")
 
@@ -531,7 +509,6 @@ with st.container(border=True):
 
 st.markdown("---")
 
-# 地図表示
 reg_info = REGION_CODES.get(selected_region, REGION_CODES["関東"])
 st.markdown(f"### 🗺️ {selected_region}エリアの中心地図（中心：{reg_info['center_name']}）")
 st.caption("※地図上のピンや都道府県を選択すると、下部の管内都道府県別ステータス等の詳細データが連動して表示されます。")
@@ -541,12 +518,12 @@ st_folium(m, width="100%", height=300, key=f"map_{selected_region}")
 
 st.markdown("---")
 
-# 緊急地震速報 ＆ 地震情報セクション
+# ==================== 地震情報 ＆ 緊急地震速報 セクション ====================
 st.markdown("### 🚨 緊急地震速報 ＆ 直近の地震情報")
 
 eq_data = fetch_p2p_earthquake_and_eew()
 
-# 緊急地震速報（EEW）のアラート表示
+# 1. 緊急地震速報（EEW）のアラート表示
 if eq_data["success"] and eq_data["eew"]:
     latest_eew = eq_data["eew"][0]
     eew_html = f"""
@@ -560,17 +537,26 @@ if eq_data["success"] and eq_data["eew"]:
 else:
     st.info("現在、緊急地震速報の発表はありません（常時監視中）。")
 
-# 直近の地震履歴
+# 2. 直近の地震履歴の表示改善（リストから安全に取得して表示）
 if eq_data["success"] and eq_data["quakes"]:
-    latest = eq_data["quakes"][0]
-    with st.container(border=True):
-        col_e1, col_e2 = st.columns(2)
-        with col_e1:
-            st.markdown(f"**最大震度:** :red[**{latest['max_scale']}**]")
-            st.markdown(f"**震源地:** {latest['hypocenter']}")
-        with col_e2:
-            st.markdown(f"**発生日時:** {latest['time']}")
-            st.markdown(f"**規模:** M{latest['magnitude']} / 深さ:{latest['depth']}km")
+    st.markdown("#### 📍 直近の地震活動履歴（最新5件）")
+    for idx, q in enumerate(eq_data["quakes"]):
+        with st.container(border=True):
+            col_eq1, col_eq2 = st.columns(2)
+            with col_eq1:
+                st.markdown(f"**最大震度:** :red[**{q['max_scale']}**]")
+                st.markdown(f"**震源地:** {q['hypocenter']}")
+            with col_eq2:
+                st.markdown(f"**発生日時:** {q['time']}")
+                st.markdown(f"**規模:** M{q['magnitude']} / 深さ: {q['depth']}km")
+else:
+    # 取得失敗時やデータが空のときのフォールバック・デバッグ表示
+    if not eq_data["success"]:
+        st.warning(f"⚠️ 地震情報の取得に一時的な制限または通信エラーが発生しました。（詳細: {eq_data.get('error', '不明なエラー')}）")
+    else:
+        st.info("直近の地震履歴データが取得できませんでした。")
+
+st.markdown("---")
 
 c1, c2 = st.columns(2)
 w_data = fetch_jma_realtime_data(selected_region)
@@ -579,7 +565,6 @@ with c2: st.metric(label="エリア予想最高気温", value=f"{w_data['max_tem
 
 st.markdown("---")
 
-# 気象解説
 st.markdown(f'<p class="custom-underline-title">📡 {selected_region}地方の気象解説 ({w_data["office"]})</p>', unsafe_allow_html=True)
 for fc in w_data["forecasts"]: st.markdown(f"- {fc}")
 
@@ -591,7 +576,6 @@ for pw in fetch_region_prefecture_weather(selected_region):
 
 st.markdown("---")
 
-# インフラ・防災リンク集
 with st.container(border=True):
     st.markdown("**🔗 インフラ・交通・防災・キキクル・放射線関連リンク集（公式リアルタイム情報）**")
     st.markdown("""
