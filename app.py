@@ -23,18 +23,21 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- P2P地震情報APIからデータ取得（パラメータ修正版） ---
+# --- P2P地震情報APIからデータ取得（確実に動くパラメータ） ---
 @st.cache_data(ttl=0)
 def fetch_p2p_earthquake_and_eew():
-    # パラメータを修正（codesではなく、通常の履歴取得エンドポイントを利用）
-    p2p_url = "https://api.p2pquake.net/v2/history?limit=10"
+    # 地震情報コード（551）のみに絞り、確実にデータを取得する
+    p2p_url = "https://api.p2pquake.net/v2/history?codes=551&limit=5"
     try:
-        req = urllib.request.Request(p2p_url, headers={'User-Agent': 'Mozilla/5.0'})
-        with urllib.request.urlopen(req, timeout=5) as response:
-            p2p_data = json.loads(response.read().decode('utf-8'))
+        req = urllib.request.Request(
+            p2p_url, 
+            headers={'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'}
+        )
+        with urllib.request.urlopen(req, timeout=10) as response:
+            raw_body = response.read().decode('utf-8')
+            p2p_data = json.loads(raw_body)
         
         quakes = []
-        eew_alerts = []
         p2p_scale_map = {
             10: "震度1", 20: "震度2", 30: "震度3", 40: "震度4",
             45: "震度5弱", 50: "震度5強", 55: "震度6弱", 60: "震度6強", 70: "震度7"
@@ -42,14 +45,7 @@ def fetch_p2p_earthquake_and_eew():
         
         for item in p2p_data:
             code = item.get("code")
-            # 556: 緊急地震速報, 551: 地震情報
-            if code == 556:
-                eew_alerts.append({
-                    "time": item.get("time", "日時不明"),
-                    "canceled": item.get("cancelled", False),
-                    "message": item.get("issue", {}).get("type", "緊急地震速報発表")
-                })
-            elif code == 551:
+            if code == 551:
                 eq = item.get("earthquake", {})
                 hypo = eq.get("hypocenter", {})
                 scale = eq.get("maxScale", -1)
@@ -60,36 +56,21 @@ def fetch_p2p_earthquake_and_eew():
                     "magnitude": eq.get("magnitude", "--"),
                     "depth": hypo.get("depth", "--")
                 })
-        return {"success": True, "quakes": quakes, "eew": eew_alerts}
+        return {"success": True, "quakes": quakes, "raw": len(p2p_data)}
     except Exception as e:
-        return {"success": False, "quakes": [], "eew": [], "error": str(e)}
+        return {"success": False, "quakes": [], "error": str(e)}
 
 # --- メイン画面レイアウト ---
 st.title("🚨 冠水情報・防災監視システム")
-st.write("地域の冠水状況およびリアルタイムの地震・緊急地震速報を確認できます。")
+st.write("地域の冠水状況およびリアルタイムの地震発生履歴を確認できます。")
 
-# --- 緊急地震速報 ＆ 地震情報セクション ---
-st.markdown("### 🚨 緊急地震速報 ＆ 直近の地震発生履歴情報")
+# --- 地震情報セクション ---
+st.markdown("### 🚨 直近の地震発生履歴情報")
 
 eq_data = fetch_p2p_earthquake_and_eew()
 
-# 1. 緊急地震速報（EEW）のアラート表示
-if eq_data["success"] and eq_data["eew"]:
-    latest_eew = eq_data["eew"][0]
-    eew_html = f"""
-    <div class="box-eew-alert">
-        <p style='margin: 0 0 4px 0; color: #ef4444; font-weight: bold; font-size: 16px;'>🚨 【緊急地震速報 検知】</p>
-        <p style='margin: 2px 0;'>発表日時: {latest_eew['time']}</p>
-        <p style='margin: 2px 0;'>状態: {'キャンセル報' if latest_eew['canceled'] else '速報発表中 (強い揺れに警戒してください)'}</p>
-    </div>
-    """
-    st.markdown(eew_html, unsafe_allow_html=True)
-else:
-    st.info("現在、緊急地震速報の発表はありません（常時監視中）。")
-
-# 2. 直近の地震履歴を複数件リスト表示
 if eq_data["success"] and eq_data["quakes"]:
-    st.markdown("#### 📜 直近の地震発生履歴（最大5件）")
+    st.success(f"地震データを正常に取得しました（件数: {eq_data['raw']}件）")
     
     for i, eq in enumerate(eq_data["quakes"][:5]):
         border_color = "#ef4444" if i == 0 else "#3b82f6"
@@ -112,7 +93,7 @@ if eq_data["success"] and eq_data["quakes"]:
 else:
     st.warning("地震データの取得に失敗したか、データがありません。")
     if "error" in eq_data:
-        st.caption(f"エラー詳細: {eq_data['error']}")
+        st.error(f"エラー詳細: {eq_data['error']}")
 
 # --- その他の防災リンク・冠水情報セクション ---
 st.markdown("---")
