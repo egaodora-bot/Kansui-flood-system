@@ -268,7 +268,6 @@ def fetch_p2p_earthquake_and_eew():
                 time_str = eq.get("time", "日時不明")
                 hypo_name = hypo.get("name", "震源地不明")
                 
-                # 発生日時と震源地が一致するものを重複として除外
                 unique_key = (time_str, hypo_name)
                 if unique_key in seen_keys:
                     continue
@@ -582,7 +581,7 @@ with st.container(border=True):
     st.markdown("**🔗 インフラ・交通・防災・キキクル・放射線関連リンク集（公式リアルタイム情報）**")
     st.markdown("""
     * **【キキクル総合】** [気象庁 キキクル（危険度分布ポータル）](https://www.jma.go.jp/bosai/map.html)
-    * **【台風情報】** [気象庁 台風情報ページ](https://www.jma.go.jp/bosai/multi/cyclone/index.html?lang=jp)
+    * **【台風情報】** [気象庁 | あなたの街の防災情報](https://www.jma.go.jp/bosai/)
     * **【道路規制】** [JARTIC 日本道路交通情報センター](https://www.jartic.or.jp/)
     * **【雨雲ズーム】** [Yahoo!天気（雨雲ズームレーダー）](https://weather.yahoo.co.jp/weather/zoomradar/)
     * **【防災情報】** [気象庁 防災情報ポータル](https://www.jma.go.jp/bosai/)
